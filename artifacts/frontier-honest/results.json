@@ -1,0 +1,2128 @@
+{
+  "suite": "frontier_comparison_harness",
+  "environment": {
+    "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "processor": "arm"
+  },
+  "config": {
+    "baseline": "none",
+    "baseline_model": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "baseline_quant": "none",
+    "baseline_load_in_4bit": false,
+    "math_count": 20,
+    "context_tokens": [
+      512,
+      2048,
+      8192
+    ],
+    "size": 128,
+    "steps": 180,
+    "backend": "auto",
+    "pin_strength": 0.25,
+    "residual_carry": 0.08,
+    "max_budget": 180,
+    "temperature": 0.25,
+    "verifier_control": true,
+    "reset_between_tasks": true,
+    "max_new_tokens": 64
+  },
+  "task_count": 23,
+  "models": {
+    "phase_mesh": {
+      "status": "ok",
+      "topology": {
+        "full_state_path": "runs/frontier-honest/phase_mesh_topology.full.npz",
+        "q8_state_path": "runs/frontier-honest/phase_mesh_topology.q8.npz",
+        "full_state_bytes": 635826,
+        "q8_state_bytes": 65175,
+        "compression_ratio": 9.755673187571922,
+        "note": "q8 is compact quantized state, not mathematically lossless compression."
+      }
+    },
+    "baseline": {
+      "kind": "none",
+      "status": "not_requested"
+    }
+  },
+  "aggregates": {
+    "phase_mesh": {
+      "total_records": 23,
+      "ok_records": 23,
+      "error_records": 0,
+      "scored_records": 23,
+      "pass_rate": 0.13043478260869565,
+      "latency_s": {
+        "min": 0.18275316699873656,
+        "mean": 2.1409084529972775,
+        "max": 41.01539091701852,
+        "median": 0.2001811250229366
+      },
+      "rss_peak_bytes": {
+        "min": 62816256.0,
+        "mean": 63916121.04347826,
+        "max": 64569344.0,
+        "median": 63995904.0
+      },
+      "estimated_flops": {
+        "min": 20971520.0,
+        "mean": 20972104.347826086,
+        "max": 20972192.0,
+        "median": 20972192.0
+      },
+      "flops": {
+        "min": 20971520.0,
+        "mean": 20972104.347826086,
+        "max": 20972192.0,
+        "median": 20972192.0
+      },
+      "field_flops": {
+        "min": 20971520.0,
+        "mean": 20971520.0,
+        "max": 20971520.0,
+        "median": 20971520.0
+      },
+      "verifier_flops": {
+        "min": 0.0,
+        "mean": 584.3478260869565,
+        "max": 672.0,
+        "median": 672.0
+      },
+      "steps_used": {
+        "min": 40.0,
+        "mean": 40.0,
+        "max": 40.0,
+        "median": 40.0
+      },
+      "context_scaling": [
+        {
+          "task_id": "context-512",
+          "token_count": 512,
+          "passed": true,
+          "latency_s": 0.38819191697984934,
+          "rss_peak_bytes": 64012288,
+          "score": {
+            "gradient": 0.007314914858523473,
+            "target_gradient": 0.05
+          }
+        },
+        {
+          "task_id": "context-2048",
+          "token_count": 2048,
+          "passed": true,
+          "latency_s": 3.8936470839835238,
+          "rss_peak_bytes": 64126976,
+          "score": {
+            "gradient": 0.007531977017653349,
+            "target_gradient": 0.05
+          }
+        },
+        {
+          "task_id": "context-8192",
+          "token_count": 8192,
+          "passed": true,
+          "latency_s": 41.01539091701852,
+          "rss_peak_bytes": 64569344,
+          "score": {
+            "gradient": 0.007634970842764762,
+            "target_gradient": 0.05
+          }
+        }
+      ]
+    }
+  },
+  "records": [
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0000",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 11 * 13\nReturn only the final number.",
+        "expected": "143",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "11 * 13"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "143",
+        "numbers_found": [],
+        "decoded": {
+          "route": "plan",
+          "signature": "205c0356114d2fc7",
+          "dominant_sector": 5,
+          "confidence": 0.5069362957275175,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            51,
+            8312,
+            8021,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "plan",
+        "signature": "205c0356114d2fc7",
+        "confidence": 0.5069362957275175,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "11 * 13 evaluated to 143",
+          "payload": {
+            "actual": 143.0,
+            "expected": 143.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.0026434710276876505,
+        "final_prediction_error": 0.0031861130661021636,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9986097360223216,
+        "gradient": 0.004940449025278253,
+        "energy": 0.0005410044153432907,
+        "coherence_delta": 2.3616940060033897e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.2297600419842638,
+        "rss_start_bytes": 57966592,
+        "rss_end_bytes": 62783488,
+        "rss_peak_bytes": 62816256,
+        "max_rss_bytes": 62816256
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0001",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 18 * 24\nReturn only the final number.",
+        "expected": "432",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "18 * 24"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "432",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "04f20610eaf8a6be",
+          "dominant_sector": 6,
+          "confidence": 0.9503355872733027,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            704,
+            15590,
+            51,
+            9,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "04f20610eaf8a6be",
+        "confidence": 0.9503355872733027,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "18 * 24 evaluated to 432",
+          "payload": {
+            "actual": 432.0,
+            "expected": 432.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.0030784110851810346,
+        "final_prediction_error": 0.00376651913079586,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9977022872337501,
+        "gradient": 0.0054336592178389626,
+        "energy": 0.0007649411933852207,
+        "coherence_delta": 5.133019438174902e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.1880982500151731,
+        "rss_start_bytes": 62783488,
+        "rss_end_bytes": 62783488,
+        "rss_peak_bytes": 62816256,
+        "max_rss_bytes": 62816256
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0002",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 25 * 35\nReturn only the final number.",
+        "expected": "875",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "25 * 35"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "875",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "12e86c8c989c875d",
+          "dominant_sector": 6,
+          "confidence": 0.9457621107817771,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            850,
+            15504,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "12e86c8c989c875d",
+        "confidence": 0.9457621107817771,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "25 * 35 evaluated to 875",
+          "payload": {
+            "actual": 875.0,
+            "expected": 875.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.0035674342547960306,
+        "final_prediction_error": 0.003968991427670197,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9989875249845944,
+        "gradient": 0.00449898506585193,
+        "energy": 0.0005137350013568664,
+        "coherence_delta": 2.1591642204055184e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.19084766699234024,
+        "rss_start_bytes": 62783488,
+        "rss_end_bytes": 63913984,
+        "rss_peak_bytes": 63946752,
+        "max_rss_bytes": 63946752
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0003",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 32 * 46\nReturn only the final number.",
+        "expected": "1472",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "32 * 46"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "1472",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "949dc46cc4c90078",
+          "dominant_sector": 6,
+          "confidence": 0.9404237982764903,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            938,
+            15416,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "949dc46cc4c90078",
+        "confidence": 0.9404237982764903,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "32 * 46 evaluated to 1472",
+          "payload": {
+            "actual": 1472.0,
+            "expected": 1472.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.0044591050827970866,
+        "final_prediction_error": 0.004728699186881265,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9990450902205519,
+        "gradient": 0.004555272961168311,
+        "energy": 0.0005358979964361513,
+        "coherence_delta": 1.9324702847156594e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.20240479198400863,
+        "rss_start_bytes": 63913984,
+        "rss_end_bytes": 63913984,
+        "rss_peak_bytes": 63946752,
+        "max_rss_bytes": 63946752
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0004",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 39 * 57\nReturn only the final number.",
+        "expected": "2223",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "39 * 57"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "2223",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "7b6ec625552085d7",
+          "dominant_sector": 6,
+          "confidence": 0.9477700628742866,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            816,
+            15538,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "7b6ec625552085d7",
+        "confidence": 0.9477700628742866,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "39 * 57 evaluated to 2223",
+          "payload": {
+            "actual": 2223.0,
+            "expected": 2223.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.005380208638753739,
+        "final_prediction_error": 0.005600578435798529,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9988608233342668,
+        "gradient": 0.00500062557263691,
+        "energy": 0.0005504620831882776,
+        "coherence_delta": 2.3062524079797697e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.1925454160082154,
+        "rss_start_bytes": 63913984,
+        "rss_end_bytes": 63913984,
+        "rss_peak_bytes": 63946752,
+        "max_rss_bytes": 63946752
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0005",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 46 * 68\nReturn only the final number.",
+        "expected": "3128",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "46 * 68"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "3128",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "115ef4c3880efb4b",
+          "dominant_sector": 6,
+          "confidence": 0.9549197545513328,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            34,
+            695,
+            15655,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "115ef4c3880efb4b",
+        "confidence": 0.9549197545513328,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "46 * 68 evaluated to 3128",
+          "payload": {
+            "actual": 3128.0,
+            "expected": 3128.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.0063874170033811975,
+        "final_prediction_error": 0.0066343260700422535,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9988856605289086,
+        "gradient": 0.004978155850371107,
+        "energy": 0.0006207299566897286,
+        "coherence_delta": 2.622074427449661e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.2001811250229366,
+        "rss_start_bytes": 63930368,
+        "rss_end_bytes": 63930368,
+        "rss_peak_bytes": 63963136,
+        "max_rss_bytes": 63963136
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0006",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 53 * 79\nReturn only the final number.",
+        "expected": "4187",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "53 * 79"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "4187",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "54f403f92a43e953",
+          "dominant_sector": 6,
+          "confidence": 0.9663670973001086,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            510,
+            15844,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "54f403f92a43e953",
+        "confidence": 0.9663670973001086,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "53 * 79 evaluated to 4187",
+          "payload": {
+            "actual": 4187.0,
+            "expected": 4187.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.007263956893958101,
+        "final_prediction_error": 0.007357348560333634,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9987329327035158,
+        "gradient": 0.005332494887057021,
+        "energy": 0.0005819325951887068,
+        "coherence_delta": 1.6397187331484986e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.20391262500197627,
+        "rss_start_bytes": 63930368,
+        "rss_end_bytes": 63930368,
+        "rss_peak_bytes": 63963136,
+        "max_rss_bytes": 63963136
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0007",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 60 * 90\nReturn only the final number.",
+        "expected": "5400",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "60 * 90"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "5400",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "ed9ebd547ef0bde7",
+          "dominant_sector": 6,
+          "confidence": 0.9653146132595526,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            529,
+            15825,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "ed9ebd547ef0bde7",
+        "confidence": 0.9653146132595526,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "60 * 90 evaluated to 5400",
+          "payload": {
+            "actual": 5400.0,
+            "expected": 5400.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.008271692876754019,
+        "final_prediction_error": 0.008283811649567778,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9989331751997137,
+        "gradient": 0.004958942661555363,
+        "energy": 0.0006053608441353336,
+        "coherence_delta": 2.416094239787725e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.19146958299097605,
+        "rss_start_bytes": 63930368,
+        "rss_end_bytes": 63930368,
+        "rss_peak_bytes": 63963136,
+        "max_rss_bytes": 63963136
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0008",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 67 * 18\nReturn only the final number.",
+        "expected": "1206",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "67 * 18"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "1206",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "16c222242952a104",
+          "dominant_sector": 6,
+          "confidence": 0.9624630646387264,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            575,
+            15779,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "16c222242952a104",
+        "confidence": 0.9624630646387264,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "67 * 18 evaluated to 1206",
+          "payload": {
+            "actual": 1206.0,
+            "expected": 1206.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.009147905916720496,
+        "final_prediction_error": 0.009130400371877082,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9988471271990843,
+        "gradient": 0.00518135841117741,
+        "energy": 0.0006118010128013929,
+        "coherence_delta": 1.7251382177452257e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.19163091699010693,
+        "rss_start_bytes": 63946752,
+        "rss_end_bytes": 63946752,
+        "rss_peak_bytes": 63979520,
+        "max_rss_bytes": 63979520
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0009",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 74 * 29\nReturn only the final number.",
+        "expected": "2146",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "74 * 29"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "2146",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "5be991333693acac",
+          "dominant_sector": 6,
+          "confidence": 0.9666211680599298,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            483,
+            15850,
+            21,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "5be991333693acac",
+        "confidence": 0.9666211680599298,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "74 * 29 evaluated to 2146",
+          "payload": {
+            "actual": 2146.0,
+            "expected": 2146.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.010017979011773804,
+        "final_prediction_error": 0.009975748093188503,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9985226518490264,
+        "gradient": 0.005604638784388656,
+        "energy": 0.0006926628201362518,
+        "coherence_delta": 2.9596939415288404e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.1852388750121463,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0010",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 81 * 40\nReturn only the final number.",
+        "expected": "3240",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "81 * 40"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "3240",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "00a1654d4d5749bf",
+          "dominant_sector": 6,
+          "confidence": 0.9445559954059174,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            868,
+            15486,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "00a1654d4d5749bf",
+        "confidence": 0.9445559954059174,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "81 * 40 evaluated to 3240",
+          "payload": {
+            "actual": 3240.0,
+            "expected": 3240.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.010872910086140662,
+        "final_prediction_error": 0.01080103469699603,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.998779593149302,
+        "gradient": 0.005319281706187797,
+        "energy": 0.0006568086093956351,
+        "coherence_delta": 2.1217498449188632e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.2059522079944145,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0011",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 88 * 51\nReturn only the final number.",
+        "expected": "4488",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "88 * 51"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "4488",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "16f9286c202d589b",
+          "dominant_sector": 6,
+          "confidence": 0.9654925056299833,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            523,
+            15831,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "16f9286c202d589b",
+        "confidence": 0.9654925056299833,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "88 * 51 evaluated to 4488",
+          "payload": {
+            "actual": 4488.0,
+            "expected": 4488.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.011597661728227997,
+        "final_prediction_error": 0.011484745729583554,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9985792216929554,
+        "gradient": 0.005591108336101521,
+        "energy": 0.0007050480921778663,
+        "coherence_delta": 2.1349689905525437e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.1980500839999877,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0012",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 95 * 62\nReturn only the final number.",
+        "expected": "5890",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "95 * 62"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "5890",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "0e8dc3085242209d",
+          "dominant_sector": 6,
+          "confidence": 0.9525414658860113,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            25,
+            745,
+            15614,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "0e8dc3085242209d",
+        "confidence": 0.9525414658860113,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "95 * 62 evaluated to 5890",
+          "payload": {
+            "actual": 5890.0,
+            "expected": 5890.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.012276999296624522,
+        "final_prediction_error": 0.012048362671133945,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9991195986208656,
+        "gradient": 0.0044422005352557315,
+        "energy": 0.0005223285372404612,
+        "coherence_delta": 1.5727822914368694e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.2010522909986321,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0013",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 13 * 73\nReturn only the final number.",
+        "expected": "949",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "13 * 73"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "949",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "4b9136dbb6da3626",
+          "dominant_sector": 6,
+          "confidence": 0.945239997340087,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            67,
+            815,
+            15502,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "4b9136dbb6da3626",
+        "confidence": 0.945239997340087,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "13 * 73 evaluated to 949",
+          "payload": {
+            "actual": 949.0,
+            "expected": 949.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.013079594040139031,
+        "final_prediction_error": 0.012971206628857156,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9982186599289223,
+        "gradient": 0.006073804488195773,
+        "energy": 0.0008650514581278921,
+        "coherence_delta": 4.264553304289542e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.18275316699873656,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0014",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 20 * 84\nReturn only the final number.",
+        "expected": "1680",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "20 * 84"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "1680",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "db79d6bf0274e775",
+          "dominant_sector": 6,
+          "confidence": 0.9539255649008411,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            30,
+            715,
+            15639,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "db79d6bf0274e775",
+        "confidence": 0.9539255649008411,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "20 * 84 evaluated to 1680",
+          "payload": {
+            "actual": 1680.0,
+            "expected": 1680.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.013681091395189327,
+        "final_prediction_error": 0.013485665682478437,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9988509443565189,
+        "gradient": 0.005383602215215401,
+        "energy": 0.0007745179331956952,
+        "coherence_delta": 1.8898024950364523e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.18322199999238364,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0015",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 27 * 95\nReturn only the final number.",
+        "expected": "2565",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "27 * 95"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "2565",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "ed3365f476cc5dd7",
+          "dominant_sector": 6,
+          "confidence": 0.9589214820486812,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            55,
+            603,
+            15726,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "ed3365f476cc5dd7",
+        "confidence": 0.9589214820486812,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "27 * 95 evaluated to 2565",
+          "payload": {
+            "actual": 2565.0,
+            "expected": 2565.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.014196879945706212,
+        "final_prediction_error": 0.01406297451264645,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9982622364683373,
+        "gradient": 0.006197706099049986,
+        "energy": 0.0009387905922758953,
+        "coherence_delta": 4.579464139709e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.1828025830036495,
+        "rss_start_bytes": 63963136,
+        "rss_end_bytes": 63963136,
+        "rss_peak_bytes": 63995904,
+        "max_rss_bytes": 63995904
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0016",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 34 * 23\nReturn only the final number.",
+        "expected": "782",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "34 * 23"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "782",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "5a4d08b12ffeed89",
+          "dominant_sector": 6,
+          "confidence": 0.9666303432381687,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            26,
+            512,
+            15846,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "5a4d08b12ffeed89",
+        "confidence": 0.9666303432381687,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "34 * 23 evaluated to 782",
+          "payload": {
+            "actual": 782.0,
+            "expected": 782.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.014703681487807981,
+        "final_prediction_error": 0.014479134041225285,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9989984904265091,
+        "gradient": 0.004904077990878327,
+        "energy": 0.000803157589747233,
+        "coherence_delta": 2.2621392282151653e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.19802399998297915,
+        "rss_start_bytes": 63979520,
+        "rss_end_bytes": 63979520,
+        "rss_peak_bytes": 64012288,
+        "max_rss_bytes": 64012288
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0017",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 41 * 34\nReturn only the final number.",
+        "expected": "1394",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "41 * 34"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "1394",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "acc1c361db28b226",
+          "dominant_sector": 6,
+          "confidence": 0.9628248543437739,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            26,
+            574,
+            15784,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "acc1c361db28b226",
+        "confidence": 0.9628248543437739,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "41 * 34 evaluated to 1394",
+          "payload": {
+            "actual": 1394.0,
+            "expected": 1394.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.0151921402809199,
+        "final_prediction_error": 0.014947391120380082,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.998954339672901,
+        "gradient": 0.0052047247366894065,
+        "energy": 0.0008600019588934993,
+        "coherence_delta": 2.4757284590726236e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.20347041700733826,
+        "rss_start_bytes": 63979520,
+        "rss_end_bytes": 63979520,
+        "rss_peak_bytes": 64012288,
+        "max_rss_bytes": 64012288
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0018",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 48 * 45\nReturn only the final number.",
+        "expected": "2160",
+        "difficulty": "easy",
+        "token_count": 6,
+        "metadata": {
+          "expression": "48 * 45"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "2160",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "db77e2b7fe7c8806",
+          "dominant_sector": 6,
+          "confidence": 0.9538151903984787,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            26,
+            668,
+            15645,
+            45,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "db77e2b7fe7c8806",
+        "confidence": 0.9538151903984787,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "48 * 45 evaluated to 2160",
+          "payload": {
+            "actual": 2160.0,
+            "expected": 2160.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.015615773424980888,
+        "final_prediction_error": 0.015371339413500933,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9979439355575324,
+        "gradient": 0.006406628065924571,
+        "energy": 0.0010630490165957902,
+        "coherence_delta": 4.868714220296333e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.2066519589861855,
+        "rss_start_bytes": 63979520,
+        "rss_end_bytes": 63979520,
+        "rss_peak_bytes": 64012288,
+        "max_rss_bytes": 64012288
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "math-0019",
+        "suite": "generated_math",
+        "kind": "arithmetic",
+        "prompt": "Calculate: 55 * 56\nReturn only the final number.",
+        "expected": "3080",
+        "difficulty": "hard",
+        "token_count": 6,
+        "metadata": {
+          "expression": "55 * 56"
+        }
+      },
+      "status": "ok",
+      "passed": false,
+      "score_mode": "mesh-decoded-numeric-exact-match",
+      "score": {
+        "expected": "3080",
+        "numbers_found": [],
+        "decoded": {
+          "route": "compress",
+          "signature": "5163f072fd576fca",
+          "dominant_sector": 6,
+          "confidence": 0.9555005076750309,
+          "sector_histogram": [
+            0,
+            0,
+            0,
+            0,
+            26,
+            640,
+            15673,
+            40,
+            5,
+            0,
+            0,
+            0
+          ]
+        },
+        "reason": "The current mesh decoder emits route/signature fields, not a fluent numeric answer."
+      },
+      "output": {
+        "route": "compress",
+        "signature": "5163f072fd576fca",
+        "confidence": 0.9555005076750309,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "arithmetic-expected",
+          "message": "55 * 56 evaluated to 3080",
+          "payload": {
+            "actual": 3080.0,
+            "expected": 3080.0
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.01598611797097117,
+        "final_prediction_error": 0.015726818466487887,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9979026255630942,
+        "gradient": 0.006376928795957661,
+        "energy": 0.0010757424280590962,
+        "coherence_delta": 5.02881236496e-05,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 672,
+      "verifier_calls_counted": 2,
+      "flops": 20972192,
+      "estimated_flops": 20972192,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.20559649998904206,
+        "rss_start_bytes": 63979520,
+        "rss_end_bytes": 63979520,
+        "rss_peak_bytes": 64012288,
+        "max_rss_bytes": 64012288
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "context-512",
+        "suite": "synthetic_context",
+        "kind": "context",
+        "prompt": "ctx_000000 ctx_000001 ctx_000002 ctx_000003 ctx_000004 ctx_000005 ctx_000006 ctx_000007 ctx_000008 ctx_000009 ctx_000010 ctx_000011 ctx_000012 ctx_000013 ctx_000014 ctx_000015 ctx_000016 ctx_000017 ctx_000018 ctx_000019 ctx_000020 ctx_000021 ctx_000022 ctx_000023 ctx_000024 ctx_000025 ctx_000026 ctx_000027 ctx_000028 ctx_000029 ctx_000030 ctx_000031 ctx_000032 ctx_000033 ctx_000034 ctx_000035 ctx_000036 ctx_000037 ctx_000038 ctx_000039 ctx_000040 ctx_000041 ctx_000042 ctx_000043 ctx_000044 ctx_000045 ctx_000046 ctx_000047 ctx_000048 ctx_000049 ctx_000050 ctx_000051 ctx_000052 ctx_000053 ctx_000054 ctx_000055 ctx_000056 ctx_000057 ctx_000058 ctx_000059 ctx_000060 ctx_000061 ctx_000062 ctx_000063 ctx_000064 ctx_000065 ctx_000066 ctx_000067 ctx_000068 ctx_000069 ctx_000070 ctx_000071 ctx_000072 ctx_000073 ctx_000074 ctx_000075 ctx_000076 ctx_000077 ctx_000078 ctx_000079 ctx_000080 ctx_000081 ctx_000082 ctx_000083 ctx_000084 ctx_000085 ctx_000086 ctx_000087 ctx_000088 ctx_000089 ctx_000090 ctx_000091 ctx_000092 ctx_000093 ctx_000094 ctx_000095 ctx_000096 ctx_000097 ctx_000098 ctx_000099 ctx_000100 ctx_000101 ctx_000102 ctx_000103 ctx_000104 ctx_000105 ctx_000106 ctx_000107 ctx_000108 ctx_000109 ctx_000110 ctx_000111 ctx_000112 ctx_000113 ctx_000114 ctx_000115 ctx_000116 ctx_000117 ctx_000118 ctx_000119 ctx_000120 ctx_000121 ctx_000122 ctx_000123 ctx_000124 ctx_000125 ctx_000126 ctx_000127 ctx_000128 ctx_000129 ctx_000130 ctx_000131 ctx_000132 ctx_000133 ctx_000134 ctx_000135 ctx_000136 ctx_000137 ctx_000138 ctx_000139 ctx_000140 ctx_000141 ctx_000142 ctx_000143 ctx_000144 ctx_000145 ctx_000146 ctx_000147 ctx_000148 ctx_000149 ctx_000150 ctx_000151 ctx_000152 ctx_000153 ctx_000154 ctx_000155 ctx_000156 ctx_000157 ctx_000158 ctx_000159 ctx_000160 ctx_000161 ctx_000162 ctx_000163 ctx_000164 ctx_000165 ctx_000166 ctx_000167 ctx_000168 ctx_000169 ctx_000170 ctx_000171 ctx_000172 ctx_000173 ctx_000174 ctx_000175 ctx_000176 ctx_000177 ctx_000178 ctx_000179 ctx_000180 ctx_000181 ctx_000182 ctx_000183 ctx_000184 ctx_000185 ctx_000186 ctx_000187 ctx_000188 ctx_000189 ctx_000190 ctx_000191 ctx_000192 ctx_000193 ctx_000194 ctx_000195 ctx_000196 ctx_000197 ctx_000198 ctx_000199 ctx_000200 ctx_000201 ctx_000202 ctx_000203 ctx_000204 ctx_000205 ctx_000206 ctx_000207 ctx_000208 ctx_000209 ctx_000210 ctx_000211 ctx_000212 ctx_000213 ctx_000214 ctx_000215 ctx_000216 ctx_000217 ctx_000218 ctx_000219 ctx_000220 ctx_000221 ctx_000222 ctx_000223 ctx_000224 ctx_000225 ctx_000226 ctx_000227 ctx_000228 ctx_000229 ctx_000230 ctx_000231 ctx_000232 ctx_000233 ctx_000234 ctx_000235 ctx_000236 ctx_000237 ctx_000238 ctx_000239 ctx_000240 ctx_000241 ctx_000242 ctx_000243 ctx_000244 ctx_000245 ctx_000246 ctx_000247 ctx_000248 ctx_000249 ctx_000250 ctx_000251 ctx_000252 ctx_000253 ctx_000254 ctx_000255 ctx_000256 ctx_000257 ctx_000258 ctx_000259 ctx_000260 ctx_000261 ctx_000262 ctx_000263 ctx_000264 ctx_000265 ctx_000266 ctx_000267 ctx_000268 ctx_000269 ctx_000270 ctx_000271 ctx_000272 ctx_000273 ctx_000274 ctx_000275 ctx_000276 ctx_000277 ctx_000278 ctx_000279 ctx_000280 ctx_000281 ctx_000282 ctx_000283 ctx_000284 ctx_000285 ctx_000286 ctx_000287 ctx_000288 ctx_000289 ctx_000290 ctx_000291 ctx_000292 ctx_000293 ctx_000294 ctx_000295 ctx_000296 ctx_000297 ctx_000298 ctx_000299 ctx_000300 ctx_000301 ctx_000302 ctx_000303 ctx_000304 ctx_000305 ctx_000306 ctx_000307 ctx_000308 ctx_000309 ctx_000310 ctx_000311 ctx_000312 ctx_000313 ctx_000314 ctx_000315 ctx_000316 ctx_000317 ctx_000318 ctx_000319 ctx_000320 ctx_000321 ctx_000322 ctx_000323 ctx_000324 ctx_000325 ctx_000326 ctx_000327 ctx_000328 ctx_000329 ctx_000330 ctx_000331 ctx_000332 ctx_000333 ctx_000334 ctx_000335 ctx_000336 ctx_000337 ctx_000338 ctx_000339 ctx_000340 ctx_000341 ctx_000342 ctx_000343 ctx_000344 ctx_000345 ctx_000346 ctx_000347 ctx_000348 ctx_000349 ctx_000350 ctx_000351 ctx_000352 ctx_000353 ctx_000354 ctx_000355 ctx_000356 ctx_000357 ctx_000358 ctx_000359 ctx_000360 ctx_000361 ctx_000362 ctx_000363 ctx_000364 ctx_000365 ctx_000366 ctx_000367 ctx_000368 ctx_000369 ctx_000370 ctx_000371 ctx_000372 ctx_000373 ctx_000374 ctx_000375 ctx_000376 ctx_000377 ctx_000378 ctx_000379 ctx_000380 ctx_000381 ctx_000382 ctx_000383 ctx_000384 ctx_000385 ctx_000386 ctx_000387 ctx_000388 ctx_000389 ctx_000390 ctx_000391 ctx_000392 ctx_000393 ctx_000394 ctx_000395 ctx_000396 ctx_000397 ctx_000398 ctx_000399 ctx_000400 ctx_000401 ctx_000402 ctx_000403 ctx_000404 ctx_000405 ctx_000406 ctx_000407 ctx_000408 ctx_000409 ctx_000410 ctx_000411 ctx_000412 ctx_000413 ctx_000414 ctx_000415 ctx_000416 ctx_000417 ctx_000418 ctx_000419 ctx_000420 ctx_000421 ctx_000422 ctx_000423 ctx_000424 ctx_000425 ctx_000426 ctx_000427 ctx_000428 ctx_000429 ctx_000430 ctx_000431 ctx_000432 ctx_000433 ctx_000434 ctx_000435 ctx_000436 ctx_000437 ctx_000438 ctx_000439 ctx_000440 ctx_000441 ctx_000442 ctx_000443 ctx_000444 ctx_000445 ctx_000446 ctx_000447 ctx_000448 ctx_000449 ctx_000450 ctx_000451 ctx_000452 ctx_000453 ctx_000454 ctx_000455 ctx_000456 ctx_000457 ctx_000458 ctx_000459 ctx_000460 ctx_000461 ctx_000462 ctx_000463 ctx_000464 ctx_000465 ctx_000466 ctx_000467 ctx_000468 ctx_000469 ctx_000470 ctx_000471 ctx_000472 ctx_000473 ctx_000474 ctx_000475 ctx_000476 ctx_000477 ctx_000478 ctx_000479 ctx_000480 ctx_000481 ctx_000482 ctx_000483 ctx_000484 ctx_000485 ctx_000486 ctx_000487 ctx_000488 ctx_000489 ctx_000490 ctx_000491 ctx_000492 ctx_000493 ctx_000494 ctx_000495 ctx_000496 ctx_000497 ctx_000498 ctx_000499 ctx_000500 ctx_000501 ctx_000502 ctx_000503 ctx_000504 ctx_000505 ctx_000506 ctx_000507 ctx_000508 ctx_000509 ctx_000510 ctx_000511\nQuestion: which early token is marked for recall? ctx_000005",
+        "expected": "ctx_000005",
+        "difficulty": "medium",
+        "token_count": 512,
+        "metadata": {
+          "target_index": 5
+        }
+      },
+      "status": "ok",
+      "passed": true,
+      "score_mode": "context-gradient",
+      "score": {
+        "gradient": 0.007314914858523473,
+        "target_gradient": 0.05
+      },
+      "output": {
+        "route": "compress",
+        "signature": "6dbde93871d0ee51",
+        "confidence": 0.8816083111469315,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "coherence",
+          "message": "coherence threshold passed",
+          "payload": {
+            "coherence": 0.9997823329303266,
+            "threshold": 0.96
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.015640409283873075,
+        "final_prediction_error": 0.015267685550000694,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.9997823329303266,
+        "gradient": 0.007314914858523473,
+        "energy": 0.0004680315114099295,
+        "coherence_delta": 2.356237669975947e-06,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 0,
+      "verifier_calls_counted": 0,
+      "flops": 20971520,
+      "estimated_flops": 20971520,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 0.38819191697984934,
+        "rss_start_bytes": 63979520,
+        "rss_end_bytes": 63979520,
+        "rss_peak_bytes": 64012288,
+        "max_rss_bytes": 64012288
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "context-2048",
+        "suite": "synthetic_context",
+        "kind": "context",
+        "prompt": "ctx_000000 ctx_000001 ctx_000002 ctx_000003 ctx_000004 ctx_000005 ctx_000006 ctx_000007 ctx_000008 ctx_000009 ctx_000010 ctx_000011 ctx_000012 ctx_000013 ctx_000014 ctx_000015 ctx_000016 ctx_000017 ctx_000018 ctx_000019 ctx_000020 ctx_000021 ctx_000022 ctx_000023 ctx_000024 ctx_000025 ctx_000026 ctx_000027 ctx_000028 ctx_000029 ctx_000030 ctx_000031 ctx_000032 ctx_000033 ctx_000034 ctx_000035 ctx_000036 ctx_000037 ctx_000038 ctx_000039 ctx_000040 ctx_000041 ctx_000042 ctx_000043 ctx_000044 ctx_000045 ctx_000046 ctx_000047 ctx_000048 ctx_000049 ctx_000050 ctx_000051 ctx_000052 ctx_000053 ctx_000054 ctx_000055 ctx_000056 ctx_000057 ctx_000058 ctx_000059 ctx_000060 ctx_000061 ctx_000062 ctx_000063 ctx_000064 ctx_000065 ctx_000066 ctx_000067 ctx_000068 ctx_000069 ctx_000070 ctx_000071 ctx_000072 ctx_000073 ctx_000074 ctx_000075 ctx_000076 ctx_000077 ctx_000078 ctx_000079 ctx_000080 ctx_000081 ctx_000082 ctx_000083 ctx_000084 ctx_000085 ctx_000086 ctx_000087 ctx_000088 ctx_000089 ctx_000090 ctx_000091 ctx_000092 ctx_000093 ctx_000094 ctx_000095 ctx_000096 ctx_000097 ctx_000098 ctx_000099 ctx_000100 ctx_000101 ctx_000102 ctx_000103 ctx_000104 ctx_000105 ctx_000106 ctx_000107 ctx_000108 ctx_000109 ctx_000110 ctx_000111 ctx_000112 ctx_000113 ctx_000114 ctx_000115 ctx_000116 ctx_000117 ctx_000118 ctx_000119 ctx_000120 ctx_000121 ctx_000122 ctx_000123 ctx_000124 ctx_000125 ctx_000126 ctx_000127 ctx_000128 ctx_000129 ctx_000130 ctx_000131 ctx_000132 ctx_000133 ctx_000134 ctx_000135 ctx_000136 ctx_000137 ctx_000138 ctx_000139 ctx_000140 ctx_000141 ctx_000142 ctx_000143 ctx_000144 ctx_000145 ctx_000146 ctx_000147 ctx_000148 ctx_000149 ctx_000150 ctx_000151 ctx_000152 ctx_000153 ctx_000154 ctx_000155 ctx_000156 ctx_000157 ctx_000158 ctx_000159 ctx_000160 ctx_000161 ctx_000162 ctx_000163 ctx_000164 ctx_000165 ctx_000166 ctx_000167 ctx_000168 ctx_000169 ctx_000170 ctx_000171 ctx_000172 ctx_000173 ctx_000174 ctx_000175 ctx_000176 ctx_000177 ctx_000178 ctx_000179 ctx_000180 ctx_000181 ctx_000182 ctx_000183 ctx_000184 ctx_000185 ctx_000186 ctx_000187 ctx_000188 ctx_000189 ctx_000190 ctx_000191 ctx_000192 ctx_000193 ctx_000194 ctx_000195 ctx_000196 ctx_000197 ctx_000198 ctx_000199 ctx_000200 ctx_000201 ctx_000202 ctx_000203 ctx_000204 ctx_000205 ctx_000206 ctx_000207 ctx_000208 ctx_000209 ctx_000210 ctx_000211 ctx_000212 ctx_000213 ctx_000214 ctx_000215 ctx_000216 ctx_000217 ctx_000218 ctx_000219 ctx_000220 ctx_000221 ctx_000222 ctx_000223 ctx_000224 ctx_000225 ctx_000226 ctx_000227 ctx_000228 ctx_000229 ctx_000230 ctx_000231 ctx_000232 ctx_000233 ctx_000234 ctx_000235 ctx_000236 ctx_000237 ctx_000238 ctx_000239 ctx_000240 ctx_000241 ctx_000242 ctx_000243 ctx_000244 ctx_000245 ctx_000246 ctx_000247 ctx_000248 ctx_000249 ctx_000250 ctx_000251 ctx_000252 ctx_000253 ctx_000254 ctx_000255 ctx_000256 ctx_000257 ctx_000258 ctx_000259 ctx_000260 ctx_000261 ctx_000262 ctx_000263 ctx_000264 ctx_000265 ctx_000266 ctx_000267 ctx_000268 ctx_000269 ctx_000270 ctx_000271 ctx_000272 ctx_000273 ctx_000274 ctx_000275 ctx_000276 ctx_000277 ctx_000278 ctx_000279 ctx_000280 ctx_000281 ctx_000282 ctx_000283 ctx_000284 ctx_000285 ctx_000286 ctx_000287 ctx_000288 ctx_000289 ctx_000290 ctx_000291 ctx_000292 ctx_000293 ctx_000294 ctx_000295 ctx_000296 ctx_000297 ctx_000298 ctx_000299 ctx_000300 ctx_000301 ctx_000302 ctx_000303 ctx_000304 ctx_000305 ctx_000306 ctx_000307 ctx_000308 ctx_000309 ctx_000310 ctx_000311 ctx_000312 ctx_000313 ctx_000314 ctx_000315 ctx_000316 ctx_000317 ctx_000318 ctx_000319 ctx_000320 ctx_000321 ctx_000322 ctx_000323 ctx_000324 ctx_000325 ctx_000326 ctx_000327 ctx_000328 ctx_000329 ctx_000330 ctx_000331 ctx_000332 ctx_000333 ctx_000334 ctx_000335 ctx_000336 ctx_000337 ctx_000338 ctx_000339 ctx_000340 ctx_000341 ctx_000342 ctx_000343 ctx_000344 ctx_000345 ctx_000346 ctx_000347 ctx_000348 ctx_000349 ctx_000350 ctx_000351 ctx_000352 ctx_000353 ctx_000354 ctx_000355 ctx_000356 ctx_000357 ctx_000358 ctx_000359 ctx_000360 ctx_000361 ctx_000362 ctx_000363 ctx_000364 ctx_000365 ctx_000366 ctx_000367 ctx_000368 ctx_000369 ctx_000370 ctx_000371 ctx_000372 ctx_000373 ctx_000374 ctx_000375 ctx_000376 ctx_000377 ctx_000378 ctx_000379 ctx_000380 ctx_000381 ctx_000382 ctx_000383 ctx_000384 ctx_000385 ctx_000386 ctx_000387 ctx_000388 ctx_000389 ctx_000390 ctx_000391 ctx_000392 ctx_000393 ctx_000394 ctx_000395 ctx_000396 ctx_000397 ctx_000398 ctx_000399 ctx_000400 ctx_000401 ctx_000402 ctx_000403 ctx_000404 ctx_000405 ctx_000406 ctx_000407 ctx_000408 ctx_000409 ctx_000410 ctx_000411 ctx_000412 ctx_000413 ctx_000414 ctx_000415 ctx_000416 ctx_000417 ctx_000418 ctx_000419 ctx_000420 ctx_000421 ctx_000422 ctx_000423 ctx_000424 ctx_000425 ctx_000426 ctx_000427 ctx_000428 ctx_000429 ctx_000430 ctx_000431 ctx_000432 ctx_000433 ctx_000434 ctx_000435 ctx_000436 ctx_000437 ctx_000438 ctx_000439 ctx_000440 ctx_000441 ctx_000442 ctx_000443 ctx_000444 ctx_000445 ctx_000446 ctx_000447 ctx_000448 ctx_000449 ctx_000450 ctx_000451 ctx_000452 ctx_000453 ctx_000454 ctx_000455 ctx_000456 ctx_000457 ctx_000458 ctx_000459 ctx_000460 ctx_000461 ctx_000462 ctx_000463 ctx_000464 ctx_000465 ctx_000466 ctx_000467 ctx_000468 ctx_000469 ctx_000470 ctx_000471 ctx_000472 ctx_000473 ctx_000474 ctx_000475 ctx_000476 ctx_000477 ctx_000478 ctx_000479 ctx_000480 ctx_000481 ctx_000482 ctx_000483 ctx_000484 ctx_000485 ctx_000486 ctx_000487 ctx_000488 ctx_000489 ctx_000490 ctx_000491 ctx_000492 ctx_000493 ctx_000494 ctx_000495 ctx_000496 ctx_000497 ctx_000498 ctx_000499 ctx_000500 ctx_000501 ctx_000502 ctx_000503 ctx_000504 ctx_000505 ctx_000506 ctx_000507 ctx_000508 ctx_000509 ctx_000510 ctx_000511 ctx_000512 ctx_000513 ctx_000514 ctx_000515 ctx_000516 ctx_000517 ctx_000518 ctx_000519 ctx_000520 ctx_000521 ctx_000522 ctx_000523 ctx_000524 ctx_000525 ctx_000526 ctx_000527 ctx_000528 ctx_000529 ctx_000530 ctx_000531 ctx_000532 ctx_000533 ctx_000534 ctx_000535 ctx_000536 ctx_000537 ctx_000538 ctx_000539 ctx_000540 ctx_000541 ctx_000542 ctx_000543 ctx_000544 ctx_000545 ctx_000546 ctx_000547 ctx_000548 ctx_000549 ctx_000550 ctx_000551 ctx_000552 ctx_000553 ctx_000554 ctx_000555 ctx_000556 ctx_000557 ctx_000558 ctx_000559 ctx_000560 ctx_000561 ctx_000562 ctx_000563 ctx_000564 ctx_000565 ctx_000566 ctx_000567 ctx_000568 ctx_000569 ctx_000570 ctx_000571 ctx_000572 ctx_000573 ctx_000574 ctx_000575 ctx_000576 ctx_000577 ctx_000578 ctx_000579 ctx_000580 ctx_000581 ctx_000582 ctx_000583 ctx_000584 ctx_000585 ctx_000586 ctx_000587 ctx_000588 ctx_000589 ctx_000590 ctx_000591 ctx_000592 ctx_000593 ctx_000594 ctx_000595 ctx_000596 ctx_000597 ctx_000598 ctx_000599 ctx_000600 ctx_000601 ctx_000602 ctx_000603 ctx_000604 ctx_000605 ctx_000606 ctx_000607 ctx_000608 ctx_000609 ctx_000610 ctx_000611 ctx_000612 ctx_000613 ctx_000614 ctx_000615 ctx_000616 ctx_000617 ctx_000618 ctx_000619 ctx_000620 ctx_000621 ctx_000622 ctx_000623 ctx_000624 ctx_000625 ctx_000626 ctx_000627 ctx_000628 ctx_000629 ctx_000630 ctx_000631 ctx_000632 ctx_000633 ctx_000634 ctx_000635 ctx_000636 ctx_000637 ctx_000638 ctx_000639 ctx_000640 ctx_000641 ctx_000642 ctx_000643 ctx_000644 ctx_000645 ctx_000646 ctx_000647 ctx_000648 ctx_000649 ctx_000650 ctx_000651 ctx_000652 ctx_000653 ctx_000654 ctx_000655 ctx_000656 ctx_000657 ctx_000658 ctx_000659 ctx_000660 ctx_000661 ctx_000662 ctx_000663 ctx_000664 ctx_000665 ctx_000666 ctx_000667 ctx_000668 ctx_000669 ctx_000670 ctx_000671 ctx_000672 ctx_000673 ctx_000674 ctx_000675 ctx_000676 ctx_000677 ctx_000678 ctx_000679 ctx_000680 ctx_000681 ctx_000682 ctx_000683 ctx_000684 ctx_000685 ctx_000686 ctx_000687 ctx_000688 ctx_000689 ctx_000690 ctx_000691 ctx_000692 ctx_000693 ctx_000694 ctx_000695 ctx_000696 ctx_000697 ctx_000698 ctx_000699 ctx_000700 ctx_000701 ctx_000702 ctx_000703 ctx_000704 ctx_000705 ctx_000706 ctx_000707 ctx_000708 ctx_000709 ctx_000710 ctx_000711 ctx_000712 ctx_000713 ctx_000714 ctx_000715 ctx_000716 ctx_000717 ctx_000718 ctx_000719 ctx_000720 ctx_000721 ctx_000722 ctx_000723 ctx_000724 ctx_000725 ctx_000726 ctx_000727 ctx_000728 ctx_000729 ctx_000730 ctx_000731 ctx_000732 ctx_000733 ctx_000734 ctx_000735 ctx_000736 ctx_000737 ctx_000738 ctx_000739 ctx_000740 ctx_000741 ctx_000742 ctx_000743 ctx_000744 ctx_000745 ctx_000746 ctx_000747 ctx_000748 ctx_000749 ctx_000750 ctx_000751 ctx_000752 ctx_000753 ctx_000754 ctx_000755 ctx_000756 ctx_000757 ctx_000758 ctx_000759 ctx_000760 ctx_000761 ctx_000762 ctx_000763 ctx_000764 ctx_000765 ctx_000766 ctx_000767 ctx_000768 ctx_000769 ctx_000770 ctx_000771 ctx_000772 ctx_000773 ctx_000774 ctx_000775 ctx_000776 ctx_000777 ctx_000778 ctx_000779 ctx_000780 ctx_000781 ctx_000782 ctx_000783 ctx_000784 ctx_000785 ctx_000786 ctx_000787 ctx_000788 ctx_000789 ctx_000790 ctx_000791 ctx_000792 ctx_000793 ctx_000794 ctx_000795 ctx_000796 ctx_000797 ctx_000798 ctx_000799 ctx_000800 ctx_000801 ctx_000802 ctx_000803 ctx_000804 ctx_000805 ctx_000806 ctx_000807 ctx_000808 ctx_000809 ctx_000810 ctx_000811 ctx_000812 ctx_000813 ctx_000814 ctx_000815 ctx_000816 ctx_000817 ctx_000818 ctx_000819 ctx_000820 ctx_000821 ctx_000822 ctx_000823 ctx_000824 ctx_000825 ctx_000826 ctx_000827 ctx_000828 ctx_000829 ctx_000830 ctx_000831 ctx_000832 ctx_000833 ctx_000834 ctx_000835 ctx_000836 ctx_000837 ctx_000838 ctx_000839 ctx_000840 ctx_000841 ctx_000842 ctx_000843 ctx_000844 ctx_000845 ctx_000846 ctx_000847 ctx_000848 ctx_000849 ctx_000850 ctx_000851 ctx_000852 ctx_000853 ctx_000854 ctx_000855 ctx_000856 ctx_000857 ctx_000858 ctx_000859 ctx_000860 ctx_000861 ctx_000862 ctx_000863 ctx_000864 ctx_000865 ctx_000866 ctx_000867 ctx_000868 ctx_000869 ctx_000870 ctx_000871 ctx_000872 ctx_000873 ctx_000874 ctx_000875 ctx_000876 ctx_000877 ctx_000878 ctx_000879 ctx_000880 ctx_000881 ctx_000882 ctx_000883 ctx_000884 ctx_000885 ctx_000886 ctx_000887 ctx_000888 ctx_000889 ctx_000890 ctx_000891 ctx_000892 ctx_000893 ctx_000894 ctx_000895 ctx_000896 ctx_000897 ctx_000898 ctx_000899 ctx_000900 ctx_000901 ctx_000902 ctx_000903 ctx_000904 ctx_000905 ctx_000906 ctx_000907 ctx_000908 ctx_000909 ctx_000910 ctx_000911 ctx_000912 ctx_000913 ctx_000914 ctx_000915 ctx_000916 ctx_000917 ctx_000918 ctx_000919 ctx_000920 ctx_000921 ctx_000922 ctx_000923 ctx_000924 ctx_000925 ctx_000926 ctx_000927 ctx_000928 ctx_000929 ctx_000930 ctx_000931 ctx_000932 ctx_000933 ctx_000934 ctx_000935 ctx_000936 ctx_000937 ctx_000938 ctx_000939 ctx_000940 ctx_000941 ctx_000942 ctx_000943 ctx_000944 ctx_000945 ctx_000946 ctx_000947 ctx_000948 ctx_000949 ctx_000950 ctx_000951 ctx_000952 ctx_000953 ctx_000954 ctx_000955 ctx_000956 ctx_000957 ctx_000958 ctx_000959 ctx_000960 ctx_000961 ctx_000962 ctx_000963 ctx_000964 ctx_000965 ctx_000966 ctx_000967 ctx_000968 ctx_000969 ctx_000970 ctx_000971 ctx_000972 ctx_000973 ctx_000974 ctx_000975 ctx_000976 ctx_000977 ctx_000978 ctx_000979 ctx_000980 ctx_000981 ctx_000982 ctx_000983 ctx_000984 ctx_000985 ctx_000986 ctx_000987 ctx_000988 ctx_000989 ctx_000990 ctx_000991 ctx_000992 ctx_000993 ctx_000994 ctx_000995 ctx_000996 ctx_000997 ctx_000998 ctx_000999 ctx_001000 ctx_001001 ctx_001002 ctx_001003 ctx_001004 ctx_001005 ctx_001006 ctx_001007 ctx_001008 ctx_001009 ctx_001010 ctx_001011 ctx_001012 ctx_001013 ctx_001014 ctx_001015 ctx_001016 ctx_001017 ctx_001018 ctx_001019 ctx_001020 ctx_001021 ctx_001022 ctx_001023 ctx_001024 ctx_001025 ctx_001026 ctx_001027 ctx_001028 ctx_001029 ctx_001030 ctx_001031 ctx_001032 ctx_001033 ctx_001034 ctx_001035 ctx_001036 ctx_001037 ctx_001038 ctx_001039 ctx_001040 ctx_001041 ctx_001042 ctx_001043 ctx_001044 ctx_001045 ctx_001046 ctx_001047 ctx_001048 ctx_001049 ctx_001050 ctx_001051 ctx_001052 ctx_001053 ctx_001054 ctx_001055 ctx_001056 ctx_001057 ctx_001058 ctx_001059 ctx_001060 ctx_001061 ctx_001062 ctx_001063 ctx_001064 ctx_001065 ctx_001066 ctx_001067 ctx_001068 ctx_001069 ctx_001070 ctx_001071 ctx_001072 ctx_001073 ctx_001074 ctx_001075 ctx_001076 ctx_001077 ctx_001078 ctx_001079 ctx_001080 ctx_001081 ctx_001082 ctx_001083 ctx_001084 ctx_001085 ctx_001086 ctx_001087 ctx_001088 ctx_001089 ctx_001090 ctx_001091 ctx_001092 ctx_001093 ctx_001094 ctx_001095 ctx_001096 ctx_001097 ctx_001098 ctx_001099 ctx_001100 ctx_001101 ctx_001102 ctx_001103 ctx_001104 ctx_001105 ctx_001106 ctx_001107 ctx_001108 ctx_001109 ctx_001110 ctx_001111 ctx_001112 ctx_001113 ctx_001114 ctx_001115 ctx_001116 ctx_001117 ctx_001118 ctx_001119 ctx_001120 ctx_001121 ctx_001122 ctx_001123 ctx_001124 ctx_001125 ctx_001126 ctx_001127 ctx_001128 ctx_001129 ctx_001130 ctx_001131 ctx_001132 ctx_001133 ctx_001134 ctx_001135 ctx_001136 ctx_001137 ctx_001138 ctx_001139 ctx_001140 ctx_001141 ctx_001142 ctx_001143 ctx_001144 ctx_001145 ctx_001146 ctx_001147 ctx_001148 ctx_001149 ctx_001150 ctx_001151 ctx_001152 ctx_001153 ctx_001154 ctx_001155 ctx_001156 ctx_001157 ctx_001158 ctx_001159 ctx_001160 ctx_001161 ctx_001162 ctx_001163 ctx_001164 ctx_001165 ctx_001166 ctx_001167 ctx_001168 ctx_001169 ctx_001170 ctx_001171 ctx_001172 ctx_001173 ctx_001174 ctx_001175 ctx_001176 ctx_001177 ctx_001178 ctx_001179 ctx_001180 ctx_001181 ctx_001182 ctx_001183 ctx_001184 ctx_001185 ctx_001186 ctx_001187 ctx_001188 ctx_001189 ctx_001190 ctx_001191 ctx_001192 ctx_001193 ctx_001194 ctx_001195 ctx_001196 ctx_001197 ctx_001198 ctx_001199 ctx_001200 ctx_001201 ctx_001202 ctx_001203 ctx_001204 ctx_001205 ctx_001206 ctx_001207 ctx_001208 ctx_001209 ctx_001210 ctx_001211 ctx_001212 ctx_001213 ctx_001214 ctx_001215 ctx_001216 ctx_001217 ctx_001218 ctx_001219 ctx_001220 ctx_001221 ctx_001222 ctx_001223 ctx_001224 ctx_001225 ctx_001226 ctx_001227 ctx_001228 ctx_001229 ctx_001230 ctx_001231 ctx_001232 ctx_001233 ctx_001234 ctx_001235 ctx_001236 ctx_001237 ctx_001238 ctx_001239 ctx_001240 ctx_001241 ctx_001242 ctx_001243 ctx_001244 ctx_001245 ctx_001246 ctx_001247 ctx_001248 ctx_001249 ctx_001250 ctx_001251 ctx_001252 ctx_001253 ctx_001254 ctx_001255 ctx_001256 ctx_001257 ctx_001258 ctx_001259 ctx_001260 ctx_001261 ctx_001262 ctx_001263 ctx_001264 ctx_001265 ctx_001266 ctx_001267 ctx_001268 ctx_001269 ctx_001270 ctx_001271 ctx_001272 ctx_001273 ctx_001274 ctx_001275 ctx_001276 ctx_001277 ctx_001278 ctx_001279 ctx_001280 ctx_001281 ctx_001282 ctx_001283 ctx_001284 ctx_001285 ctx_001286 ctx_001287 ctx_001288 ctx_001289 ctx_001290 ctx_001291 ctx_001292 ctx_001293 ctx_001294 ctx_001295 ctx_001296 ctx_001297 ctx_001298 ctx_001299 ctx_001300 ctx_001301 ctx_001302 ctx_001303 ctx_001304 ctx_001305 ctx_001306 ctx_001307 ctx_001308 ctx_001309 ctx_001310 ctx_001311 ctx_001312 ctx_001313 ctx_001314 ctx_001315 ctx_001316 ctx_001317 ctx_001318 ctx_001319 ctx_001320 ctx_001321 ctx_001322 ctx_001323 ctx_001324 ctx_001325 ctx_001326 ctx_001327 ctx_001328 ctx_001329 ctx_001330 ctx_001331 ctx_001332 ctx_001333 ctx_001334 ctx_001335 ctx_001336 ctx_001337 ctx_001338 ctx_001339 ctx_001340 ctx_001341 ctx_001342 ctx_001343 ctx_001344 ctx_001345 ctx_001346 ctx_001347 ctx_001348 ctx_001349 ctx_001350 ctx_001351 ctx_001352 ctx_001353 ctx_001354 ctx_001355 ctx_001356 ctx_001357 ctx_001358 ctx_001359 ctx_001360 ctx_001361 ctx_001362 ctx_001363 ctx_001364 ctx_001365 ctx_001366 ctx_001367 ctx_001368 ctx_001369 ctx_001370 ctx_001371 ctx_001372 ctx_001373 ctx_001374 ctx_001375 ctx_001376 ctx_001377 ctx_001378 ctx_001379 ctx_001380 ctx_001381 ctx_001382 ctx_001383 ctx_001384 ctx_001385 ctx_001386 ctx_001387 ctx_001388 ctx_001389 ctx_001390 ctx_001391 ctx_001392 ctx_001393 ctx_001394 ctx_001395 ctx_001396 ctx_001397 ctx_001398 ctx_001399 ctx_001400 ctx_001401 ctx_001402 ctx_001403 ctx_001404 ctx_001405 ctx_001406 ctx_001407 ctx_001408 ctx_001409 ctx_001410 ctx_001411 ctx_001412 ctx_001413 ctx_001414 ctx_001415 ctx_001416 ctx_001417 ctx_001418 ctx_001419 ctx_001420 ctx_001421 ctx_001422 ctx_001423 ctx_001424 ctx_001425 ctx_001426 ctx_001427 ctx_001428 ctx_001429 ctx_001430 ctx_001431 ctx_001432 ctx_001433 ctx_001434 ctx_001435 ctx_001436 ctx_001437 ctx_001438 ctx_001439 ctx_001440 ctx_001441 ctx_001442 ctx_001443 ctx_001444 ctx_001445 ctx_001446 ctx_001447 ctx_001448 ctx_001449 ctx_001450 ctx_001451 ctx_001452 ctx_001453 ctx_001454 ctx_001455 ctx_001456 ctx_001457 ctx_001458 ctx_001459 ctx_001460 ctx_001461 ctx_001462 ctx_001463 ctx_001464 ctx_001465 ctx_001466 ctx_001467 ctx_001468 ctx_001469 ctx_001470 ctx_001471 ctx_001472 ctx_001473 ctx_001474 ctx_001475 ctx_001476 ctx_001477 ctx_001478 ctx_001479 ctx_001480 ctx_001481 ctx_001482 ctx_001483 ctx_001484 ctx_001485 ctx_001486 ctx_001487 ctx_001488 ctx_001489 ctx_001490 ctx_001491 ctx_001492 ctx_001493 ctx_001494 ctx_001495 ctx_001496 ctx_001497 ctx_001498 ctx_001499 ctx_001500 ctx_001501 ctx_001502 ctx_001503 ctx_001504 ctx_001505 ctx_001506 ctx_001507 ctx_001508 ctx_001509 ctx_001510 ctx_001511 ctx_001512 ctx_001513 ctx_001514 ctx_001515 ctx_001516 ctx_001517 ctx_001518 ctx_001519 ctx_001520 ctx_001521 ctx_001522 ctx_001523 ctx_001524 ctx_001525 ctx_001526 ctx_001527 ctx_001528 ctx_001529 ctx_001530 ctx_001531 ctx_001532 ctx_001533 ctx_001534 ctx_001535 ctx_001536 ctx_001537 ctx_001538 ctx_001539 ctx_001540 ctx_001541 ctx_001542 ctx_001543 ctx_001544 ctx_001545 ctx_001546 ctx_001547 ctx_001548 ctx_001549 ctx_001550 ctx_001551 ctx_001552 ctx_001553 ctx_001554 ctx_001555 ctx_001556 ctx_001557 ctx_001558 ctx_001559 ctx_001560 ctx_001561 ctx_001562 ctx_001563 ctx_001564 ctx_001565 ctx_001566 ctx_001567 ctx_001568 ctx_001569 ctx_001570 ctx_001571 ctx_001572 ctx_001573 ctx_001574 ctx_001575 ctx_001576 ctx_001577 ctx_001578 ctx_001579 ctx_001580 ctx_001581 ctx_001582 ctx_001583 ctx_001584 ctx_001585 ctx_001586 ctx_001587 ctx_001588 ctx_001589 ctx_001590 ctx_001591 ctx_001592 ctx_001593 ctx_001594 ctx_001595 ctx_001596 ctx_001597 ctx_001598 ctx_001599 ctx_001600 ctx_001601 ctx_001602 ctx_001603 ctx_001604 ctx_001605 ctx_001606 ctx_001607 ctx_001608 ctx_001609 ctx_001610 ctx_001611 ctx_001612 ctx_001613 ctx_001614 ctx_001615 ctx_001616 ctx_001617 ctx_001618 ctx_001619 ctx_001620 ctx_001621 ctx_001622 ctx_001623 ctx_001624 ctx_001625 ctx_001626 ctx_001627 ctx_001628 ctx_001629 ctx_001630 ctx_001631 ctx_001632 ctx_001633 ctx_001634 ctx_001635 ctx_001636 ctx_001637 ctx_001638 ctx_001639 ctx_001640 ctx_001641 ctx_001642 ctx_001643 ctx_001644 ctx_001645 ctx_001646 ctx_001647 ctx_001648 ctx_001649 ctx_001650 ctx_001651 ctx_001652 ctx_001653 ctx_001654 ctx_001655 ctx_001656 ctx_001657 ctx_001658 ctx_001659 ctx_001660 ctx_001661 ctx_001662 ctx_001663 ctx_001664 ctx_001665 ctx_001666 ctx_001667 ctx_001668 ctx_001669 ctx_001670 ctx_001671 ctx_001672 ctx_001673 ctx_001674 ctx_001675 ctx_001676 ctx_001677 ctx_001678 ctx_001679 ctx_001680 ctx_001681 ctx_001682 ctx_001683 ctx_001684 ctx_001685 ctx_001686 ctx_001687 ctx_001688 ctx_001689 ctx_001690 ctx_001691 ctx_001692 ctx_001693 ctx_001694 ctx_001695 ctx_001696 ctx_001697 ctx_001698 ctx_001699 ctx_001700 ctx_001701 ctx_001702 ctx_001703 ctx_001704 ctx_001705 ctx_001706 ctx_001707 ctx_001708 ctx_001709 ctx_001710 ctx_001711 ctx_001712 ctx_001713 ctx_001714 ctx_001715 ctx_001716 ctx_001717 ctx_001718 ctx_001719 ctx_001720 ctx_001721 ctx_001722 ctx_001723 ctx_001724 ctx_001725 ctx_001726 ctx_001727 ctx_001728 ctx_001729 ctx_001730 ctx_001731 ctx_001732 ctx_001733 ctx_001734 ctx_001735 ctx_001736 ctx_001737 ctx_001738 ctx_001739 ctx_001740 ctx_001741 ctx_001742 ctx_001743 ctx_001744 ctx_001745 ctx_001746 ctx_001747 ctx_001748 ctx_001749 ctx_001750 ctx_001751 ctx_001752 ctx_001753 ctx_001754 ctx_001755 ctx_001756 ctx_001757 ctx_001758 ctx_001759 ctx_001760 ctx_001761 ctx_001762 ctx_001763 ctx_001764 ctx_001765 ctx_001766 ctx_001767 ctx_001768 ctx_001769 ctx_001770 ctx_001771 ctx_001772 ctx_001773 ctx_001774 ctx_001775 ctx_001776 ctx_001777 ctx_001778 ctx_001779 ctx_001780 ctx_001781 ctx_001782 ctx_001783 ctx_001784 ctx_001785 ctx_001786 ctx_001787 ctx_001788 ctx_001789 ctx_001790 ctx_001791 ctx_001792 ctx_001793 ctx_001794 ctx_001795 ctx_001796 ctx_001797 ctx_001798 ctx_001799 ctx_001800 ctx_001801 ctx_001802 ctx_001803 ctx_001804 ctx_001805 ctx_001806 ctx_001807 ctx_001808 ctx_001809 ctx_001810 ctx_001811 ctx_001812 ctx_001813 ctx_001814 ctx_001815 ctx_001816 ctx_001817 ctx_001818 ctx_001819 ctx_001820 ctx_001821 ctx_001822 ctx_001823 ctx_001824 ctx_001825 ctx_001826 ctx_001827 ctx_001828 ctx_001829 ctx_001830 ctx_001831 ctx_001832 ctx_001833 ctx_001834 ctx_001835 ctx_001836 ctx_001837 ctx_001838 ctx_001839 ctx_001840 ctx_001841 ctx_001842 ctx_001843 ctx_001844 ctx_001845 ctx_001846 ctx_001847 ctx_001848 ctx_001849 ctx_001850 ctx_001851 ctx_001852 ctx_001853 ctx_001854 ctx_001855 ctx_001856 ctx_001857 ctx_001858 ctx_001859 ctx_001860 ctx_001861 ctx_001862 ctx_001863 ctx_001864 ctx_001865 ctx_001866 ctx_001867 ctx_001868 ctx_001869 ctx_001870 ctx_001871 ctx_001872 ctx_001873 ctx_001874 ctx_001875 ctx_001876 ctx_001877 ctx_001878 ctx_001879 ctx_001880 ctx_001881 ctx_001882 ctx_001883 ctx_001884 ctx_001885 ctx_001886 ctx_001887 ctx_001888 ctx_001889 ctx_001890 ctx_001891 ctx_001892 ctx_001893 ctx_001894 ctx_001895 ctx_001896 ctx_001897 ctx_001898 ctx_001899 ctx_001900 ctx_001901 ctx_001902 ctx_001903 ctx_001904 ctx_001905 ctx_001906 ctx_001907 ctx_001908 ctx_001909 ctx_001910 ctx_001911 ctx_001912 ctx_001913 ctx_001914 ctx_001915 ctx_001916 ctx_001917 ctx_001918 ctx_001919 ctx_001920 ctx_001921 ctx_001922 ctx_001923 ctx_001924 ctx_001925 ctx_001926 ctx_001927 ctx_001928 ctx_001929 ctx_001930 ctx_001931 ctx_001932 ctx_001933 ctx_001934 ctx_001935 ctx_001936 ctx_001937 ctx_001938 ctx_001939 ctx_001940 ctx_001941 ctx_001942 ctx_001943 ctx_001944 ctx_001945 ctx_001946 ctx_001947 ctx_001948 ctx_001949 ctx_001950 ctx_001951 ctx_001952 ctx_001953 ctx_001954 ctx_001955 ctx_001956 ctx_001957 ctx_001958 ctx_001959 ctx_001960 ctx_001961 ctx_001962 ctx_001963 ctx_001964 ctx_001965 ctx_001966 ctx_001967 ctx_001968 ctx_001969 ctx_001970 ctx_001971 ctx_001972 ctx_001973 ctx_001974 ctx_001975 ctx_001976 ctx_001977 ctx_001978 ctx_001979 ctx_001980 ctx_001981 ctx_001982 ctx_001983 ctx_001984 ctx_001985 ctx_001986 ctx_001987 ctx_001988 ctx_001989 ctx_001990 ctx_001991 ctx_001992 ctx_001993 ctx_001994 ctx_001995 ctx_001996 ctx_001997 ctx_001998 ctx_001999 ctx_002000 ctx_002001 ctx_002002 ctx_002003 ctx_002004 ctx_002005 ctx_002006 ctx_002007 ctx_002008 ctx_002009 ctx_002010 ctx_002011 ctx_002012 ctx_002013 ctx_002014 ctx_002015 ctx_002016 ctx_002017 ctx_002018 ctx_002019 ctx_002020 ctx_002021 ctx_002022 ctx_002023 ctx_002024 ctx_002025 ctx_002026 ctx_002027 ctx_002028 ctx_002029 ctx_002030 ctx_002031 ctx_002032 ctx_002033 ctx_002034 ctx_002035 ctx_002036 ctx_002037 ctx_002038 ctx_002039 ctx_002040 ctx_002041 ctx_002042 ctx_002043 ctx_002044 ctx_002045 ctx_002046 ctx_002047\nQuestion: which early token is marked for recall? ctx_000005",
+        "expected": "ctx_000005",
+        "difficulty": "medium",
+        "token_count": 2048,
+        "metadata": {
+          "target_index": 5
+        }
+      },
+      "status": "ok",
+      "passed": true,
+      "score_mode": "context-gradient",
+      "score": {
+        "gradient": 0.007531977017653349,
+        "target_gradient": 0.05
+      },
+      "output": {
+        "route": "compress",
+        "signature": "5028f6b50c6d63bc",
+        "confidence": 0.8723148061331856,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "coherence",
+          "message": "coherence threshold passed",
+          "payload": {
+            "coherence": 0.99974633777505,
+            "threshold": 0.96
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.015686533129005885,
+        "final_prediction_error": 0.015300293038524981,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.99974633777505,
+        "gradient": 0.007531977017653349,
+        "energy": 0.0005036838176723844,
+        "coherence_delta": 3.3894521378474707e-07,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 0,
+      "verifier_calls_counted": 0,
+      "flops": 20971520,
+      "estimated_flops": 20971520,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 3.8936470839835238,
+        "rss_start_bytes": 63995904,
+        "rss_end_bytes": 64094208,
+        "rss_peak_bytes": 64126976,
+        "max_rss_bytes": 64126976
+      }
+    },
+    {
+      "model": "phase_mesh",
+      "task": {
+        "id": "context-8192",
+        "suite": "synthetic_context",
+        "kind": "context",
+        "prompt": "ctx_000000 ctx_000001 ctx_000002 ctx_000003 ctx_000004 ctx_000005 ctx_000006 ctx_000007 ctx_000008 ctx_000009 ctx_000010 ctx_000011 ctx_000012 ctx_000013 ctx_000014 ctx_000015 ctx_000016 ctx_000017 ctx_000018 ctx_000019 ctx_000020 ctx_000021 ctx_000022 ctx_000023 ctx_000024 ctx_000025 ctx_000026 ctx_000027 ctx_000028 ctx_000029 ctx_000030 ctx_000031 ctx_000032 ctx_000033 ctx_000034 ctx_000035 ctx_000036 ctx_000037 ctx_000038 ctx_000039 ctx_000040 ctx_000041 ctx_000042 ctx_000043 ctx_000044 ctx_000045 ctx_000046 ctx_000047 ctx_000048 ctx_000049 ctx_000050 ctx_000051 ctx_000052 ctx_000053 ctx_000054 ctx_000055 ctx_000056 ctx_000057 ctx_000058 ctx_000059 ctx_000060 ctx_000061 ctx_000062 ctx_000063 ctx_000064 ctx_000065 ctx_000066 ctx_000067 ctx_000068 ctx_000069 ctx_000070 ctx_000071 ctx_000072 ctx_000073 ctx_000074 ctx_000075 ctx_000076 ctx_000077 ctx_000078 ctx_000079 ctx_000080 ctx_000081 ctx_000082 ctx_000083 ctx_000084 ctx_000085 ctx_000086 ctx_000087 ctx_000088 ctx_000089 ctx_000090 ctx_000091 ctx_000092 ctx_000093 ctx_000094 ctx_000095 ctx_000096 ctx_000097 ctx_000098 ctx_000099 ctx_000100 ctx_000101 ctx_000102 ctx_000103 ctx_000104 ctx_000105 ctx_000106 ctx_000107 ctx_000108 ctx_000109 ctx_000110 ctx_000111 ctx_000112 ctx_000113 ctx_000114 ctx_000115 ctx_000116 ctx_000117 ctx_000118 ctx_000119 ctx_000120 ctx_000121 ctx_000122 ctx_000123 ctx_000124 ctx_000125 ctx_000126 ctx_000127 ctx_000128 ctx_000129 ctx_000130 ctx_000131 ctx_000132 ctx_000133 ctx_000134 ctx_000135 ctx_000136 ctx_000137 ctx_000138 ctx_000139 ctx_000140 ctx_000141 ctx_000142 ctx_000143 ctx_000144 ctx_000145 ctx_000146 ctx_000147 ctx_000148 ctx_000149 ctx_000150 ctx_000151 ctx_000152 ctx_000153 ctx_000154 ctx_000155 ctx_000156 ctx_000157 ctx_000158 ctx_000159 ctx_000160 ctx_000161 ctx_000162 ctx_000163 ctx_000164 ctx_000165 ctx_000166 ctx_000167 ctx_000168 ctx_000169 ctx_000170 ctx_000171 ctx_000172 ctx_000173 ctx_000174 ctx_000175 ctx_000176 ctx_000177 ctx_000178 ctx_000179 ctx_000180 ctx_000181 ctx_000182 ctx_000183 ctx_000184 ctx_000185 ctx_000186 ctx_000187 ctx_000188 ctx_000189 ctx_000190 ctx_000191 ctx_000192 ctx_000193 ctx_000194 ctx_000195 ctx_000196 ctx_000197 ctx_000198 ctx_000199 ctx_000200 ctx_000201 ctx_000202 ctx_000203 ctx_000204 ctx_000205 ctx_000206 ctx_000207 ctx_000208 ctx_000209 ctx_000210 ctx_000211 ctx_000212 ctx_000213 ctx_000214 ctx_000215 ctx_000216 ctx_000217 ctx_000218 ctx_000219 ctx_000220 ctx_000221 ctx_000222 ctx_000223 ctx_000224 ctx_000225 ctx_000226 ctx_000227 ctx_000228 ctx_000229 ctx_000230 ctx_000231 ctx_000232 ctx_000233 ctx_000234 ctx_000235 ctx_000236 ctx_000237 ctx_000238 ctx_000239 ctx_000240 ctx_000241 ctx_000242 ctx_000243 ctx_000244 ctx_000245 ctx_000246 ctx_000247 ctx_000248 ctx_000249 ctx_000250 ctx_000251 ctx_000252 ctx_000253 ctx_000254 ctx_000255 ctx_000256 ctx_000257 ctx_000258 ctx_000259 ctx_000260 ctx_000261 ctx_000262 ctx_000263 ctx_000264 ctx_000265 ctx_000266 ctx_000267 ctx_000268 ctx_000269 ctx_000270 ctx_000271 ctx_000272 ctx_000273 ctx_000274 ctx_000275 ctx_000276 ctx_000277 ctx_000278 ctx_000279 ctx_000280 ctx_000281 ctx_000282 ctx_000283 ctx_000284 ctx_000285 ctx_000286 ctx_000287 ctx_000288 ctx_000289 ctx_000290 ctx_000291 ctx_000292 ctx_000293 ctx_000294 ctx_000295 ctx_000296 ctx_000297 ctx_000298 ctx_000299 ctx_000300 ctx_000301 ctx_000302 ctx_000303 ctx_000304 ctx_000305 ctx_000306 ctx_000307 ctx_000308 ctx_000309 ctx_000310 ctx_000311 ctx_000312 ctx_000313 ctx_000314 ctx_000315 ctx_000316 ctx_000317 ctx_000318 ctx_000319 ctx_000320 ctx_000321 ctx_000322 ctx_000323 ctx_000324 ctx_000325 ctx_000326 ctx_000327 ctx_000328 ctx_000329 ctx_000330 ctx_000331 ctx_000332 ctx_000333 ctx_000334 ctx_000335 ctx_000336 ctx_000337 ctx_000338 ctx_000339 ctx_000340 ctx_000341 ctx_000342 ctx_000343 ctx_000344 ctx_000345 ctx_000346 ctx_000347 ctx_000348 ctx_000349 ctx_000350 ctx_000351 ctx_000352 ctx_000353 ctx_000354 ctx_000355 ctx_000356 ctx_000357 ctx_000358 ctx_000359 ctx_000360 ctx_000361 ctx_000362 ctx_000363 ctx_000364 ctx_000365 ctx_000366 ctx_000367 ctx_000368 ctx_000369 ctx_000370 ctx_000371 ctx_000372 ctx_000373 ctx_000374 ctx_000375 ctx_000376 ctx_000377 ctx_000378 ctx_000379 ctx_000380 ctx_000381 ctx_000382 ctx_000383 ctx_000384 ctx_000385 ctx_000386 ctx_000387 ctx_000388 ctx_000389 ctx_000390 ctx_000391 ctx_000392 ctx_000393 ctx_000394 ctx_000395 ctx_000396 ctx_000397 ctx_000398 ctx_000399 ctx_000400 ctx_000401 ctx_000402 ctx_000403 ctx_000404 ctx_000405 ctx_000406 ctx_000407 ctx_000408 ctx_000409 ctx_000410 ctx_000411 ctx_000412 ctx_000413 ctx_000414 ctx_000415 ctx_000416 ctx_000417 ctx_000418 ctx_000419 ctx_000420 ctx_000421 ctx_000422 ctx_000423 ctx_000424 ctx_000425 ctx_000426 ctx_000427 ctx_000428 ctx_000429 ctx_000430 ctx_000431 ctx_000432 ctx_000433 ctx_000434 ctx_000435 ctx_000436 ctx_000437 ctx_000438 ctx_000439 ctx_000440 ctx_000441 ctx_000442 ctx_000443 ctx_000444 ctx_000445 ctx_000446 ctx_000447 ctx_000448 ctx_000449 ctx_000450 ctx_000451 ctx_000452 ctx_000453 ctx_000454 ctx_000455 ctx_000456 ctx_000457 ctx_000458 ctx_000459 ctx_000460 ctx_000461 ctx_000462 ctx_000463 ctx_000464 ctx_000465 ctx_000466 ctx_000467 ctx_000468 ctx_000469 ctx_000470 ctx_000471 ctx_000472 ctx_000473 ctx_000474 ctx_000475 ctx_000476 ctx_000477 ctx_000478 ctx_000479 ctx_000480 ctx_000481 ctx_000482 ctx_000483 ctx_000484 ctx_000485 ctx_000486 ctx_000487 ctx_000488 ctx_000489 ctx_000490 ctx_000491 ctx_000492 ctx_000493 ctx_000494 ctx_000495 ctx_000496 ctx_000497 ctx_000498 ctx_000499 ctx_000500 ctx_000501 ctx_000502 ctx_000503 ctx_000504 ctx_000505 ctx_000506 ctx_000507 ctx_000508 ctx_000509 ctx_000510 ctx_000511 ctx_000512 ctx_000513 ctx_000514 ctx_000515 ctx_000516 ctx_000517 ctx_000518 ctx_000519 ctx_000520 ctx_000521 ctx_000522 ctx_000523 ctx_000524 ctx_000525 ctx_000526 ctx_000527 ctx_000528 ctx_000529 ctx_000530 ctx_000531 ctx_000532 ctx_000533 ctx_000534 ctx_000535 ctx_000536 ctx_000537 ctx_000538 ctx_000539 ctx_000540 ctx_000541 ctx_000542 ctx_000543 ctx_000544 ctx_000545 ctx_000546 ctx_000547 ctx_000548 ctx_000549 ctx_000550 ctx_000551 ctx_000552 ctx_000553 ctx_000554 ctx_000555 ctx_000556 ctx_000557 ctx_000558 ctx_000559 ctx_000560 ctx_000561 ctx_000562 ctx_000563 ctx_000564 ctx_000565 ctx_000566 ctx_000567 ctx_000568 ctx_000569 ctx_000570 ctx_000571 ctx_000572 ctx_000573 ctx_000574 ctx_000575 ctx_000576 ctx_000577 ctx_000578 ctx_000579 ctx_000580 ctx_000581 ctx_000582 ctx_000583 ctx_000584 ctx_000585 ctx_000586 ctx_000587 ctx_000588 ctx_000589 ctx_000590 ctx_000591 ctx_000592 ctx_000593 ctx_000594 ctx_000595 ctx_000596 ctx_000597 ctx_000598 ctx_000599 ctx_000600 ctx_000601 ctx_000602 ctx_000603 ctx_000604 ctx_000605 ctx_000606 ctx_000607 ctx_000608 ctx_000609 ctx_000610 ctx_000611 ctx_000612 ctx_000613 ctx_000614 ctx_000615 ctx_000616 ctx_000617 ctx_000618 ctx_000619 ctx_000620 ctx_000621 ctx_000622 ctx_000623 ctx_000624 ctx_000625 ctx_000626 ctx_000627 ctx_000628 ctx_000629 ctx_000630 ctx_000631 ctx_000632 ctx_000633 ctx_000634 ctx_000635 ctx_000636 ctx_000637 ctx_000638 ctx_000639 ctx_000640 ctx_000641 ctx_000642 ctx_000643 ctx_000644 ctx_000645 ctx_000646 ctx_000647 ctx_000648 ctx_000649 ctx_000650 ctx_000651 ctx_000652 ctx_000653 ctx_000654 ctx_000655 ctx_000656 ctx_000657 ctx_000658 ctx_000659 ctx_000660 ctx_000661 ctx_000662 ctx_000663 ctx_000664 ctx_000665 ctx_000666 ctx_000667 ctx_000668 ctx_000669 ctx_000670 ctx_000671 ctx_000672 ctx_000673 ctx_000674 ctx_000675 ctx_000676 ctx_000677 ctx_000678 ctx_000679 ctx_000680 ctx_000681 ctx_000682 ctx_000683 ctx_000684 ctx_000685 ctx_000686 ctx_000687 ctx_000688 ctx_000689 ctx_000690 ctx_000691 ctx_000692 ctx_000693 ctx_000694 ctx_000695 ctx_000696 ctx_000697 ctx_000698 ctx_000699 ctx_000700 ctx_000701 ctx_000702 ctx_000703 ctx_000704 ctx_000705 ctx_000706 ctx_000707 ctx_000708 ctx_000709 ctx_000710 ctx_000711 ctx_000712 ctx_000713 ctx_000714 ctx_000715 ctx_000716 ctx_000717 ctx_000718 ctx_000719 ctx_000720 ctx_000721 ctx_000722 ctx_000723 ctx_000724 ctx_000725 ctx_000726 ctx_000727 ctx_000728 ctx_000729 ctx_000730 ctx_000731 ctx_000732 ctx_000733 ctx_000734 ctx_000735 ctx_000736 ctx_000737 ctx_000738 ctx_000739 ctx_000740 ctx_000741 ctx_000742 ctx_000743 ctx_000744 ctx_000745 ctx_000746 ctx_000747 ctx_000748 ctx_000749 ctx_000750 ctx_000751 ctx_000752 ctx_000753 ctx_000754 ctx_000755 ctx_000756 ctx_000757 ctx_000758 ctx_000759 ctx_000760 ctx_000761 ctx_000762 ctx_000763 ctx_000764 ctx_000765 ctx_000766 ctx_000767 ctx_000768 ctx_000769 ctx_000770 ctx_000771 ctx_000772 ctx_000773 ctx_000774 ctx_000775 ctx_000776 ctx_000777 ctx_000778 ctx_000779 ctx_000780 ctx_000781 ctx_000782 ctx_000783 ctx_000784 ctx_000785 ctx_000786 ctx_000787 ctx_000788 ctx_000789 ctx_000790 ctx_000791 ctx_000792 ctx_000793 ctx_000794 ctx_000795 ctx_000796 ctx_000797 ctx_000798 ctx_000799 ctx_000800 ctx_000801 ctx_000802 ctx_000803 ctx_000804 ctx_000805 ctx_000806 ctx_000807 ctx_000808 ctx_000809 ctx_000810 ctx_000811 ctx_000812 ctx_000813 ctx_000814 ctx_000815 ctx_000816 ctx_000817 ctx_000818 ctx_000819 ctx_000820 ctx_000821 ctx_000822 ctx_000823 ctx_000824 ctx_000825 ctx_000826 ctx_000827 ctx_000828 ctx_000829 ctx_000830 ctx_000831 ctx_000832 ctx_000833 ctx_000834 ctx_000835 ctx_000836 ctx_000837 ctx_000838 ctx_000839 ctx_000840 ctx_000841 ctx_000842 ctx_000843 ctx_000844 ctx_000845 ctx_000846 ctx_000847 ctx_000848 ctx_000849 ctx_000850 ctx_000851 ctx_000852 ctx_000853 ctx_000854 ctx_000855 ctx_000856 ctx_000857 ctx_000858 ctx_000859 ctx_000860 ctx_000861 ctx_000862 ctx_000863 ctx_000864 ctx_000865 ctx_000866 ctx_000867 ctx_000868 ctx_000869 ctx_000870 ctx_000871 ctx_000872 ctx_000873 ctx_000874 ctx_000875 ctx_000876 ctx_000877 ctx_000878 ctx_000879 ctx_000880 ctx_000881 ctx_000882 ctx_000883 ctx_000884 ctx_000885 ctx_000886 ctx_000887 ctx_000888 ctx_000889 ctx_000890 ctx_000891 ctx_000892 ctx_000893 ctx_000894 ctx_000895 ctx_000896 ctx_000897 ctx_000898 ctx_000899 ctx_000900 ctx_000901 ctx_000902 ctx_000903 ctx_000904 ctx_000905 ctx_000906 ctx_000907 ctx_000908 ctx_000909 ctx_000910 ctx_000911 ctx_000912 ctx_000913 ctx_000914 ctx_000915 ctx_000916 ctx_000917 ctx_000918 ctx_000919 ctx_000920 ctx_000921 ctx_000922 ctx_000923 ctx_000924 ctx_000925 ctx_000926 ctx_000927 ctx_000928 ctx_000929 ctx_000930 ctx_000931 ctx_000932 ctx_000933 ctx_000934 ctx_000935 ctx_000936 ctx_000937 ctx_000938 ctx_000939 ctx_000940 ctx_000941 ctx_000942 ctx_000943 ctx_000944 ctx_000945 ctx_000946 ctx_000947 ctx_000948 ctx_000949 ctx_000950 ctx_000951 ctx_000952 ctx_000953 ctx_000954 ctx_000955 ctx_000956 ctx_000957 ctx_000958 ctx_000959 ctx_000960 ctx_000961 ctx_000962 ctx_000963 ctx_000964 ctx_000965 ctx_000966 ctx_000967 ctx_000968 ctx_000969 ctx_000970 ctx_000971 ctx_000972 ctx_000973 ctx_000974 ctx_000975 ctx_000976 ctx_000977 ctx_000978 ctx_000979 ctx_000980 ctx_000981 ctx_000982 ctx_000983 ctx_000984 ctx_000985 ctx_000986 ctx_000987 ctx_000988 ctx_000989 ctx_000990 ctx_000991 ctx_000992 ctx_000993 ctx_000994 ctx_000995 ctx_000996 ctx_000997 ctx_000998 ctx_000999 ctx_001000 ctx_001001 ctx_001002 ctx_001003 ctx_001004 ctx_001005 ctx_001006 ctx_001007 ctx_001008 ctx_001009 ctx_001010 ctx_001011 ctx_001012 ctx_001013 ctx_001014 ctx_001015 ctx_001016 ctx_001017 ctx_001018 ctx_001019 ctx_001020 ctx_001021 ctx_001022 ctx_001023 ctx_001024 ctx_001025 ctx_001026 ctx_001027 ctx_001028 ctx_001029 ctx_001030 ctx_001031 ctx_001032 ctx_001033 ctx_001034 ctx_001035 ctx_001036 ctx_001037 ctx_001038 ctx_001039 ctx_001040 ctx_001041 ctx_001042 ctx_001043 ctx_001044 ctx_001045 ctx_001046 ctx_001047 ctx_001048 ctx_001049 ctx_001050 ctx_001051 ctx_001052 ctx_001053 ctx_001054 ctx_001055 ctx_001056 ctx_001057 ctx_001058 ctx_001059 ctx_001060 ctx_001061 ctx_001062 ctx_001063 ctx_001064 ctx_001065 ctx_001066 ctx_001067 ctx_001068 ctx_001069 ctx_001070 ctx_001071 ctx_001072 ctx_001073 ctx_001074 ctx_001075 ctx_001076 ctx_001077 ctx_001078 ctx_001079 ctx_001080 ctx_001081 ctx_001082 ctx_001083 ctx_001084 ctx_001085 ctx_001086 ctx_001087 ctx_001088 ctx_001089 ctx_001090 ctx_001091 ctx_001092 ctx_001093 ctx_001094 ctx_001095 ctx_001096 ctx_001097 ctx_001098 ctx_001099 ctx_001100 ctx_001101 ctx_001102 ctx_001103 ctx_001104 ctx_001105 ctx_001106 ctx_001107 ctx_001108 ctx_001109 ctx_001110 ctx_001111 ctx_001112 ctx_001113 ctx_001114 ctx_001115 ctx_001116 ctx_001117 ctx_001118 ctx_001119 ctx_001120 ctx_001121 ctx_001122 ctx_001123 ctx_001124 ctx_001125 ctx_001126 ctx_001127 ctx_001128 ctx_001129 ctx_001130 ctx_001131 ctx_001132 ctx_001133 ctx_001134 ctx_001135 ctx_001136 ctx_001137 ctx_001138 ctx_001139 ctx_001140 ctx_001141 ctx_001142 ctx_001143 ctx_001144 ctx_001145 ctx_001146 ctx_001147 ctx_001148 ctx_001149 ctx_001150 ctx_001151 ctx_001152 ctx_001153 ctx_001154 ctx_001155 ctx_001156 ctx_001157 ctx_001158 ctx_001159 ctx_001160 ctx_001161 ctx_001162 ctx_001163 ctx_001164 ctx_001165 ctx_001166 ctx_001167 ctx_001168 ctx_001169 ctx_001170 ctx_001171 ctx_001172 ctx_001173 ctx_001174 ctx_001175 ctx_001176 ctx_001177 ctx_001178 ctx_001179 ctx_001180 ctx_001181 ctx_001182 ctx_001183 ctx_001184 ctx_001185 ctx_001186 ctx_001187 ctx_001188 ctx_001189 ctx_001190 ctx_001191 ctx_001192 ctx_001193 ctx_001194 ctx_001195 ctx_001196 ctx_001197 ctx_001198 ctx_001199 ctx_001200 ctx_001201 ctx_001202 ctx_001203 ctx_001204 ctx_001205 ctx_001206 ctx_001207 ctx_001208 ctx_001209 ctx_001210 ctx_001211 ctx_001212 ctx_001213 ctx_001214 ctx_001215 ctx_001216 ctx_001217 ctx_001218 ctx_001219 ctx_001220 ctx_001221 ctx_001222 ctx_001223 ctx_001224 ctx_001225 ctx_001226 ctx_001227 ctx_001228 ctx_001229 ctx_001230 ctx_001231 ctx_001232 ctx_001233 ctx_001234 ctx_001235 ctx_001236 ctx_001237 ctx_001238 ctx_001239 ctx_001240 ctx_001241 ctx_001242 ctx_001243 ctx_001244 ctx_001245 ctx_001246 ctx_001247 ctx_001248 ctx_001249 ctx_001250 ctx_001251 ctx_001252 ctx_001253 ctx_001254 ctx_001255 ctx_001256 ctx_001257 ctx_001258 ctx_001259 ctx_001260 ctx_001261 ctx_001262 ctx_001263 ctx_001264 ctx_001265 ctx_001266 ctx_001267 ctx_001268 ctx_001269 ctx_001270 ctx_001271 ctx_001272 ctx_001273 ctx_001274 ctx_001275 ctx_001276 ctx_001277 ctx_001278 ctx_001279 ctx_001280 ctx_001281 ctx_001282 ctx_001283 ctx_001284 ctx_001285 ctx_001286 ctx_001287 ctx_001288 ctx_001289 ctx_001290 ctx_001291 ctx_001292 ctx_001293 ctx_001294 ctx_001295 ctx_001296 ctx_001297 ctx_001298 ctx_001299 ctx_001300 ctx_001301 ctx_001302 ctx_001303 ctx_001304 ctx_001305 ctx_001306 ctx_001307 ctx_001308 ctx_001309 ctx_001310 ctx_001311 ctx_001312 ctx_001313 ctx_001314 ctx_001315 ctx_001316 ctx_001317 ctx_001318 ctx_001319 ctx_001320 ctx_001321 ctx_001322 ctx_001323 ctx_001324 ctx_001325 ctx_001326 ctx_001327 ctx_001328 ctx_001329 ctx_001330 ctx_001331 ctx_001332 ctx_001333 ctx_001334 ctx_001335 ctx_001336 ctx_001337 ctx_001338 ctx_001339 ctx_001340 ctx_001341 ctx_001342 ctx_001343 ctx_001344 ctx_001345 ctx_001346 ctx_001347 ctx_001348 ctx_001349 ctx_001350 ctx_001351 ctx_001352 ctx_001353 ctx_001354 ctx_001355 ctx_001356 ctx_001357 ctx_001358 ctx_001359 ctx_001360 ctx_001361 ctx_001362 ctx_001363 ctx_001364 ctx_001365 ctx_001366 ctx_001367 ctx_001368 ctx_001369 ctx_001370 ctx_001371 ctx_001372 ctx_001373 ctx_001374 ctx_001375 ctx_001376 ctx_001377 ctx_001378 ctx_001379 ctx_001380 ctx_001381 ctx_001382 ctx_001383 ctx_001384 ctx_001385 ctx_001386 ctx_001387 ctx_001388 ctx_001389 ctx_001390 ctx_001391 ctx_001392 ctx_001393 ctx_001394 ctx_001395 ctx_001396 ctx_001397 ctx_001398 ctx_001399 ctx_001400 ctx_001401 ctx_001402 ctx_001403 ctx_001404 ctx_001405 ctx_001406 ctx_001407 ctx_001408 ctx_001409 ctx_001410 ctx_001411 ctx_001412 ctx_001413 ctx_001414 ctx_001415 ctx_001416 ctx_001417 ctx_001418 ctx_001419 ctx_001420 ctx_001421 ctx_001422 ctx_001423 ctx_001424 ctx_001425 ctx_001426 ctx_001427 ctx_001428 ctx_001429 ctx_001430 ctx_001431 ctx_001432 ctx_001433 ctx_001434 ctx_001435 ctx_001436 ctx_001437 ctx_001438 ctx_001439 ctx_001440 ctx_001441 ctx_001442 ctx_001443 ctx_001444 ctx_001445 ctx_001446 ctx_001447 ctx_001448 ctx_001449 ctx_001450 ctx_001451 ctx_001452 ctx_001453 ctx_001454 ctx_001455 ctx_001456 ctx_001457 ctx_001458 ctx_001459 ctx_001460 ctx_001461 ctx_001462 ctx_001463 ctx_001464 ctx_001465 ctx_001466 ctx_001467 ctx_001468 ctx_001469 ctx_001470 ctx_001471 ctx_001472 ctx_001473 ctx_001474 ctx_001475 ctx_001476 ctx_001477 ctx_001478 ctx_001479 ctx_001480 ctx_001481 ctx_001482 ctx_001483 ctx_001484 ctx_001485 ctx_001486 ctx_001487 ctx_001488 ctx_001489 ctx_001490 ctx_001491 ctx_001492 ctx_001493 ctx_001494 ctx_001495 ctx_001496 ctx_001497 ctx_001498 ctx_001499 ctx_001500 ctx_001501 ctx_001502 ctx_001503 ctx_001504 ctx_001505 ctx_001506 ctx_001507 ctx_001508 ctx_001509 ctx_001510 ctx_001511 ctx_001512 ctx_001513 ctx_001514 ctx_001515 ctx_001516 ctx_001517 ctx_001518 ctx_001519 ctx_001520 ctx_001521 ctx_001522 ctx_001523 ctx_001524 ctx_001525 ctx_001526 ctx_001527 ctx_001528 ctx_001529 ctx_001530 ctx_001531 ctx_001532 ctx_001533 ctx_001534 ctx_001535 ctx_001536 ctx_001537 ctx_001538 ctx_001539 ctx_001540 ctx_001541 ctx_001542 ctx_001543 ctx_001544 ctx_001545 ctx_001546 ctx_001547 ctx_001548 ctx_001549 ctx_001550 ctx_001551 ctx_001552 ctx_001553 ctx_001554 ctx_001555 ctx_001556 ctx_001557 ctx_001558 ctx_001559 ctx_001560 ctx_001561 ctx_001562 ctx_001563 ctx_001564 ctx_001565 ctx_001566 ctx_001567 ctx_001568 ctx_001569 ctx_001570 ctx_001571 ctx_001572 ctx_001573 ctx_001574 ctx_001575 ctx_001576 ctx_001577 ctx_001578 ctx_001579 ctx_001580 ctx_001581 ctx_001582 ctx_001583 ctx_001584 ctx_001585 ctx_001586 ctx_001587 ctx_001588 ctx_001589 ctx_001590 ctx_001591 ctx_001592 ctx_001593 ctx_001594 ctx_001595 ctx_001596 ctx_001597 ctx_001598 ctx_001599 ctx_001600 ctx_001601 ctx_001602 ctx_001603 ctx_001604 ctx_001605 ctx_001606 ctx_001607 ctx_001608 ctx_001609 ctx_001610 ctx_001611 ctx_001612 ctx_001613 ctx_001614 ctx_001615 ctx_001616 ctx_001617 ctx_001618 ctx_001619 ctx_001620 ctx_001621 ctx_001622 ctx_001623 ctx_001624 ctx_001625 ctx_001626 ctx_001627 ctx_001628 ctx_001629 ctx_001630 ctx_001631 ctx_001632 ctx_001633 ctx_001634 ctx_001635 ctx_001636 ctx_001637 ctx_001638 ctx_001639 ctx_001640 ctx_001641 ctx_001642 ctx_001643 ctx_001644 ctx_001645 ctx_001646 ctx_001647 ctx_001648 ctx_001649 ctx_001650 ctx_001651 ctx_001652 ctx_001653 ctx_001654 ctx_001655 ctx_001656 ctx_001657 ctx_001658 ctx_001659 ctx_001660 ctx_001661 ctx_001662 ctx_001663 ctx_001664 ctx_001665 ctx_001666 ctx_001667 ctx_001668 ctx_001669 ctx_001670 ctx_001671 ctx_001672 ctx_001673 ctx_001674 ctx_001675 ctx_001676 ctx_001677 ctx_001678 ctx_001679 ctx_001680 ctx_001681 ctx_001682 ctx_001683 ctx_001684 ctx_001685 ctx_001686 ctx_001687 ctx_001688 ctx_001689 ctx_001690 ctx_001691 ctx_001692 ctx_001693 ctx_001694 ctx_001695 ctx_001696 ctx_001697 ctx_001698 ctx_001699 ctx_001700 ctx_001701 ctx_001702 ctx_001703 ctx_001704 ctx_001705 ctx_001706 ctx_001707 ctx_001708 ctx_001709 ctx_001710 ctx_001711 ctx_001712 ctx_001713 ctx_001714 ctx_001715 ctx_001716 ctx_001717 ctx_001718 ctx_001719 ctx_001720 ctx_001721 ctx_001722 ctx_001723 ctx_001724 ctx_001725 ctx_001726 ctx_001727 ctx_001728 ctx_001729 ctx_001730 ctx_001731 ctx_001732 ctx_001733 ctx_001734 ctx_001735 ctx_001736 ctx_001737 ctx_001738 ctx_001739 ctx_001740 ctx_001741 ctx_001742 ctx_001743 ctx_001744 ctx_001745 ctx_001746 ctx_001747 ctx_001748 ctx_001749 ctx_001750 ctx_001751 ctx_001752 ctx_001753 ctx_001754 ctx_001755 ctx_001756 ctx_001757 ctx_001758 ctx_001759 ctx_001760 ctx_001761 ctx_001762 ctx_001763 ctx_001764 ctx_001765 ctx_001766 ctx_001767 ctx_001768 ctx_001769 ctx_001770 ctx_001771 ctx_001772 ctx_001773 ctx_001774 ctx_001775 ctx_001776 ctx_001777 ctx_001778 ctx_001779 ctx_001780 ctx_001781 ctx_001782 ctx_001783 ctx_001784 ctx_001785 ctx_001786 ctx_001787 ctx_001788 ctx_001789 ctx_001790 ctx_001791 ctx_001792 ctx_001793 ctx_001794 ctx_001795 ctx_001796 ctx_001797 ctx_001798 ctx_001799 ctx_001800 ctx_001801 ctx_001802 ctx_001803 ctx_001804 ctx_001805 ctx_001806 ctx_001807 ctx_001808 ctx_001809 ctx_001810 ctx_001811 ctx_001812 ctx_001813 ctx_001814 ctx_001815 ctx_001816 ctx_001817 ctx_001818 ctx_001819 ctx_001820 ctx_001821 ctx_001822 ctx_001823 ctx_001824 ctx_001825 ctx_001826 ctx_001827 ctx_001828 ctx_001829 ctx_001830 ctx_001831 ctx_001832 ctx_001833 ctx_001834 ctx_001835 ctx_001836 ctx_001837 ctx_001838 ctx_001839 ctx_001840 ctx_001841 ctx_001842 ctx_001843 ctx_001844 ctx_001845 ctx_001846 ctx_001847 ctx_001848 ctx_001849 ctx_001850 ctx_001851 ctx_001852 ctx_001853 ctx_001854 ctx_001855 ctx_001856 ctx_001857 ctx_001858 ctx_001859 ctx_001860 ctx_001861 ctx_001862 ctx_001863 ctx_001864 ctx_001865 ctx_001866 ctx_001867 ctx_001868 ctx_001869 ctx_001870 ctx_001871 ctx_001872 ctx_001873 ctx_001874 ctx_001875 ctx_001876 ctx_001877 ctx_001878 ctx_001879 ctx_001880 ctx_001881 ctx_001882 ctx_001883 ctx_001884 ctx_001885 ctx_001886 ctx_001887 ctx_001888 ctx_001889 ctx_001890 ctx_001891 ctx_001892 ctx_001893 ctx_001894 ctx_001895 ctx_001896 ctx_001897 ctx_001898 ctx_001899 ctx_001900 ctx_001901 ctx_001902 ctx_001903 ctx_001904 ctx_001905 ctx_001906 ctx_001907 ctx_001908 ctx_001909 ctx_001910 ctx_001911 ctx_001912 ctx_001913 ctx_001914 ctx_001915 ctx_001916 ctx_001917 ctx_001918 ctx_001919 ctx_001920 ctx_001921 ctx_001922 ctx_001923 ctx_001924 ctx_001925 ctx_001926 ctx_001927 ctx_001928 ctx_001929 ctx_001930 ctx_001931 ctx_001932 ctx_001933 ctx_001934 ctx_001935 ctx_001936 ctx_001937 ctx_001938 ctx_001939 ctx_001940 ctx_001941 ctx_001942 ctx_001943 ctx_001944 ctx_001945 ctx_001946 ctx_001947 ctx_001948 ctx_001949 ctx_001950 ctx_001951 ctx_001952 ctx_001953 ctx_001954 ctx_001955 ctx_001956 ctx_001957 ctx_001958 ctx_001959 ctx_001960 ctx_001961 ctx_001962 ctx_001963 ctx_001964 ctx_001965 ctx_001966 ctx_001967 ctx_001968 ctx_001969 ctx_001970 ctx_001971 ctx_001972 ctx_001973 ctx_001974 ctx_001975 ctx_001976 ctx_001977 ctx_001978 ctx_001979 ctx_001980 ctx_001981 ctx_001982 ctx_001983 ctx_001984 ctx_001985 ctx_001986 ctx_001987 ctx_001988 ctx_001989 ctx_001990 ctx_001991 ctx_001992 ctx_001993 ctx_001994 ctx_001995 ctx_001996 ctx_001997 ctx_001998 ctx_001999 ctx_002000 ctx_002001 ctx_002002 ctx_002003 ctx_002004 ctx_002005 ctx_002006 ctx_002007 ctx_002008 ctx_002009 ctx_002010 ctx_002011 ctx_002012 ctx_002013 ctx_002014 ctx_002015 ctx_002016 ctx_002017 ctx_002018 ctx_002019 ctx_002020 ctx_002021 ctx_002022 ctx_002023 ctx_002024 ctx_002025 ctx_002026 ctx_002027 ctx_002028 ctx_002029 ctx_002030 ctx_002031 ctx_002032 ctx_002033 ctx_002034 ctx_002035 ctx_002036 ctx_002037 ctx_002038 ctx_002039 ctx_002040 ctx_002041 ctx_002042 ctx_002043 ctx_002044 ctx_002045 ctx_002046 ctx_002047 ctx_002048 ctx_002049 ctx_002050 ctx_002051 ctx_002052 ctx_002053 ctx_002054 ctx_002055 ctx_002056 ctx_002057 ctx_002058 ctx_002059 ctx_002060 ctx_002061 ctx_002062 ctx_002063 ctx_002064 ctx_002065 ctx_002066 ctx_002067 ctx_002068 ctx_002069 ctx_002070 ctx_002071 ctx_002072 ctx_002073 ctx_002074 ctx_002075 ctx_002076 ctx_002077 ctx_002078 ctx_002079 ctx_002080 ctx_002081 ctx_002082 ctx_002083 ctx_002084 ctx_002085 ctx_002086 ctx_002087 ctx_002088 ctx_002089 ctx_002090 ctx_002091 ctx_002092 ctx_002093 ctx_002094 ctx_002095 ctx_002096 ctx_002097 ctx_002098 ctx_002099 ctx_002100 ctx_002101 ctx_002102 ctx_002103 ctx_002104 ctx_002105 ctx_002106 ctx_002107 ctx_002108 ctx_002109 ctx_002110 ctx_002111 ctx_002112 ctx_002113 ctx_002114 ctx_002115 ctx_002116 ctx_002117 ctx_002118 ctx_002119 ctx_002120 ctx_002121 ctx_002122 ctx_002123 ctx_002124 ctx_002125 ctx_002126 ctx_002127 ctx_002128 ctx_002129 ctx_002130 ctx_002131 ctx_002132 ctx_002133 ctx_002134 ctx_002135 ctx_002136 ctx_002137 ctx_002138 ctx_002139 ctx_002140 ctx_002141 ctx_002142 ctx_002143 ctx_002144 ctx_002145 ctx_002146 ctx_002147 ctx_002148 ctx_002149 ctx_002150 ctx_002151 ctx_002152 ctx_002153 ctx_002154 ctx_002155 ctx_002156 ctx_002157 ctx_002158 ctx_002159 ctx_002160 ctx_002161 ctx_002162 ctx_002163 ctx_002164 ctx_002165 ctx_002166 ctx_002167 ctx_002168 ctx_002169 ctx_002170 ctx_002171 ctx_002172 ctx_002173 ctx_002174 ctx_002175 ctx_002176 ctx_002177 ctx_002178 ctx_002179 ctx_002180 ctx_002181 ctx_002182 ctx_002183 ctx_002184 ctx_002185 ctx_002186 ctx_002187 ctx_002188 ctx_002189 ctx_002190 ctx_002191 ctx_002192 ctx_002193 ctx_002194 ctx_002195 ctx_002196 ctx_002197 ctx_002198 ctx_002199 ctx_002200 ctx_002201 ctx_002202 ctx_002203 ctx_002204 ctx_002205 ctx_002206 ctx_002207 ctx_002208 ctx_002209 ctx_002210 ctx_002211 ctx_002212 ctx_002213 ctx_002214 ctx_002215 ctx_002216 ctx_002217 ctx_002218 ctx_002219 ctx_002220 ctx_002221 ctx_002222 ctx_002223 ctx_002224 ctx_002225 ctx_002226 ctx_002227 ctx_002228 ctx_002229 ctx_002230 ctx_002231 ctx_002232 ctx_002233 ctx_002234 ctx_002235 ctx_002236 ctx_002237 ctx_002238 ctx_002239 ctx_002240 ctx_002241 ctx_002242 ctx_002243 ctx_002244 ctx_002245 ctx_002246 ctx_002247 ctx_002248 ctx_002249 ctx_002250 ctx_002251 ctx_002252 ctx_002253 ctx_002254 ctx_002255 ctx_002256 ctx_002257 ctx_002258 ctx_002259 ctx_002260 ctx_002261 ctx_002262 ctx_002263 ctx_002264 ctx_002265 ctx_002266 ctx_002267 ctx_002268 ctx_002269 ctx_002270 ctx_002271 ctx_002272 ctx_002273 ctx_002274 ctx_002275 ctx_002276 ctx_002277 ctx_002278 ctx_002279 ctx_002280 ctx_002281 ctx_002282 ctx_002283 ctx_002284 ctx_002285 ctx_002286 ctx_002287 ctx_002288 ctx_002289 ctx_002290 ctx_002291 ctx_002292 ctx_002293 ctx_002294 ctx_002295 ctx_002296 ctx_002297 ctx_002298 ctx_002299 ctx_002300 ctx_002301 ctx_002302 ctx_002303 ctx_002304 ctx_002305 ctx_002306 ctx_002307 ctx_002308 ctx_002309 ctx_002310 ctx_002311 ctx_002312 ctx_002313 ctx_002314 ctx_002315 ctx_002316 ctx_002317 ctx_002318 ctx_002319 ctx_002320 ctx_002321 ctx_002322 ctx_002323 ctx_002324 ctx_002325 ctx_002326 ctx_002327 ctx_002328 ctx_002329 ctx_002330 ctx_002331 ctx_002332 ctx_002333 ctx_002334 ctx_002335 ctx_002336 ctx_002337 ctx_002338 ctx_002339 ctx_002340 ctx_002341 ctx_002342 ctx_002343 ctx_002344 ctx_002345 ctx_002346 ctx_002347 ctx_002348 ctx_002349 ctx_002350 ctx_002351 ctx_002352 ctx_002353 ctx_002354 ctx_002355 ctx_002356 ctx_002357 ctx_002358 ctx_002359 ctx_002360 ctx_002361 ctx_002362 ctx_002363 ctx_002364 ctx_002365 ctx_002366 ctx_002367 ctx_002368 ctx_002369 ctx_002370 ctx_002371 ctx_002372 ctx_002373 ctx_002374 ctx_002375 ctx_002376 ctx_002377 ctx_002378 ctx_002379 ctx_002380 ctx_002381 ctx_002382 ctx_002383 ctx_002384 ctx_002385 ctx_002386 ctx_002387 ctx_002388 ctx_002389 ctx_002390 ctx_002391 ctx_002392 ctx_002393 ctx_002394 ctx_002395 ctx_002396 ctx_002397 ctx_002398 ctx_002399 ctx_002400 ctx_002401 ctx_002402 ctx_002403 ctx_002404 ctx_002405 ctx_002406 ctx_002407 ctx_002408 ctx_002409 ctx_002410 ctx_002411 ctx_002412 ctx_002413 ctx_002414 ctx_002415 ctx_002416 ctx_002417 ctx_002418 ctx_002419 ctx_002420 ctx_002421 ctx_002422 ctx_002423 ctx_002424 ctx_002425 ctx_002426 ctx_002427 ctx_002428 ctx_002429 ctx_002430 ctx_002431 ctx_002432 ctx_002433 ctx_002434 ctx_002435 ctx_002436 ctx_002437 ctx_002438 ctx_002439 ctx_002440 ctx_002441 ctx_002442 ctx_002443 ctx_002444 ctx_002445 ctx_002446 ctx_002447 ctx_002448 ctx_002449 ctx_002450 ctx_002451 ctx_002452 ctx_002453 ctx_002454 ctx_002455 ctx_002456 ctx_002457 ctx_002458 ctx_002459 ctx_002460 ctx_002461 ctx_002462 ctx_002463 ctx_002464 ctx_002465 ctx_002466 ctx_002467 ctx_002468 ctx_002469 ctx_002470 ctx_002471 ctx_002472 ctx_002473 ctx_002474 ctx_002475 ctx_002476 ctx_002477 ctx_002478 ctx_002479 ctx_002480 ctx_002481 ctx_002482 ctx_002483 ctx_002484 ctx_002485 ctx_002486 ctx_002487 ctx_002488 ctx_002489 ctx_002490 ctx_002491 ctx_002492 ctx_002493 ctx_002494 ctx_002495 ctx_002496 ctx_002497 ctx_002498 ctx_002499 ctx_002500 ctx_002501 ctx_002502 ctx_002503 ctx_002504 ctx_002505 ctx_002506 ctx_002507 ctx_002508 ctx_002509 ctx_002510 ctx_002511 ctx_002512 ctx_002513 ctx_002514 ctx_002515 ctx_002516 ctx_002517 ctx_002518 ctx_002519 ctx_002520 ctx_002521 ctx_002522 ctx_002523 ctx_002524 ctx_002525 ctx_002526 ctx_002527 ctx_002528 ctx_002529 ctx_002530 ctx_002531 ctx_002532 ctx_002533 ctx_002534 ctx_002535 ctx_002536 ctx_002537 ctx_002538 ctx_002539 ctx_002540 ctx_002541 ctx_002542 ctx_002543 ctx_002544 ctx_002545 ctx_002546 ctx_002547 ctx_002548 ctx_002549 ctx_002550 ctx_002551 ctx_002552 ctx_002553 ctx_002554 ctx_002555 ctx_002556 ctx_002557 ctx_002558 ctx_002559 ctx_002560 ctx_002561 ctx_002562 ctx_002563 ctx_002564 ctx_002565 ctx_002566 ctx_002567 ctx_002568 ctx_002569 ctx_002570 ctx_002571 ctx_002572 ctx_002573 ctx_002574 ctx_002575 ctx_002576 ctx_002577 ctx_002578 ctx_002579 ctx_002580 ctx_002581 ctx_002582 ctx_002583 ctx_002584 ctx_002585 ctx_002586 ctx_002587 ctx_002588 ctx_002589 ctx_002590 ctx_002591 ctx_002592 ctx_002593 ctx_002594 ctx_002595 ctx_002596 ctx_002597 ctx_002598 ctx_002599 ctx_002600 ctx_002601 ctx_002602 ctx_002603 ctx_002604 ctx_002605 ctx_002606 ctx_002607 ctx_002608 ctx_002609 ctx_002610 ctx_002611 ctx_002612 ctx_002613 ctx_002614 ctx_002615 ctx_002616 ctx_002617 ctx_002618 ctx_002619 ctx_002620 ctx_002621 ctx_002622 ctx_002623 ctx_002624 ctx_002625 ctx_002626 ctx_002627 ctx_002628 ctx_002629 ctx_002630 ctx_002631 ctx_002632 ctx_002633 ctx_002634 ctx_002635 ctx_002636 ctx_002637 ctx_002638 ctx_002639 ctx_002640 ctx_002641 ctx_002642 ctx_002643 ctx_002644 ctx_002645 ctx_002646 ctx_002647 ctx_002648 ctx_002649 ctx_002650 ctx_002651 ctx_002652 ctx_002653 ctx_002654 ctx_002655 ctx_002656 ctx_002657 ctx_002658 ctx_002659 ctx_002660 ctx_002661 ctx_002662 ctx_002663 ctx_002664 ctx_002665 ctx_002666 ctx_002667 ctx_002668 ctx_002669 ctx_002670 ctx_002671 ctx_002672 ctx_002673 ctx_002674 ctx_002675 ctx_002676 ctx_002677 ctx_002678 ctx_002679 ctx_002680 ctx_002681 ctx_002682 ctx_002683 ctx_002684 ctx_002685 ctx_002686 ctx_002687 ctx_002688 ctx_002689 ctx_002690 ctx_002691 ctx_002692 ctx_002693 ctx_002694 ctx_002695 ctx_002696 ctx_002697 ctx_002698 ctx_002699 ctx_002700 ctx_002701 ctx_002702 ctx_002703 ctx_002704 ctx_002705 ctx_002706 ctx_002707 ctx_002708 ctx_002709 ctx_002710 ctx_002711 ctx_002712 ctx_002713 ctx_002714 ctx_002715 ctx_002716 ctx_002717 ctx_002718 ctx_002719 ctx_002720 ctx_002721 ctx_002722 ctx_002723 ctx_002724 ctx_002725 ctx_002726 ctx_002727 ctx_002728 ctx_002729 ctx_002730 ctx_002731 ctx_002732 ctx_002733 ctx_002734 ctx_002735 ctx_002736 ctx_002737 ctx_002738 ctx_002739 ctx_002740 ctx_002741 ctx_002742 ctx_002743 ctx_002744 ctx_002745 ctx_002746 ctx_002747 ctx_002748 ctx_002749 ctx_002750 ctx_002751 ctx_002752 ctx_002753 ctx_002754 ctx_002755 ctx_002756 ctx_002757 ctx_002758 ctx_002759 ctx_002760 ctx_002761 ctx_002762 ctx_002763 ctx_002764 ctx_002765 ctx_002766 ctx_002767 ctx_002768 ctx_002769 ctx_002770 ctx_002771 ctx_002772 ctx_002773 ctx_002774 ctx_002775 ctx_002776 ctx_002777 ctx_002778 ctx_002779 ctx_002780 ctx_002781 ctx_002782 ctx_002783 ctx_002784 ctx_002785 ctx_002786 ctx_002787 ctx_002788 ctx_002789 ctx_002790 ctx_002791 ctx_002792 ctx_002793 ctx_002794 ctx_002795 ctx_002796 ctx_002797 ctx_002798 ctx_002799 ctx_002800 ctx_002801 ctx_002802 ctx_002803 ctx_002804 ctx_002805 ctx_002806 ctx_002807 ctx_002808 ctx_002809 ctx_002810 ctx_002811 ctx_002812 ctx_002813 ctx_002814 ctx_002815 ctx_002816 ctx_002817 ctx_002818 ctx_002819 ctx_002820 ctx_002821 ctx_002822 ctx_002823 ctx_002824 ctx_002825 ctx_002826 ctx_002827 ctx_002828 ctx_002829 ctx_002830 ctx_002831 ctx_002832 ctx_002833 ctx_002834 ctx_002835 ctx_002836 ctx_002837 ctx_002838 ctx_002839 ctx_002840 ctx_002841 ctx_002842 ctx_002843 ctx_002844 ctx_002845 ctx_002846 ctx_002847 ctx_002848 ctx_002849 ctx_002850 ctx_002851 ctx_002852 ctx_002853 ctx_002854 ctx_002855 ctx_002856 ctx_002857 ctx_002858 ctx_002859 ctx_002860 ctx_002861 ctx_002862 ctx_002863 ctx_002864 ctx_002865 ctx_002866 ctx_002867 ctx_002868 ctx_002869 ctx_002870 ctx_002871 ctx_002872 ctx_002873 ctx_002874 ctx_002875 ctx_002876 ctx_002877 ctx_002878 ctx_002879 ctx_002880 ctx_002881 ctx_002882 ctx_002883 ctx_002884 ctx_002885 ctx_002886 ctx_002887 ctx_002888 ctx_002889 ctx_002890 ctx_002891 ctx_002892 ctx_002893 ctx_002894 ctx_002895 ctx_002896 ctx_002897 ctx_002898 ctx_002899 ctx_002900 ctx_002901 ctx_002902 ctx_002903 ctx_002904 ctx_002905 ctx_002906 ctx_002907 ctx_002908 ctx_002909 ctx_002910 ctx_002911 ctx_002912 ctx_002913 ctx_002914 ctx_002915 ctx_002916 ctx_002917 ctx_002918 ctx_002919 ctx_002920 ctx_002921 ctx_002922 ctx_002923 ctx_002924 ctx_002925 ctx_002926 ctx_002927 ctx_002928 ctx_002929 ctx_002930 ctx_002931 ctx_002932 ctx_002933 ctx_002934 ctx_002935 ctx_002936 ctx_002937 ctx_002938 ctx_002939 ctx_002940 ctx_002941 ctx_002942 ctx_002943 ctx_002944 ctx_002945 ctx_002946 ctx_002947 ctx_002948 ctx_002949 ctx_002950 ctx_002951 ctx_002952 ctx_002953 ctx_002954 ctx_002955 ctx_002956 ctx_002957 ctx_002958 ctx_002959 ctx_002960 ctx_002961 ctx_002962 ctx_002963 ctx_002964 ctx_002965 ctx_002966 ctx_002967 ctx_002968 ctx_002969 ctx_002970 ctx_002971 ctx_002972 ctx_002973 ctx_002974 ctx_002975 ctx_002976 ctx_002977 ctx_002978 ctx_002979 ctx_002980 ctx_002981 ctx_002982 ctx_002983 ctx_002984 ctx_002985 ctx_002986 ctx_002987 ctx_002988 ctx_002989 ctx_002990 ctx_002991 ctx_002992 ctx_002993 ctx_002994 ctx_002995 ctx_002996 ctx_002997 ctx_002998 ctx_002999 ctx_003000 ctx_003001 ctx_003002 ctx_003003 ctx_003004 ctx_003005 ctx_003006 ctx_003007 ctx_003008 ctx_003009 ctx_003010 ctx_003011 ctx_003012 ctx_003013 ctx_003014 ctx_003015 ctx_003016 ctx_003017 ctx_003018 ctx_003019 ctx_003020 ctx_003021 ctx_003022 ctx_003023 ctx_003024 ctx_003025 ctx_003026 ctx_003027 ctx_003028 ctx_003029 ctx_003030 ctx_003031 ctx_003032 ctx_003033 ctx_003034 ctx_003035 ctx_003036 ctx_003037 ctx_003038 ctx_003039 ctx_003040 ctx_003041 ctx_003042 ctx_003043 ctx_003044 ctx_003045 ctx_003046 ctx_003047 ctx_003048 ctx_003049 ctx_003050 ctx_003051 ctx_003052 ctx_003053 ctx_003054 ctx_003055 ctx_003056 ctx_003057 ctx_003058 ctx_003059 ctx_003060 ctx_003061 ctx_003062 ctx_003063 ctx_003064 ctx_003065 ctx_003066 ctx_003067 ctx_003068 ctx_003069 ctx_003070 ctx_003071 ctx_003072 ctx_003073 ctx_003074 ctx_003075 ctx_003076 ctx_003077 ctx_003078 ctx_003079 ctx_003080 ctx_003081 ctx_003082 ctx_003083 ctx_003084 ctx_003085 ctx_003086 ctx_003087 ctx_003088 ctx_003089 ctx_003090 ctx_003091 ctx_003092 ctx_003093 ctx_003094 ctx_003095 ctx_003096 ctx_003097 ctx_003098 ctx_003099 ctx_003100 ctx_003101 ctx_003102 ctx_003103 ctx_003104 ctx_003105 ctx_003106 ctx_003107 ctx_003108 ctx_003109 ctx_003110 ctx_003111 ctx_003112 ctx_003113 ctx_003114 ctx_003115 ctx_003116 ctx_003117 ctx_003118 ctx_003119 ctx_003120 ctx_003121 ctx_003122 ctx_003123 ctx_003124 ctx_003125 ctx_003126 ctx_003127 ctx_003128 ctx_003129 ctx_003130 ctx_003131 ctx_003132 ctx_003133 ctx_003134 ctx_003135 ctx_003136 ctx_003137 ctx_003138 ctx_003139 ctx_003140 ctx_003141 ctx_003142 ctx_003143 ctx_003144 ctx_003145 ctx_003146 ctx_003147 ctx_003148 ctx_003149 ctx_003150 ctx_003151 ctx_003152 ctx_003153 ctx_003154 ctx_003155 ctx_003156 ctx_003157 ctx_003158 ctx_003159 ctx_003160 ctx_003161 ctx_003162 ctx_003163 ctx_003164 ctx_003165 ctx_003166 ctx_003167 ctx_003168 ctx_003169 ctx_003170 ctx_003171 ctx_003172 ctx_003173 ctx_003174 ctx_003175 ctx_003176 ctx_003177 ctx_003178 ctx_003179 ctx_003180 ctx_003181 ctx_003182 ctx_003183 ctx_003184 ctx_003185 ctx_003186 ctx_003187 ctx_003188 ctx_003189 ctx_003190 ctx_003191 ctx_003192 ctx_003193 ctx_003194 ctx_003195 ctx_003196 ctx_003197 ctx_003198 ctx_003199 ctx_003200 ctx_003201 ctx_003202 ctx_003203 ctx_003204 ctx_003205 ctx_003206 ctx_003207 ctx_003208 ctx_003209 ctx_003210 ctx_003211 ctx_003212 ctx_003213 ctx_003214 ctx_003215 ctx_003216 ctx_003217 ctx_003218 ctx_003219 ctx_003220 ctx_003221 ctx_003222 ctx_003223 ctx_003224 ctx_003225 ctx_003226 ctx_003227 ctx_003228 ctx_003229 ctx_003230 ctx_003231 ctx_003232 ctx_003233 ctx_003234 ctx_003235 ctx_003236 ctx_003237 ctx_003238 ctx_003239 ctx_003240 ctx_003241 ctx_003242 ctx_003243 ctx_003244 ctx_003245 ctx_003246 ctx_003247 ctx_003248 ctx_003249 ctx_003250 ctx_003251 ctx_003252 ctx_003253 ctx_003254 ctx_003255 ctx_003256 ctx_003257 ctx_003258 ctx_003259 ctx_003260 ctx_003261 ctx_003262 ctx_003263 ctx_003264 ctx_003265 ctx_003266 ctx_003267 ctx_003268 ctx_003269 ctx_003270 ctx_003271 ctx_003272 ctx_003273 ctx_003274 ctx_003275 ctx_003276 ctx_003277 ctx_003278 ctx_003279 ctx_003280 ctx_003281 ctx_003282 ctx_003283 ctx_003284 ctx_003285 ctx_003286 ctx_003287 ctx_003288 ctx_003289 ctx_003290 ctx_003291 ctx_003292 ctx_003293 ctx_003294 ctx_003295 ctx_003296 ctx_003297 ctx_003298 ctx_003299 ctx_003300 ctx_003301 ctx_003302 ctx_003303 ctx_003304 ctx_003305 ctx_003306 ctx_003307 ctx_003308 ctx_003309 ctx_003310 ctx_003311 ctx_003312 ctx_003313 ctx_003314 ctx_003315 ctx_003316 ctx_003317 ctx_003318 ctx_003319 ctx_003320 ctx_003321 ctx_003322 ctx_003323 ctx_003324 ctx_003325 ctx_003326 ctx_003327 ctx_003328 ctx_003329 ctx_003330 ctx_003331 ctx_003332 ctx_003333 ctx_003334 ctx_003335 ctx_003336 ctx_003337 ctx_003338 ctx_003339 ctx_003340 ctx_003341 ctx_003342 ctx_003343 ctx_003344 ctx_003345 ctx_003346 ctx_003347 ctx_003348 ctx_003349 ctx_003350 ctx_003351 ctx_003352 ctx_003353 ctx_003354 ctx_003355 ctx_003356 ctx_003357 ctx_003358 ctx_003359 ctx_003360 ctx_003361 ctx_003362 ctx_003363 ctx_003364 ctx_003365 ctx_003366 ctx_003367 ctx_003368 ctx_003369 ctx_003370 ctx_003371 ctx_003372 ctx_003373 ctx_003374 ctx_003375 ctx_003376 ctx_003377 ctx_003378 ctx_003379 ctx_003380 ctx_003381 ctx_003382 ctx_003383 ctx_003384 ctx_003385 ctx_003386 ctx_003387 ctx_003388 ctx_003389 ctx_003390 ctx_003391 ctx_003392 ctx_003393 ctx_003394 ctx_003395 ctx_003396 ctx_003397 ctx_003398 ctx_003399 ctx_003400 ctx_003401 ctx_003402 ctx_003403 ctx_003404 ctx_003405 ctx_003406 ctx_003407 ctx_003408 ctx_003409 ctx_003410 ctx_003411 ctx_003412 ctx_003413 ctx_003414 ctx_003415 ctx_003416 ctx_003417 ctx_003418 ctx_003419 ctx_003420 ctx_003421 ctx_003422 ctx_003423 ctx_003424 ctx_003425 ctx_003426 ctx_003427 ctx_003428 ctx_003429 ctx_003430 ctx_003431 ctx_003432 ctx_003433 ctx_003434 ctx_003435 ctx_003436 ctx_003437 ctx_003438 ctx_003439 ctx_003440 ctx_003441 ctx_003442 ctx_003443 ctx_003444 ctx_003445 ctx_003446 ctx_003447 ctx_003448 ctx_003449 ctx_003450 ctx_003451 ctx_003452 ctx_003453 ctx_003454 ctx_003455 ctx_003456 ctx_003457 ctx_003458 ctx_003459 ctx_003460 ctx_003461 ctx_003462 ctx_003463 ctx_003464 ctx_003465 ctx_003466 ctx_003467 ctx_003468 ctx_003469 ctx_003470 ctx_003471 ctx_003472 ctx_003473 ctx_003474 ctx_003475 ctx_003476 ctx_003477 ctx_003478 ctx_003479 ctx_003480 ctx_003481 ctx_003482 ctx_003483 ctx_003484 ctx_003485 ctx_003486 ctx_003487 ctx_003488 ctx_003489 ctx_003490 ctx_003491 ctx_003492 ctx_003493 ctx_003494 ctx_003495 ctx_003496 ctx_003497 ctx_003498 ctx_003499 ctx_003500 ctx_003501 ctx_003502 ctx_003503 ctx_003504 ctx_003505 ctx_003506 ctx_003507 ctx_003508 ctx_003509 ctx_003510 ctx_003511 ctx_003512 ctx_003513 ctx_003514 ctx_003515 ctx_003516 ctx_003517 ctx_003518 ctx_003519 ctx_003520 ctx_003521 ctx_003522 ctx_003523 ctx_003524 ctx_003525 ctx_003526 ctx_003527 ctx_003528 ctx_003529 ctx_003530 ctx_003531 ctx_003532 ctx_003533 ctx_003534 ctx_003535 ctx_003536 ctx_003537 ctx_003538 ctx_003539 ctx_003540 ctx_003541 ctx_003542 ctx_003543 ctx_003544 ctx_003545 ctx_003546 ctx_003547 ctx_003548 ctx_003549 ctx_003550 ctx_003551 ctx_003552 ctx_003553 ctx_003554 ctx_003555 ctx_003556 ctx_003557 ctx_003558 ctx_003559 ctx_003560 ctx_003561 ctx_003562 ctx_003563 ctx_003564 ctx_003565 ctx_003566 ctx_003567 ctx_003568 ctx_003569 ctx_003570 ctx_003571 ctx_003572 ctx_003573 ctx_003574 ctx_003575 ctx_003576 ctx_003577 ctx_003578 ctx_003579 ctx_003580 ctx_003581 ctx_003582 ctx_003583 ctx_003584 ctx_003585 ctx_003586 ctx_003587 ctx_003588 ctx_003589 ctx_003590 ctx_003591 ctx_003592 ctx_003593 ctx_003594 ctx_003595 ctx_003596 ctx_003597 ctx_003598 ctx_003599 ctx_003600 ctx_003601 ctx_003602 ctx_003603 ctx_003604 ctx_003605 ctx_003606 ctx_003607 ctx_003608 ctx_003609 ctx_003610 ctx_003611 ctx_003612 ctx_003613 ctx_003614 ctx_003615 ctx_003616 ctx_003617 ctx_003618 ctx_003619 ctx_003620 ctx_003621 ctx_003622 ctx_003623 ctx_003624 ctx_003625 ctx_003626 ctx_003627 ctx_003628 ctx_003629 ctx_003630 ctx_003631 ctx_003632 ctx_003633 ctx_003634 ctx_003635 ctx_003636 ctx_003637 ctx_003638 ctx_003639 ctx_003640 ctx_003641 ctx_003642 ctx_003643 ctx_003644 ctx_003645 ctx_003646 ctx_003647 ctx_003648 ctx_003649 ctx_003650 ctx_003651 ctx_003652 ctx_003653 ctx_003654 ctx_003655 ctx_003656 ctx_003657 ctx_003658 ctx_003659 ctx_003660 ctx_003661 ctx_003662 ctx_003663 ctx_003664 ctx_003665 ctx_003666 ctx_003667 ctx_003668 ctx_003669 ctx_003670 ctx_003671 ctx_003672 ctx_003673 ctx_003674 ctx_003675 ctx_003676 ctx_003677 ctx_003678 ctx_003679 ctx_003680 ctx_003681 ctx_003682 ctx_003683 ctx_003684 ctx_003685 ctx_003686 ctx_003687 ctx_003688 ctx_003689 ctx_003690 ctx_003691 ctx_003692 ctx_003693 ctx_003694 ctx_003695 ctx_003696 ctx_003697 ctx_003698 ctx_003699 ctx_003700 ctx_003701 ctx_003702 ctx_003703 ctx_003704 ctx_003705 ctx_003706 ctx_003707 ctx_003708 ctx_003709 ctx_003710 ctx_003711 ctx_003712 ctx_003713 ctx_003714 ctx_003715 ctx_003716 ctx_003717 ctx_003718 ctx_003719 ctx_003720 ctx_003721 ctx_003722 ctx_003723 ctx_003724 ctx_003725 ctx_003726 ctx_003727 ctx_003728 ctx_003729 ctx_003730 ctx_003731 ctx_003732 ctx_003733 ctx_003734 ctx_003735 ctx_003736 ctx_003737 ctx_003738 ctx_003739 ctx_003740 ctx_003741 ctx_003742 ctx_003743 ctx_003744 ctx_003745 ctx_003746 ctx_003747 ctx_003748 ctx_003749 ctx_003750 ctx_003751 ctx_003752 ctx_003753 ctx_003754 ctx_003755 ctx_003756 ctx_003757 ctx_003758 ctx_003759 ctx_003760 ctx_003761 ctx_003762 ctx_003763 ctx_003764 ctx_003765 ctx_003766 ctx_003767 ctx_003768 ctx_003769 ctx_003770 ctx_003771 ctx_003772 ctx_003773 ctx_003774 ctx_003775 ctx_003776 ctx_003777 ctx_003778 ctx_003779 ctx_003780 ctx_003781 ctx_003782 ctx_003783 ctx_003784 ctx_003785 ctx_003786 ctx_003787 ctx_003788 ctx_003789 ctx_003790 ctx_003791 ctx_003792 ctx_003793 ctx_003794 ctx_003795 ctx_003796 ctx_003797 ctx_003798 ctx_003799 ctx_003800 ctx_003801 ctx_003802 ctx_003803 ctx_003804 ctx_003805 ctx_003806 ctx_003807 ctx_003808 ctx_003809 ctx_003810 ctx_003811 ctx_003812 ctx_003813 ctx_003814 ctx_003815 ctx_003816 ctx_003817 ctx_003818 ctx_003819 ctx_003820 ctx_003821 ctx_003822 ctx_003823 ctx_003824 ctx_003825 ctx_003826 ctx_003827 ctx_003828 ctx_003829 ctx_003830 ctx_003831 ctx_003832 ctx_003833 ctx_003834 ctx_003835 ctx_003836 ctx_003837 ctx_003838 ctx_003839 ctx_003840 ctx_003841 ctx_003842 ctx_003843 ctx_003844 ctx_003845 ctx_003846 ctx_003847 ctx_003848 ctx_003849 ctx_003850 ctx_003851 ctx_003852 ctx_003853 ctx_003854 ctx_003855 ctx_003856 ctx_003857 ctx_003858 ctx_003859 ctx_003860 ctx_003861 ctx_003862 ctx_003863 ctx_003864 ctx_003865 ctx_003866 ctx_003867 ctx_003868 ctx_003869 ctx_003870 ctx_003871 ctx_003872 ctx_003873 ctx_003874 ctx_003875 ctx_003876 ctx_003877 ctx_003878 ctx_003879 ctx_003880 ctx_003881 ctx_003882 ctx_003883 ctx_003884 ctx_003885 ctx_003886 ctx_003887 ctx_003888 ctx_003889 ctx_003890 ctx_003891 ctx_003892 ctx_003893 ctx_003894 ctx_003895 ctx_003896 ctx_003897 ctx_003898 ctx_003899 ctx_003900 ctx_003901 ctx_003902 ctx_003903 ctx_003904 ctx_003905 ctx_003906 ctx_003907 ctx_003908 ctx_003909 ctx_003910 ctx_003911 ctx_003912 ctx_003913 ctx_003914 ctx_003915 ctx_003916 ctx_003917 ctx_003918 ctx_003919 ctx_003920 ctx_003921 ctx_003922 ctx_003923 ctx_003924 ctx_003925 ctx_003926 ctx_003927 ctx_003928 ctx_003929 ctx_003930 ctx_003931 ctx_003932 ctx_003933 ctx_003934 ctx_003935 ctx_003936 ctx_003937 ctx_003938 ctx_003939 ctx_003940 ctx_003941 ctx_003942 ctx_003943 ctx_003944 ctx_003945 ctx_003946 ctx_003947 ctx_003948 ctx_003949 ctx_003950 ctx_003951 ctx_003952 ctx_003953 ctx_003954 ctx_003955 ctx_003956 ctx_003957 ctx_003958 ctx_003959 ctx_003960 ctx_003961 ctx_003962 ctx_003963 ctx_003964 ctx_003965 ctx_003966 ctx_003967 ctx_003968 ctx_003969 ctx_003970 ctx_003971 ctx_003972 ctx_003973 ctx_003974 ctx_003975 ctx_003976 ctx_003977 ctx_003978 ctx_003979 ctx_003980 ctx_003981 ctx_003982 ctx_003983 ctx_003984 ctx_003985 ctx_003986 ctx_003987 ctx_003988 ctx_003989 ctx_003990 ctx_003991 ctx_003992 ctx_003993 ctx_003994 ctx_003995 ctx_003996 ctx_003997 ctx_003998 ctx_003999 ctx_004000 ctx_004001 ctx_004002 ctx_004003 ctx_004004 ctx_004005 ctx_004006 ctx_004007 ctx_004008 ctx_004009 ctx_004010 ctx_004011 ctx_004012 ctx_004013 ctx_004014 ctx_004015 ctx_004016 ctx_004017 ctx_004018 ctx_004019 ctx_004020 ctx_004021 ctx_004022 ctx_004023 ctx_004024 ctx_004025 ctx_004026 ctx_004027 ctx_004028 ctx_004029 ctx_004030 ctx_004031 ctx_004032 ctx_004033 ctx_004034 ctx_004035 ctx_004036 ctx_004037 ctx_004038 ctx_004039 ctx_004040 ctx_004041 ctx_004042 ctx_004043 ctx_004044 ctx_004045 ctx_004046 ctx_004047 ctx_004048 ctx_004049 ctx_004050 ctx_004051 ctx_004052 ctx_004053 ctx_004054 ctx_004055 ctx_004056 ctx_004057 ctx_004058 ctx_004059 ctx_004060 ctx_004061 ctx_004062 ctx_004063 ctx_004064 ctx_004065 ctx_004066 ctx_004067 ctx_004068 ctx_004069 ctx_004070 ctx_004071 ctx_004072 ctx_004073 ctx_004074 ctx_004075 ctx_004076 ctx_004077 ctx_004078 ctx_004079 ctx_004080 ctx_004081 ctx_004082 ctx_004083 ctx_004084 ctx_004085 ctx_004086 ctx_004087 ctx_004088 ctx_004089 ctx_004090 ctx_004091 ctx_004092 ctx_004093 ctx_004094 ctx_004095 ctx_004096 ctx_004097 ctx_004098 ctx_004099 ctx_004100 ctx_004101 ctx_004102 ctx_004103 ctx_004104 ctx_004105 ctx_004106 ctx_004107 ctx_004108 ctx_004109 ctx_004110 ctx_004111 ctx_004112 ctx_004113 ctx_004114 ctx_004115 ctx_004116 ctx_004117 ctx_004118 ctx_004119 ctx_004120 ctx_004121 ctx_004122 ctx_004123 ctx_004124 ctx_004125 ctx_004126 ctx_004127 ctx_004128 ctx_004129 ctx_004130 ctx_004131 ctx_004132 ctx_004133 ctx_004134 ctx_004135 ctx_004136 ctx_004137 ctx_004138 ctx_004139 ctx_004140 ctx_004141 ctx_004142 ctx_004143 ctx_004144 ctx_004145 ctx_004146 ctx_004147 ctx_004148 ctx_004149 ctx_004150 ctx_004151 ctx_004152 ctx_004153 ctx_004154 ctx_004155 ctx_004156 ctx_004157 ctx_004158 ctx_004159 ctx_004160 ctx_004161 ctx_004162 ctx_004163 ctx_004164 ctx_004165 ctx_004166 ctx_004167 ctx_004168 ctx_004169 ctx_004170 ctx_004171 ctx_004172 ctx_004173 ctx_004174 ctx_004175 ctx_004176 ctx_004177 ctx_004178 ctx_004179 ctx_004180 ctx_004181 ctx_004182 ctx_004183 ctx_004184 ctx_004185 ctx_004186 ctx_004187 ctx_004188 ctx_004189 ctx_004190 ctx_004191 ctx_004192 ctx_004193 ctx_004194 ctx_004195 ctx_004196 ctx_004197 ctx_004198 ctx_004199 ctx_004200 ctx_004201 ctx_004202 ctx_004203 ctx_004204 ctx_004205 ctx_004206 ctx_004207 ctx_004208 ctx_004209 ctx_004210 ctx_004211 ctx_004212 ctx_004213 ctx_004214 ctx_004215 ctx_004216 ctx_004217 ctx_004218 ctx_004219 ctx_004220 ctx_004221 ctx_004222 ctx_004223 ctx_004224 ctx_004225 ctx_004226 ctx_004227 ctx_004228 ctx_004229 ctx_004230 ctx_004231 ctx_004232 ctx_004233 ctx_004234 ctx_004235 ctx_004236 ctx_004237 ctx_004238 ctx_004239 ctx_004240 ctx_004241 ctx_004242 ctx_004243 ctx_004244 ctx_004245 ctx_004246 ctx_004247 ctx_004248 ctx_004249 ctx_004250 ctx_004251 ctx_004252 ctx_004253 ctx_004254 ctx_004255 ctx_004256 ctx_004257 ctx_004258 ctx_004259 ctx_004260 ctx_004261 ctx_004262 ctx_004263 ctx_004264 ctx_004265 ctx_004266 ctx_004267 ctx_004268 ctx_004269 ctx_004270 ctx_004271 ctx_004272 ctx_004273 ctx_004274 ctx_004275 ctx_004276 ctx_004277 ctx_004278 ctx_004279 ctx_004280 ctx_004281 ctx_004282 ctx_004283 ctx_004284 ctx_004285 ctx_004286 ctx_004287 ctx_004288 ctx_004289 ctx_004290 ctx_004291 ctx_004292 ctx_004293 ctx_004294 ctx_004295 ctx_004296 ctx_004297 ctx_004298 ctx_004299 ctx_004300 ctx_004301 ctx_004302 ctx_004303 ctx_004304 ctx_004305 ctx_004306 ctx_004307 ctx_004308 ctx_004309 ctx_004310 ctx_004311 ctx_004312 ctx_004313 ctx_004314 ctx_004315 ctx_004316 ctx_004317 ctx_004318 ctx_004319 ctx_004320 ctx_004321 ctx_004322 ctx_004323 ctx_004324 ctx_004325 ctx_004326 ctx_004327 ctx_004328 ctx_004329 ctx_004330 ctx_004331 ctx_004332 ctx_004333 ctx_004334 ctx_004335 ctx_004336 ctx_004337 ctx_004338 ctx_004339 ctx_004340 ctx_004341 ctx_004342 ctx_004343 ctx_004344 ctx_004345 ctx_004346 ctx_004347 ctx_004348 ctx_004349 ctx_004350 ctx_004351 ctx_004352 ctx_004353 ctx_004354 ctx_004355 ctx_004356 ctx_004357 ctx_004358 ctx_004359 ctx_004360 ctx_004361 ctx_004362 ctx_004363 ctx_004364 ctx_004365 ctx_004366 ctx_004367 ctx_004368 ctx_004369 ctx_004370 ctx_004371 ctx_004372 ctx_004373 ctx_004374 ctx_004375 ctx_004376 ctx_004377 ctx_004378 ctx_004379 ctx_004380 ctx_004381 ctx_004382 ctx_004383 ctx_004384 ctx_004385 ctx_004386 ctx_004387 ctx_004388 ctx_004389 ctx_004390 ctx_004391 ctx_004392 ctx_004393 ctx_004394 ctx_004395 ctx_004396 ctx_004397 ctx_004398 ctx_004399 ctx_004400 ctx_004401 ctx_004402 ctx_004403 ctx_004404 ctx_004405 ctx_004406 ctx_004407 ctx_004408 ctx_004409 ctx_004410 ctx_004411 ctx_004412 ctx_004413 ctx_004414 ctx_004415 ctx_004416 ctx_004417 ctx_004418 ctx_004419 ctx_004420 ctx_004421 ctx_004422 ctx_004423 ctx_004424 ctx_004425 ctx_004426 ctx_004427 ctx_004428 ctx_004429 ctx_004430 ctx_004431 ctx_004432 ctx_004433 ctx_004434 ctx_004435 ctx_004436 ctx_004437 ctx_004438 ctx_004439 ctx_004440 ctx_004441 ctx_004442 ctx_004443 ctx_004444 ctx_004445 ctx_004446 ctx_004447 ctx_004448 ctx_004449 ctx_004450 ctx_004451 ctx_004452 ctx_004453 ctx_004454 ctx_004455 ctx_004456 ctx_004457 ctx_004458 ctx_004459 ctx_004460 ctx_004461 ctx_004462 ctx_004463 ctx_004464 ctx_004465 ctx_004466 ctx_004467 ctx_004468 ctx_004469 ctx_004470 ctx_004471 ctx_004472 ctx_004473 ctx_004474 ctx_004475 ctx_004476 ctx_004477 ctx_004478 ctx_004479 ctx_004480 ctx_004481 ctx_004482 ctx_004483 ctx_004484 ctx_004485 ctx_004486 ctx_004487 ctx_004488 ctx_004489 ctx_004490 ctx_004491 ctx_004492 ctx_004493 ctx_004494 ctx_004495 ctx_004496 ctx_004497 ctx_004498 ctx_004499 ctx_004500 ctx_004501 ctx_004502 ctx_004503 ctx_004504 ctx_004505 ctx_004506 ctx_004507 ctx_004508 ctx_004509 ctx_004510 ctx_004511 ctx_004512 ctx_004513 ctx_004514 ctx_004515 ctx_004516 ctx_004517 ctx_004518 ctx_004519 ctx_004520 ctx_004521 ctx_004522 ctx_004523 ctx_004524 ctx_004525 ctx_004526 ctx_004527 ctx_004528 ctx_004529 ctx_004530 ctx_004531 ctx_004532 ctx_004533 ctx_004534 ctx_004535 ctx_004536 ctx_004537 ctx_004538 ctx_004539 ctx_004540 ctx_004541 ctx_004542 ctx_004543 ctx_004544 ctx_004545 ctx_004546 ctx_004547 ctx_004548 ctx_004549 ctx_004550 ctx_004551 ctx_004552 ctx_004553 ctx_004554 ctx_004555 ctx_004556 ctx_004557 ctx_004558 ctx_004559 ctx_004560 ctx_004561 ctx_004562 ctx_004563 ctx_004564 ctx_004565 ctx_004566 ctx_004567 ctx_004568 ctx_004569 ctx_004570 ctx_004571 ctx_004572 ctx_004573 ctx_004574 ctx_004575 ctx_004576 ctx_004577 ctx_004578 ctx_004579 ctx_004580 ctx_004581 ctx_004582 ctx_004583 ctx_004584 ctx_004585 ctx_004586 ctx_004587 ctx_004588 ctx_004589 ctx_004590 ctx_004591 ctx_004592 ctx_004593 ctx_004594 ctx_004595 ctx_004596 ctx_004597 ctx_004598 ctx_004599 ctx_004600 ctx_004601 ctx_004602 ctx_004603 ctx_004604 ctx_004605 ctx_004606 ctx_004607 ctx_004608 ctx_004609 ctx_004610 ctx_004611 ctx_004612 ctx_004613 ctx_004614 ctx_004615 ctx_004616 ctx_004617 ctx_004618 ctx_004619 ctx_004620 ctx_004621 ctx_004622 ctx_004623 ctx_004624 ctx_004625 ctx_004626 ctx_004627 ctx_004628 ctx_004629 ctx_004630 ctx_004631 ctx_004632 ctx_004633 ctx_004634 ctx_004635 ctx_004636 ctx_004637 ctx_004638 ctx_004639 ctx_004640 ctx_004641 ctx_004642 ctx_004643 ctx_004644 ctx_004645 ctx_004646 ctx_004647 ctx_004648 ctx_004649 ctx_004650 ctx_004651 ctx_004652 ctx_004653 ctx_004654 ctx_004655 ctx_004656 ctx_004657 ctx_004658 ctx_004659 ctx_004660 ctx_004661 ctx_004662 ctx_004663 ctx_004664 ctx_004665 ctx_004666 ctx_004667 ctx_004668 ctx_004669 ctx_004670 ctx_004671 ctx_004672 ctx_004673 ctx_004674 ctx_004675 ctx_004676 ctx_004677 ctx_004678 ctx_004679 ctx_004680 ctx_004681 ctx_004682 ctx_004683 ctx_004684 ctx_004685 ctx_004686 ctx_004687 ctx_004688 ctx_004689 ctx_004690 ctx_004691 ctx_004692 ctx_004693 ctx_004694 ctx_004695 ctx_004696 ctx_004697 ctx_004698 ctx_004699 ctx_004700 ctx_004701 ctx_004702 ctx_004703 ctx_004704 ctx_004705 ctx_004706 ctx_004707 ctx_004708 ctx_004709 ctx_004710 ctx_004711 ctx_004712 ctx_004713 ctx_004714 ctx_004715 ctx_004716 ctx_004717 ctx_004718 ctx_004719 ctx_004720 ctx_004721 ctx_004722 ctx_004723 ctx_004724 ctx_004725 ctx_004726 ctx_004727 ctx_004728 ctx_004729 ctx_004730 ctx_004731 ctx_004732 ctx_004733 ctx_004734 ctx_004735 ctx_004736 ctx_004737 ctx_004738 ctx_004739 ctx_004740 ctx_004741 ctx_004742 ctx_004743 ctx_004744 ctx_004745 ctx_004746 ctx_004747 ctx_004748 ctx_004749 ctx_004750 ctx_004751 ctx_004752 ctx_004753 ctx_004754 ctx_004755 ctx_004756 ctx_004757 ctx_004758 ctx_004759 ctx_004760 ctx_004761 ctx_004762 ctx_004763 ctx_004764 ctx_004765 ctx_004766 ctx_004767 ctx_004768 ctx_004769 ctx_004770 ctx_004771 ctx_004772 ctx_004773 ctx_004774 ctx_004775 ctx_004776 ctx_004777 ctx_004778 ctx_004779 ctx_004780 ctx_004781 ctx_004782 ctx_004783 ctx_004784 ctx_004785 ctx_004786 ctx_004787 ctx_004788 ctx_004789 ctx_004790 ctx_004791 ctx_004792 ctx_004793 ctx_004794 ctx_004795 ctx_004796 ctx_004797 ctx_004798 ctx_004799 ctx_004800 ctx_004801 ctx_004802 ctx_004803 ctx_004804 ctx_004805 ctx_004806 ctx_004807 ctx_004808 ctx_004809 ctx_004810 ctx_004811 ctx_004812 ctx_004813 ctx_004814 ctx_004815 ctx_004816 ctx_004817 ctx_004818 ctx_004819 ctx_004820 ctx_004821 ctx_004822 ctx_004823 ctx_004824 ctx_004825 ctx_004826 ctx_004827 ctx_004828 ctx_004829 ctx_004830 ctx_004831 ctx_004832 ctx_004833 ctx_004834 ctx_004835 ctx_004836 ctx_004837 ctx_004838 ctx_004839 ctx_004840 ctx_004841 ctx_004842 ctx_004843 ctx_004844 ctx_004845 ctx_004846 ctx_004847 ctx_004848 ctx_004849 ctx_004850 ctx_004851 ctx_004852 ctx_004853 ctx_004854 ctx_004855 ctx_004856 ctx_004857 ctx_004858 ctx_004859 ctx_004860 ctx_004861 ctx_004862 ctx_004863 ctx_004864 ctx_004865 ctx_004866 ctx_004867 ctx_004868 ctx_004869 ctx_004870 ctx_004871 ctx_004872 ctx_004873 ctx_004874 ctx_004875 ctx_004876 ctx_004877 ctx_004878 ctx_004879 ctx_004880 ctx_004881 ctx_004882 ctx_004883 ctx_004884 ctx_004885 ctx_004886 ctx_004887 ctx_004888 ctx_004889 ctx_004890 ctx_004891 ctx_004892 ctx_004893 ctx_004894 ctx_004895 ctx_004896 ctx_004897 ctx_004898 ctx_004899 ctx_004900 ctx_004901 ctx_004902 ctx_004903 ctx_004904 ctx_004905 ctx_004906 ctx_004907 ctx_004908 ctx_004909 ctx_004910 ctx_004911 ctx_004912 ctx_004913 ctx_004914 ctx_004915 ctx_004916 ctx_004917 ctx_004918 ctx_004919 ctx_004920 ctx_004921 ctx_004922 ctx_004923 ctx_004924 ctx_004925 ctx_004926 ctx_004927 ctx_004928 ctx_004929 ctx_004930 ctx_004931 ctx_004932 ctx_004933 ctx_004934 ctx_004935 ctx_004936 ctx_004937 ctx_004938 ctx_004939 ctx_004940 ctx_004941 ctx_004942 ctx_004943 ctx_004944 ctx_004945 ctx_004946 ctx_004947 ctx_004948 ctx_004949 ctx_004950 ctx_004951 ctx_004952 ctx_004953 ctx_004954 ctx_004955 ctx_004956 ctx_004957 ctx_004958 ctx_004959 ctx_004960 ctx_004961 ctx_004962 ctx_004963 ctx_004964 ctx_004965 ctx_004966 ctx_004967 ctx_004968 ctx_004969 ctx_004970 ctx_004971 ctx_004972 ctx_004973 ctx_004974 ctx_004975 ctx_004976 ctx_004977 ctx_004978 ctx_004979 ctx_004980 ctx_004981 ctx_004982 ctx_004983 ctx_004984 ctx_004985 ctx_004986 ctx_004987 ctx_004988 ctx_004989 ctx_004990 ctx_004991 ctx_004992 ctx_004993 ctx_004994 ctx_004995 ctx_004996 ctx_004997 ctx_004998 ctx_004999 ctx_005000 ctx_005001 ctx_005002 ctx_005003 ctx_005004 ctx_005005 ctx_005006 ctx_005007 ctx_005008 ctx_005009 ctx_005010 ctx_005011 ctx_005012 ctx_005013 ctx_005014 ctx_005015 ctx_005016 ctx_005017 ctx_005018 ctx_005019 ctx_005020 ctx_005021 ctx_005022 ctx_005023 ctx_005024 ctx_005025 ctx_005026 ctx_005027 ctx_005028 ctx_005029 ctx_005030 ctx_005031 ctx_005032 ctx_005033 ctx_005034 ctx_005035 ctx_005036 ctx_005037 ctx_005038 ctx_005039 ctx_005040 ctx_005041 ctx_005042 ctx_005043 ctx_005044 ctx_005045 ctx_005046 ctx_005047 ctx_005048 ctx_005049 ctx_005050 ctx_005051 ctx_005052 ctx_005053 ctx_005054 ctx_005055 ctx_005056 ctx_005057 ctx_005058 ctx_005059 ctx_005060 ctx_005061 ctx_005062 ctx_005063 ctx_005064 ctx_005065 ctx_005066 ctx_005067 ctx_005068 ctx_005069 ctx_005070 ctx_005071 ctx_005072 ctx_005073 ctx_005074 ctx_005075 ctx_005076 ctx_005077 ctx_005078 ctx_005079 ctx_005080 ctx_005081 ctx_005082 ctx_005083 ctx_005084 ctx_005085 ctx_005086 ctx_005087 ctx_005088 ctx_005089 ctx_005090 ctx_005091 ctx_005092 ctx_005093 ctx_005094 ctx_005095 ctx_005096 ctx_005097 ctx_005098 ctx_005099 ctx_005100 ctx_005101 ctx_005102 ctx_005103 ctx_005104 ctx_005105 ctx_005106 ctx_005107 ctx_005108 ctx_005109 ctx_005110 ctx_005111 ctx_005112 ctx_005113 ctx_005114 ctx_005115 ctx_005116 ctx_005117 ctx_005118 ctx_005119 ctx_005120 ctx_005121 ctx_005122 ctx_005123 ctx_005124 ctx_005125 ctx_005126 ctx_005127 ctx_005128 ctx_005129 ctx_005130 ctx_005131 ctx_005132 ctx_005133 ctx_005134 ctx_005135 ctx_005136 ctx_005137 ctx_005138 ctx_005139 ctx_005140 ctx_005141 ctx_005142 ctx_005143 ctx_005144 ctx_005145 ctx_005146 ctx_005147 ctx_005148 ctx_005149 ctx_005150 ctx_005151 ctx_005152 ctx_005153 ctx_005154 ctx_005155 ctx_005156 ctx_005157 ctx_005158 ctx_005159 ctx_005160 ctx_005161 ctx_005162 ctx_005163 ctx_005164 ctx_005165 ctx_005166 ctx_005167 ctx_005168 ctx_005169 ctx_005170 ctx_005171 ctx_005172 ctx_005173 ctx_005174 ctx_005175 ctx_005176 ctx_005177 ctx_005178 ctx_005179 ctx_005180 ctx_005181 ctx_005182 ctx_005183 ctx_005184 ctx_005185 ctx_005186 ctx_005187 ctx_005188 ctx_005189 ctx_005190 ctx_005191 ctx_005192 ctx_005193 ctx_005194 ctx_005195 ctx_005196 ctx_005197 ctx_005198 ctx_005199 ctx_005200 ctx_005201 ctx_005202 ctx_005203 ctx_005204 ctx_005205 ctx_005206 ctx_005207 ctx_005208 ctx_005209 ctx_005210 ctx_005211 ctx_005212 ctx_005213 ctx_005214 ctx_005215 ctx_005216 ctx_005217 ctx_005218 ctx_005219 ctx_005220 ctx_005221 ctx_005222 ctx_005223 ctx_005224 ctx_005225 ctx_005226 ctx_005227 ctx_005228 ctx_005229 ctx_005230 ctx_005231 ctx_005232 ctx_005233 ctx_005234 ctx_005235 ctx_005236 ctx_005237 ctx_005238 ctx_005239 ctx_005240 ctx_005241 ctx_005242 ctx_005243 ctx_005244 ctx_005245 ctx_005246 ctx_005247 ctx_005248 ctx_005249 ctx_005250 ctx_005251 ctx_005252 ctx_005253 ctx_005254 ctx_005255 ctx_005256 ctx_005257 ctx_005258 ctx_005259 ctx_005260 ctx_005261 ctx_005262 ctx_005263 ctx_005264 ctx_005265 ctx_005266 ctx_005267 ctx_005268 ctx_005269 ctx_005270 ctx_005271 ctx_005272 ctx_005273 ctx_005274 ctx_005275 ctx_005276 ctx_005277 ctx_005278 ctx_005279 ctx_005280 ctx_005281 ctx_005282 ctx_005283 ctx_005284 ctx_005285 ctx_005286 ctx_005287 ctx_005288 ctx_005289 ctx_005290 ctx_005291 ctx_005292 ctx_005293 ctx_005294 ctx_005295 ctx_005296 ctx_005297 ctx_005298 ctx_005299 ctx_005300 ctx_005301 ctx_005302 ctx_005303 ctx_005304 ctx_005305 ctx_005306 ctx_005307 ctx_005308 ctx_005309 ctx_005310 ctx_005311 ctx_005312 ctx_005313 ctx_005314 ctx_005315 ctx_005316 ctx_005317 ctx_005318 ctx_005319 ctx_005320 ctx_005321 ctx_005322 ctx_005323 ctx_005324 ctx_005325 ctx_005326 ctx_005327 ctx_005328 ctx_005329 ctx_005330 ctx_005331 ctx_005332 ctx_005333 ctx_005334 ctx_005335 ctx_005336 ctx_005337 ctx_005338 ctx_005339 ctx_005340 ctx_005341 ctx_005342 ctx_005343 ctx_005344 ctx_005345 ctx_005346 ctx_005347 ctx_005348 ctx_005349 ctx_005350 ctx_005351 ctx_005352 ctx_005353 ctx_005354 ctx_005355 ctx_005356 ctx_005357 ctx_005358 ctx_005359 ctx_005360 ctx_005361 ctx_005362 ctx_005363 ctx_005364 ctx_005365 ctx_005366 ctx_005367 ctx_005368 ctx_005369 ctx_005370 ctx_005371 ctx_005372 ctx_005373 ctx_005374 ctx_005375 ctx_005376 ctx_005377 ctx_005378 ctx_005379 ctx_005380 ctx_005381 ctx_005382 ctx_005383 ctx_005384 ctx_005385 ctx_005386 ctx_005387 ctx_005388 ctx_005389 ctx_005390 ctx_005391 ctx_005392 ctx_005393 ctx_005394 ctx_005395 ctx_005396 ctx_005397 ctx_005398 ctx_005399 ctx_005400 ctx_005401 ctx_005402 ctx_005403 ctx_005404 ctx_005405 ctx_005406 ctx_005407 ctx_005408 ctx_005409 ctx_005410 ctx_005411 ctx_005412 ctx_005413 ctx_005414 ctx_005415 ctx_005416 ctx_005417 ctx_005418 ctx_005419 ctx_005420 ctx_005421 ctx_005422 ctx_005423 ctx_005424 ctx_005425 ctx_005426 ctx_005427 ctx_005428 ctx_005429 ctx_005430 ctx_005431 ctx_005432 ctx_005433 ctx_005434 ctx_005435 ctx_005436 ctx_005437 ctx_005438 ctx_005439 ctx_005440 ctx_005441 ctx_005442 ctx_005443 ctx_005444 ctx_005445 ctx_005446 ctx_005447 ctx_005448 ctx_005449 ctx_005450 ctx_005451 ctx_005452 ctx_005453 ctx_005454 ctx_005455 ctx_005456 ctx_005457 ctx_005458 ctx_005459 ctx_005460 ctx_005461 ctx_005462 ctx_005463 ctx_005464 ctx_005465 ctx_005466 ctx_005467 ctx_005468 ctx_005469 ctx_005470 ctx_005471 ctx_005472 ctx_005473 ctx_005474 ctx_005475 ctx_005476 ctx_005477 ctx_005478 ctx_005479 ctx_005480 ctx_005481 ctx_005482 ctx_005483 ctx_005484 ctx_005485 ctx_005486 ctx_005487 ctx_005488 ctx_005489 ctx_005490 ctx_005491 ctx_005492 ctx_005493 ctx_005494 ctx_005495 ctx_005496 ctx_005497 ctx_005498 ctx_005499 ctx_005500 ctx_005501 ctx_005502 ctx_005503 ctx_005504 ctx_005505 ctx_005506 ctx_005507 ctx_005508 ctx_005509 ctx_005510 ctx_005511 ctx_005512 ctx_005513 ctx_005514 ctx_005515 ctx_005516 ctx_005517 ctx_005518 ctx_005519 ctx_005520 ctx_005521 ctx_005522 ctx_005523 ctx_005524 ctx_005525 ctx_005526 ctx_005527 ctx_005528 ctx_005529 ctx_005530 ctx_005531 ctx_005532 ctx_005533 ctx_005534 ctx_005535 ctx_005536 ctx_005537 ctx_005538 ctx_005539 ctx_005540 ctx_005541 ctx_005542 ctx_005543 ctx_005544 ctx_005545 ctx_005546 ctx_005547 ctx_005548 ctx_005549 ctx_005550 ctx_005551 ctx_005552 ctx_005553 ctx_005554 ctx_005555 ctx_005556 ctx_005557 ctx_005558 ctx_005559 ctx_005560 ctx_005561 ctx_005562 ctx_005563 ctx_005564 ctx_005565 ctx_005566 ctx_005567 ctx_005568 ctx_005569 ctx_005570 ctx_005571 ctx_005572 ctx_005573 ctx_005574 ctx_005575 ctx_005576 ctx_005577 ctx_005578 ctx_005579 ctx_005580 ctx_005581 ctx_005582 ctx_005583 ctx_005584 ctx_005585 ctx_005586 ctx_005587 ctx_005588 ctx_005589 ctx_005590 ctx_005591 ctx_005592 ctx_005593 ctx_005594 ctx_005595 ctx_005596 ctx_005597 ctx_005598 ctx_005599 ctx_005600 ctx_005601 ctx_005602 ctx_005603 ctx_005604 ctx_005605 ctx_005606 ctx_005607 ctx_005608 ctx_005609 ctx_005610 ctx_005611 ctx_005612 ctx_005613 ctx_005614 ctx_005615 ctx_005616 ctx_005617 ctx_005618 ctx_005619 ctx_005620 ctx_005621 ctx_005622 ctx_005623 ctx_005624 ctx_005625 ctx_005626 ctx_005627 ctx_005628 ctx_005629 ctx_005630 ctx_005631 ctx_005632 ctx_005633 ctx_005634 ctx_005635 ctx_005636 ctx_005637 ctx_005638 ctx_005639 ctx_005640 ctx_005641 ctx_005642 ctx_005643 ctx_005644 ctx_005645 ctx_005646 ctx_005647 ctx_005648 ctx_005649 ctx_005650 ctx_005651 ctx_005652 ctx_005653 ctx_005654 ctx_005655 ctx_005656 ctx_005657 ctx_005658 ctx_005659 ctx_005660 ctx_005661 ctx_005662 ctx_005663 ctx_005664 ctx_005665 ctx_005666 ctx_005667 ctx_005668 ctx_005669 ctx_005670 ctx_005671 ctx_005672 ctx_005673 ctx_005674 ctx_005675 ctx_005676 ctx_005677 ctx_005678 ctx_005679 ctx_005680 ctx_005681 ctx_005682 ctx_005683 ctx_005684 ctx_005685 ctx_005686 ctx_005687 ctx_005688 ctx_005689 ctx_005690 ctx_005691 ctx_005692 ctx_005693 ctx_005694 ctx_005695 ctx_005696 ctx_005697 ctx_005698 ctx_005699 ctx_005700 ctx_005701 ctx_005702 ctx_005703 ctx_005704 ctx_005705 ctx_005706 ctx_005707 ctx_005708 ctx_005709 ctx_005710 ctx_005711 ctx_005712 ctx_005713 ctx_005714 ctx_005715 ctx_005716 ctx_005717 ctx_005718 ctx_005719 ctx_005720 ctx_005721 ctx_005722 ctx_005723 ctx_005724 ctx_005725 ctx_005726 ctx_005727 ctx_005728 ctx_005729 ctx_005730 ctx_005731 ctx_005732 ctx_005733 ctx_005734 ctx_005735 ctx_005736 ctx_005737 ctx_005738 ctx_005739 ctx_005740 ctx_005741 ctx_005742 ctx_005743 ctx_005744 ctx_005745 ctx_005746 ctx_005747 ctx_005748 ctx_005749 ctx_005750 ctx_005751 ctx_005752 ctx_005753 ctx_005754 ctx_005755 ctx_005756 ctx_005757 ctx_005758 ctx_005759 ctx_005760 ctx_005761 ctx_005762 ctx_005763 ctx_005764 ctx_005765 ctx_005766 ctx_005767 ctx_005768 ctx_005769 ctx_005770 ctx_005771 ctx_005772 ctx_005773 ctx_005774 ctx_005775 ctx_005776 ctx_005777 ctx_005778 ctx_005779 ctx_005780 ctx_005781 ctx_005782 ctx_005783 ctx_005784 ctx_005785 ctx_005786 ctx_005787 ctx_005788 ctx_005789 ctx_005790 ctx_005791 ctx_005792 ctx_005793 ctx_005794 ctx_005795 ctx_005796 ctx_005797 ctx_005798 ctx_005799 ctx_005800 ctx_005801 ctx_005802 ctx_005803 ctx_005804 ctx_005805 ctx_005806 ctx_005807 ctx_005808 ctx_005809 ctx_005810 ctx_005811 ctx_005812 ctx_005813 ctx_005814 ctx_005815 ctx_005816 ctx_005817 ctx_005818 ctx_005819 ctx_005820 ctx_005821 ctx_005822 ctx_005823 ctx_005824 ctx_005825 ctx_005826 ctx_005827 ctx_005828 ctx_005829 ctx_005830 ctx_005831 ctx_005832 ctx_005833 ctx_005834 ctx_005835 ctx_005836 ctx_005837 ctx_005838 ctx_005839 ctx_005840 ctx_005841 ctx_005842 ctx_005843 ctx_005844 ctx_005845 ctx_005846 ctx_005847 ctx_005848 ctx_005849 ctx_005850 ctx_005851 ctx_005852 ctx_005853 ctx_005854 ctx_005855 ctx_005856 ctx_005857 ctx_005858 ctx_005859 ctx_005860 ctx_005861 ctx_005862 ctx_005863 ctx_005864 ctx_005865 ctx_005866 ctx_005867 ctx_005868 ctx_005869 ctx_005870 ctx_005871 ctx_005872 ctx_005873 ctx_005874 ctx_005875 ctx_005876 ctx_005877 ctx_005878 ctx_005879 ctx_005880 ctx_005881 ctx_005882 ctx_005883 ctx_005884 ctx_005885 ctx_005886 ctx_005887 ctx_005888 ctx_005889 ctx_005890 ctx_005891 ctx_005892 ctx_005893 ctx_005894 ctx_005895 ctx_005896 ctx_005897 ctx_005898 ctx_005899 ctx_005900 ctx_005901 ctx_005902 ctx_005903 ctx_005904 ctx_005905 ctx_005906 ctx_005907 ctx_005908 ctx_005909 ctx_005910 ctx_005911 ctx_005912 ctx_005913 ctx_005914 ctx_005915 ctx_005916 ctx_005917 ctx_005918 ctx_005919 ctx_005920 ctx_005921 ctx_005922 ctx_005923 ctx_005924 ctx_005925 ctx_005926 ctx_005927 ctx_005928 ctx_005929 ctx_005930 ctx_005931 ctx_005932 ctx_005933 ctx_005934 ctx_005935 ctx_005936 ctx_005937 ctx_005938 ctx_005939 ctx_005940 ctx_005941 ctx_005942 ctx_005943 ctx_005944 ctx_005945 ctx_005946 ctx_005947 ctx_005948 ctx_005949 ctx_005950 ctx_005951 ctx_005952 ctx_005953 ctx_005954 ctx_005955 ctx_005956 ctx_005957 ctx_005958 ctx_005959 ctx_005960 ctx_005961 ctx_005962 ctx_005963 ctx_005964 ctx_005965 ctx_005966 ctx_005967 ctx_005968 ctx_005969 ctx_005970 ctx_005971 ctx_005972 ctx_005973 ctx_005974 ctx_005975 ctx_005976 ctx_005977 ctx_005978 ctx_005979 ctx_005980 ctx_005981 ctx_005982 ctx_005983 ctx_005984 ctx_005985 ctx_005986 ctx_005987 ctx_005988 ctx_005989 ctx_005990 ctx_005991 ctx_005992 ctx_005993 ctx_005994 ctx_005995 ctx_005996 ctx_005997 ctx_005998 ctx_005999 ctx_006000 ctx_006001 ctx_006002 ctx_006003 ctx_006004 ctx_006005 ctx_006006 ctx_006007 ctx_006008 ctx_006009 ctx_006010 ctx_006011 ctx_006012 ctx_006013 ctx_006014 ctx_006015 ctx_006016 ctx_006017 ctx_006018 ctx_006019 ctx_006020 ctx_006021 ctx_006022 ctx_006023 ctx_006024 ctx_006025 ctx_006026 ctx_006027 ctx_006028 ctx_006029 ctx_006030 ctx_006031 ctx_006032 ctx_006033 ctx_006034 ctx_006035 ctx_006036 ctx_006037 ctx_006038 ctx_006039 ctx_006040 ctx_006041 ctx_006042 ctx_006043 ctx_006044 ctx_006045 ctx_006046 ctx_006047 ctx_006048 ctx_006049 ctx_006050 ctx_006051 ctx_006052 ctx_006053 ctx_006054 ctx_006055 ctx_006056 ctx_006057 ctx_006058 ctx_006059 ctx_006060 ctx_006061 ctx_006062 ctx_006063 ctx_006064 ctx_006065 ctx_006066 ctx_006067 ctx_006068 ctx_006069 ctx_006070 ctx_006071 ctx_006072 ctx_006073 ctx_006074 ctx_006075 ctx_006076 ctx_006077 ctx_006078 ctx_006079 ctx_006080 ctx_006081 ctx_006082 ctx_006083 ctx_006084 ctx_006085 ctx_006086 ctx_006087 ctx_006088 ctx_006089 ctx_006090 ctx_006091 ctx_006092 ctx_006093 ctx_006094 ctx_006095 ctx_006096 ctx_006097 ctx_006098 ctx_006099 ctx_006100 ctx_006101 ctx_006102 ctx_006103 ctx_006104 ctx_006105 ctx_006106 ctx_006107 ctx_006108 ctx_006109 ctx_006110 ctx_006111 ctx_006112 ctx_006113 ctx_006114 ctx_006115 ctx_006116 ctx_006117 ctx_006118 ctx_006119 ctx_006120 ctx_006121 ctx_006122 ctx_006123 ctx_006124 ctx_006125 ctx_006126 ctx_006127 ctx_006128 ctx_006129 ctx_006130 ctx_006131 ctx_006132 ctx_006133 ctx_006134 ctx_006135 ctx_006136 ctx_006137 ctx_006138 ctx_006139 ctx_006140 ctx_006141 ctx_006142 ctx_006143 ctx_006144 ctx_006145 ctx_006146 ctx_006147 ctx_006148 ctx_006149 ctx_006150 ctx_006151 ctx_006152 ctx_006153 ctx_006154 ctx_006155 ctx_006156 ctx_006157 ctx_006158 ctx_006159 ctx_006160 ctx_006161 ctx_006162 ctx_006163 ctx_006164 ctx_006165 ctx_006166 ctx_006167 ctx_006168 ctx_006169 ctx_006170 ctx_006171 ctx_006172 ctx_006173 ctx_006174 ctx_006175 ctx_006176 ctx_006177 ctx_006178 ctx_006179 ctx_006180 ctx_006181 ctx_006182 ctx_006183 ctx_006184 ctx_006185 ctx_006186 ctx_006187 ctx_006188 ctx_006189 ctx_006190 ctx_006191 ctx_006192 ctx_006193 ctx_006194 ctx_006195 ctx_006196 ctx_006197 ctx_006198 ctx_006199 ctx_006200 ctx_006201 ctx_006202 ctx_006203 ctx_006204 ctx_006205 ctx_006206 ctx_006207 ctx_006208 ctx_006209 ctx_006210 ctx_006211 ctx_006212 ctx_006213 ctx_006214 ctx_006215 ctx_006216 ctx_006217 ctx_006218 ctx_006219 ctx_006220 ctx_006221 ctx_006222 ctx_006223 ctx_006224 ctx_006225 ctx_006226 ctx_006227 ctx_006228 ctx_006229 ctx_006230 ctx_006231 ctx_006232 ctx_006233 ctx_006234 ctx_006235 ctx_006236 ctx_006237 ctx_006238 ctx_006239 ctx_006240 ctx_006241 ctx_006242 ctx_006243 ctx_006244 ctx_006245 ctx_006246 ctx_006247 ctx_006248 ctx_006249 ctx_006250 ctx_006251 ctx_006252 ctx_006253 ctx_006254 ctx_006255 ctx_006256 ctx_006257 ctx_006258 ctx_006259 ctx_006260 ctx_006261 ctx_006262 ctx_006263 ctx_006264 ctx_006265 ctx_006266 ctx_006267 ctx_006268 ctx_006269 ctx_006270 ctx_006271 ctx_006272 ctx_006273 ctx_006274 ctx_006275 ctx_006276 ctx_006277 ctx_006278 ctx_006279 ctx_006280 ctx_006281 ctx_006282 ctx_006283 ctx_006284 ctx_006285 ctx_006286 ctx_006287 ctx_006288 ctx_006289 ctx_006290 ctx_006291 ctx_006292 ctx_006293 ctx_006294 ctx_006295 ctx_006296 ctx_006297 ctx_006298 ctx_006299 ctx_006300 ctx_006301 ctx_006302 ctx_006303 ctx_006304 ctx_006305 ctx_006306 ctx_006307 ctx_006308 ctx_006309 ctx_006310 ctx_006311 ctx_006312 ctx_006313 ctx_006314 ctx_006315 ctx_006316 ctx_006317 ctx_006318 ctx_006319 ctx_006320 ctx_006321 ctx_006322 ctx_006323 ctx_006324 ctx_006325 ctx_006326 ctx_006327 ctx_006328 ctx_006329 ctx_006330 ctx_006331 ctx_006332 ctx_006333 ctx_006334 ctx_006335 ctx_006336 ctx_006337 ctx_006338 ctx_006339 ctx_006340 ctx_006341 ctx_006342 ctx_006343 ctx_006344 ctx_006345 ctx_006346 ctx_006347 ctx_006348 ctx_006349 ctx_006350 ctx_006351 ctx_006352 ctx_006353 ctx_006354 ctx_006355 ctx_006356 ctx_006357 ctx_006358 ctx_006359 ctx_006360 ctx_006361 ctx_006362 ctx_006363 ctx_006364 ctx_006365 ctx_006366 ctx_006367 ctx_006368 ctx_006369 ctx_006370 ctx_006371 ctx_006372 ctx_006373 ctx_006374 ctx_006375 ctx_006376 ctx_006377 ctx_006378 ctx_006379 ctx_006380 ctx_006381 ctx_006382 ctx_006383 ctx_006384 ctx_006385 ctx_006386 ctx_006387 ctx_006388 ctx_006389 ctx_006390 ctx_006391 ctx_006392 ctx_006393 ctx_006394 ctx_006395 ctx_006396 ctx_006397 ctx_006398 ctx_006399 ctx_006400 ctx_006401 ctx_006402 ctx_006403 ctx_006404 ctx_006405 ctx_006406 ctx_006407 ctx_006408 ctx_006409 ctx_006410 ctx_006411 ctx_006412 ctx_006413 ctx_006414 ctx_006415 ctx_006416 ctx_006417 ctx_006418 ctx_006419 ctx_006420 ctx_006421 ctx_006422 ctx_006423 ctx_006424 ctx_006425 ctx_006426 ctx_006427 ctx_006428 ctx_006429 ctx_006430 ctx_006431 ctx_006432 ctx_006433 ctx_006434 ctx_006435 ctx_006436 ctx_006437 ctx_006438 ctx_006439 ctx_006440 ctx_006441 ctx_006442 ctx_006443 ctx_006444 ctx_006445 ctx_006446 ctx_006447 ctx_006448 ctx_006449 ctx_006450 ctx_006451 ctx_006452 ctx_006453 ctx_006454 ctx_006455 ctx_006456 ctx_006457 ctx_006458 ctx_006459 ctx_006460 ctx_006461 ctx_006462 ctx_006463 ctx_006464 ctx_006465 ctx_006466 ctx_006467 ctx_006468 ctx_006469 ctx_006470 ctx_006471 ctx_006472 ctx_006473 ctx_006474 ctx_006475 ctx_006476 ctx_006477 ctx_006478 ctx_006479 ctx_006480 ctx_006481 ctx_006482 ctx_006483 ctx_006484 ctx_006485 ctx_006486 ctx_006487 ctx_006488 ctx_006489 ctx_006490 ctx_006491 ctx_006492 ctx_006493 ctx_006494 ctx_006495 ctx_006496 ctx_006497 ctx_006498 ctx_006499 ctx_006500 ctx_006501 ctx_006502 ctx_006503 ctx_006504 ctx_006505 ctx_006506 ctx_006507 ctx_006508 ctx_006509 ctx_006510 ctx_006511 ctx_006512 ctx_006513 ctx_006514 ctx_006515 ctx_006516 ctx_006517 ctx_006518 ctx_006519 ctx_006520 ctx_006521 ctx_006522 ctx_006523 ctx_006524 ctx_006525 ctx_006526 ctx_006527 ctx_006528 ctx_006529 ctx_006530 ctx_006531 ctx_006532 ctx_006533 ctx_006534 ctx_006535 ctx_006536 ctx_006537 ctx_006538 ctx_006539 ctx_006540 ctx_006541 ctx_006542 ctx_006543 ctx_006544 ctx_006545 ctx_006546 ctx_006547 ctx_006548 ctx_006549 ctx_006550 ctx_006551 ctx_006552 ctx_006553 ctx_006554 ctx_006555 ctx_006556 ctx_006557 ctx_006558 ctx_006559 ctx_006560 ctx_006561 ctx_006562 ctx_006563 ctx_006564 ctx_006565 ctx_006566 ctx_006567 ctx_006568 ctx_006569 ctx_006570 ctx_006571 ctx_006572 ctx_006573 ctx_006574 ctx_006575 ctx_006576 ctx_006577 ctx_006578 ctx_006579 ctx_006580 ctx_006581 ctx_006582 ctx_006583 ctx_006584 ctx_006585 ctx_006586 ctx_006587 ctx_006588 ctx_006589 ctx_006590 ctx_006591 ctx_006592 ctx_006593 ctx_006594 ctx_006595 ctx_006596 ctx_006597 ctx_006598 ctx_006599 ctx_006600 ctx_006601 ctx_006602 ctx_006603 ctx_006604 ctx_006605 ctx_006606 ctx_006607 ctx_006608 ctx_006609 ctx_006610 ctx_006611 ctx_006612 ctx_006613 ctx_006614 ctx_006615 ctx_006616 ctx_006617 ctx_006618 ctx_006619 ctx_006620 ctx_006621 ctx_006622 ctx_006623 ctx_006624 ctx_006625 ctx_006626 ctx_006627 ctx_006628 ctx_006629 ctx_006630 ctx_006631 ctx_006632 ctx_006633 ctx_006634 ctx_006635 ctx_006636 ctx_006637 ctx_006638 ctx_006639 ctx_006640 ctx_006641 ctx_006642 ctx_006643 ctx_006644 ctx_006645 ctx_006646 ctx_006647 ctx_006648 ctx_006649 ctx_006650 ctx_006651 ctx_006652 ctx_006653 ctx_006654 ctx_006655 ctx_006656 ctx_006657 ctx_006658 ctx_006659 ctx_006660 ctx_006661 ctx_006662 ctx_006663 ctx_006664 ctx_006665 ctx_006666 ctx_006667 ctx_006668 ctx_006669 ctx_006670 ctx_006671 ctx_006672 ctx_006673 ctx_006674 ctx_006675 ctx_006676 ctx_006677 ctx_006678 ctx_006679 ctx_006680 ctx_006681 ctx_006682 ctx_006683 ctx_006684 ctx_006685 ctx_006686 ctx_006687 ctx_006688 ctx_006689 ctx_006690 ctx_006691 ctx_006692 ctx_006693 ctx_006694 ctx_006695 ctx_006696 ctx_006697 ctx_006698 ctx_006699 ctx_006700 ctx_006701 ctx_006702 ctx_006703 ctx_006704 ctx_006705 ctx_006706 ctx_006707 ctx_006708 ctx_006709 ctx_006710 ctx_006711 ctx_006712 ctx_006713 ctx_006714 ctx_006715 ctx_006716 ctx_006717 ctx_006718 ctx_006719 ctx_006720 ctx_006721 ctx_006722 ctx_006723 ctx_006724 ctx_006725 ctx_006726 ctx_006727 ctx_006728 ctx_006729 ctx_006730 ctx_006731 ctx_006732 ctx_006733 ctx_006734 ctx_006735 ctx_006736 ctx_006737 ctx_006738 ctx_006739 ctx_006740 ctx_006741 ctx_006742 ctx_006743 ctx_006744 ctx_006745 ctx_006746 ctx_006747 ctx_006748 ctx_006749 ctx_006750 ctx_006751 ctx_006752 ctx_006753 ctx_006754 ctx_006755 ctx_006756 ctx_006757 ctx_006758 ctx_006759 ctx_006760 ctx_006761 ctx_006762 ctx_006763 ctx_006764 ctx_006765 ctx_006766 ctx_006767 ctx_006768 ctx_006769 ctx_006770 ctx_006771 ctx_006772 ctx_006773 ctx_006774 ctx_006775 ctx_006776 ctx_006777 ctx_006778 ctx_006779 ctx_006780 ctx_006781 ctx_006782 ctx_006783 ctx_006784 ctx_006785 ctx_006786 ctx_006787 ctx_006788 ctx_006789 ctx_006790 ctx_006791 ctx_006792 ctx_006793 ctx_006794 ctx_006795 ctx_006796 ctx_006797 ctx_006798 ctx_006799 ctx_006800 ctx_006801 ctx_006802 ctx_006803 ctx_006804 ctx_006805 ctx_006806 ctx_006807 ctx_006808 ctx_006809 ctx_006810 ctx_006811 ctx_006812 ctx_006813 ctx_006814 ctx_006815 ctx_006816 ctx_006817 ctx_006818 ctx_006819 ctx_006820 ctx_006821 ctx_006822 ctx_006823 ctx_006824 ctx_006825 ctx_006826 ctx_006827 ctx_006828 ctx_006829 ctx_006830 ctx_006831 ctx_006832 ctx_006833 ctx_006834 ctx_006835 ctx_006836 ctx_006837 ctx_006838 ctx_006839 ctx_006840 ctx_006841 ctx_006842 ctx_006843 ctx_006844 ctx_006845 ctx_006846 ctx_006847 ctx_006848 ctx_006849 ctx_006850 ctx_006851 ctx_006852 ctx_006853 ctx_006854 ctx_006855 ctx_006856 ctx_006857 ctx_006858 ctx_006859 ctx_006860 ctx_006861 ctx_006862 ctx_006863 ctx_006864 ctx_006865 ctx_006866 ctx_006867 ctx_006868 ctx_006869 ctx_006870 ctx_006871 ctx_006872 ctx_006873 ctx_006874 ctx_006875 ctx_006876 ctx_006877 ctx_006878 ctx_006879 ctx_006880 ctx_006881 ctx_006882 ctx_006883 ctx_006884 ctx_006885 ctx_006886 ctx_006887 ctx_006888 ctx_006889 ctx_006890 ctx_006891 ctx_006892 ctx_006893 ctx_006894 ctx_006895 ctx_006896 ctx_006897 ctx_006898 ctx_006899 ctx_006900 ctx_006901 ctx_006902 ctx_006903 ctx_006904 ctx_006905 ctx_006906 ctx_006907 ctx_006908 ctx_006909 ctx_006910 ctx_006911 ctx_006912 ctx_006913 ctx_006914 ctx_006915 ctx_006916 ctx_006917 ctx_006918 ctx_006919 ctx_006920 ctx_006921 ctx_006922 ctx_006923 ctx_006924 ctx_006925 ctx_006926 ctx_006927 ctx_006928 ctx_006929 ctx_006930 ctx_006931 ctx_006932 ctx_006933 ctx_006934 ctx_006935 ctx_006936 ctx_006937 ctx_006938 ctx_006939 ctx_006940 ctx_006941 ctx_006942 ctx_006943 ctx_006944 ctx_006945 ctx_006946 ctx_006947 ctx_006948 ctx_006949 ctx_006950 ctx_006951 ctx_006952 ctx_006953 ctx_006954 ctx_006955 ctx_006956 ctx_006957 ctx_006958 ctx_006959 ctx_006960 ctx_006961 ctx_006962 ctx_006963 ctx_006964 ctx_006965 ctx_006966 ctx_006967 ctx_006968 ctx_006969 ctx_006970 ctx_006971 ctx_006972 ctx_006973 ctx_006974 ctx_006975 ctx_006976 ctx_006977 ctx_006978 ctx_006979 ctx_006980 ctx_006981 ctx_006982 ctx_006983 ctx_006984 ctx_006985 ctx_006986 ctx_006987 ctx_006988 ctx_006989 ctx_006990 ctx_006991 ctx_006992 ctx_006993 ctx_006994 ctx_006995 ctx_006996 ctx_006997 ctx_006998 ctx_006999 ctx_007000 ctx_007001 ctx_007002 ctx_007003 ctx_007004 ctx_007005 ctx_007006 ctx_007007 ctx_007008 ctx_007009 ctx_007010 ctx_007011 ctx_007012 ctx_007013 ctx_007014 ctx_007015 ctx_007016 ctx_007017 ctx_007018 ctx_007019 ctx_007020 ctx_007021 ctx_007022 ctx_007023 ctx_007024 ctx_007025 ctx_007026 ctx_007027 ctx_007028 ctx_007029 ctx_007030 ctx_007031 ctx_007032 ctx_007033 ctx_007034 ctx_007035 ctx_007036 ctx_007037 ctx_007038 ctx_007039 ctx_007040 ctx_007041 ctx_007042 ctx_007043 ctx_007044 ctx_007045 ctx_007046 ctx_007047 ctx_007048 ctx_007049 ctx_007050 ctx_007051 ctx_007052 ctx_007053 ctx_007054 ctx_007055 ctx_007056 ctx_007057 ctx_007058 ctx_007059 ctx_007060 ctx_007061 ctx_007062 ctx_007063 ctx_007064 ctx_007065 ctx_007066 ctx_007067 ctx_007068 ctx_007069 ctx_007070 ctx_007071 ctx_007072 ctx_007073 ctx_007074 ctx_007075 ctx_007076 ctx_007077 ctx_007078 ctx_007079 ctx_007080 ctx_007081 ctx_007082 ctx_007083 ctx_007084 ctx_007085 ctx_007086 ctx_007087 ctx_007088 ctx_007089 ctx_007090 ctx_007091 ctx_007092 ctx_007093 ctx_007094 ctx_007095 ctx_007096 ctx_007097 ctx_007098 ctx_007099 ctx_007100 ctx_007101 ctx_007102 ctx_007103 ctx_007104 ctx_007105 ctx_007106 ctx_007107 ctx_007108 ctx_007109 ctx_007110 ctx_007111 ctx_007112 ctx_007113 ctx_007114 ctx_007115 ctx_007116 ctx_007117 ctx_007118 ctx_007119 ctx_007120 ctx_007121 ctx_007122 ctx_007123 ctx_007124 ctx_007125 ctx_007126 ctx_007127 ctx_007128 ctx_007129 ctx_007130 ctx_007131 ctx_007132 ctx_007133 ctx_007134 ctx_007135 ctx_007136 ctx_007137 ctx_007138 ctx_007139 ctx_007140 ctx_007141 ctx_007142 ctx_007143 ctx_007144 ctx_007145 ctx_007146 ctx_007147 ctx_007148 ctx_007149 ctx_007150 ctx_007151 ctx_007152 ctx_007153 ctx_007154 ctx_007155 ctx_007156 ctx_007157 ctx_007158 ctx_007159 ctx_007160 ctx_007161 ctx_007162 ctx_007163 ctx_007164 ctx_007165 ctx_007166 ctx_007167 ctx_007168 ctx_007169 ctx_007170 ctx_007171 ctx_007172 ctx_007173 ctx_007174 ctx_007175 ctx_007176 ctx_007177 ctx_007178 ctx_007179 ctx_007180 ctx_007181 ctx_007182 ctx_007183 ctx_007184 ctx_007185 ctx_007186 ctx_007187 ctx_007188 ctx_007189 ctx_007190 ctx_007191 ctx_007192 ctx_007193 ctx_007194 ctx_007195 ctx_007196 ctx_007197 ctx_007198 ctx_007199 ctx_007200 ctx_007201 ctx_007202 ctx_007203 ctx_007204 ctx_007205 ctx_007206 ctx_007207 ctx_007208 ctx_007209 ctx_007210 ctx_007211 ctx_007212 ctx_007213 ctx_007214 ctx_007215 ctx_007216 ctx_007217 ctx_007218 ctx_007219 ctx_007220 ctx_007221 ctx_007222 ctx_007223 ctx_007224 ctx_007225 ctx_007226 ctx_007227 ctx_007228 ctx_007229 ctx_007230 ctx_007231 ctx_007232 ctx_007233 ctx_007234 ctx_007235 ctx_007236 ctx_007237 ctx_007238 ctx_007239 ctx_007240 ctx_007241 ctx_007242 ctx_007243 ctx_007244 ctx_007245 ctx_007246 ctx_007247 ctx_007248 ctx_007249 ctx_007250 ctx_007251 ctx_007252 ctx_007253 ctx_007254 ctx_007255 ctx_007256 ctx_007257 ctx_007258 ctx_007259 ctx_007260 ctx_007261 ctx_007262 ctx_007263 ctx_007264 ctx_007265 ctx_007266 ctx_007267 ctx_007268 ctx_007269 ctx_007270 ctx_007271 ctx_007272 ctx_007273 ctx_007274 ctx_007275 ctx_007276 ctx_007277 ctx_007278 ctx_007279 ctx_007280 ctx_007281 ctx_007282 ctx_007283 ctx_007284 ctx_007285 ctx_007286 ctx_007287 ctx_007288 ctx_007289 ctx_007290 ctx_007291 ctx_007292 ctx_007293 ctx_007294 ctx_007295 ctx_007296 ctx_007297 ctx_007298 ctx_007299 ctx_007300 ctx_007301 ctx_007302 ctx_007303 ctx_007304 ctx_007305 ctx_007306 ctx_007307 ctx_007308 ctx_007309 ctx_007310 ctx_007311 ctx_007312 ctx_007313 ctx_007314 ctx_007315 ctx_007316 ctx_007317 ctx_007318 ctx_007319 ctx_007320 ctx_007321 ctx_007322 ctx_007323 ctx_007324 ctx_007325 ctx_007326 ctx_007327 ctx_007328 ctx_007329 ctx_007330 ctx_007331 ctx_007332 ctx_007333 ctx_007334 ctx_007335 ctx_007336 ctx_007337 ctx_007338 ctx_007339 ctx_007340 ctx_007341 ctx_007342 ctx_007343 ctx_007344 ctx_007345 ctx_007346 ctx_007347 ctx_007348 ctx_007349 ctx_007350 ctx_007351 ctx_007352 ctx_007353 ctx_007354 ctx_007355 ctx_007356 ctx_007357 ctx_007358 ctx_007359 ctx_007360 ctx_007361 ctx_007362 ctx_007363 ctx_007364 ctx_007365 ctx_007366 ctx_007367 ctx_007368 ctx_007369 ctx_007370 ctx_007371 ctx_007372 ctx_007373 ctx_007374 ctx_007375 ctx_007376 ctx_007377 ctx_007378 ctx_007379 ctx_007380 ctx_007381 ctx_007382 ctx_007383 ctx_007384 ctx_007385 ctx_007386 ctx_007387 ctx_007388 ctx_007389 ctx_007390 ctx_007391 ctx_007392 ctx_007393 ctx_007394 ctx_007395 ctx_007396 ctx_007397 ctx_007398 ctx_007399 ctx_007400 ctx_007401 ctx_007402 ctx_007403 ctx_007404 ctx_007405 ctx_007406 ctx_007407 ctx_007408 ctx_007409 ctx_007410 ctx_007411 ctx_007412 ctx_007413 ctx_007414 ctx_007415 ctx_007416 ctx_007417 ctx_007418 ctx_007419 ctx_007420 ctx_007421 ctx_007422 ctx_007423 ctx_007424 ctx_007425 ctx_007426 ctx_007427 ctx_007428 ctx_007429 ctx_007430 ctx_007431 ctx_007432 ctx_007433 ctx_007434 ctx_007435 ctx_007436 ctx_007437 ctx_007438 ctx_007439 ctx_007440 ctx_007441 ctx_007442 ctx_007443 ctx_007444 ctx_007445 ctx_007446 ctx_007447 ctx_007448 ctx_007449 ctx_007450 ctx_007451 ctx_007452 ctx_007453 ctx_007454 ctx_007455 ctx_007456 ctx_007457 ctx_007458 ctx_007459 ctx_007460 ctx_007461 ctx_007462 ctx_007463 ctx_007464 ctx_007465 ctx_007466 ctx_007467 ctx_007468 ctx_007469 ctx_007470 ctx_007471 ctx_007472 ctx_007473 ctx_007474 ctx_007475 ctx_007476 ctx_007477 ctx_007478 ctx_007479 ctx_007480 ctx_007481 ctx_007482 ctx_007483 ctx_007484 ctx_007485 ctx_007486 ctx_007487 ctx_007488 ctx_007489 ctx_007490 ctx_007491 ctx_007492 ctx_007493 ctx_007494 ctx_007495 ctx_007496 ctx_007497 ctx_007498 ctx_007499 ctx_007500 ctx_007501 ctx_007502 ctx_007503 ctx_007504 ctx_007505 ctx_007506 ctx_007507 ctx_007508 ctx_007509 ctx_007510 ctx_007511 ctx_007512 ctx_007513 ctx_007514 ctx_007515 ctx_007516 ctx_007517 ctx_007518 ctx_007519 ctx_007520 ctx_007521 ctx_007522 ctx_007523 ctx_007524 ctx_007525 ctx_007526 ctx_007527 ctx_007528 ctx_007529 ctx_007530 ctx_007531 ctx_007532 ctx_007533 ctx_007534 ctx_007535 ctx_007536 ctx_007537 ctx_007538 ctx_007539 ctx_007540 ctx_007541 ctx_007542 ctx_007543 ctx_007544 ctx_007545 ctx_007546 ctx_007547 ctx_007548 ctx_007549 ctx_007550 ctx_007551 ctx_007552 ctx_007553 ctx_007554 ctx_007555 ctx_007556 ctx_007557 ctx_007558 ctx_007559 ctx_007560 ctx_007561 ctx_007562 ctx_007563 ctx_007564 ctx_007565 ctx_007566 ctx_007567 ctx_007568 ctx_007569 ctx_007570 ctx_007571 ctx_007572 ctx_007573 ctx_007574 ctx_007575 ctx_007576 ctx_007577 ctx_007578 ctx_007579 ctx_007580 ctx_007581 ctx_007582 ctx_007583 ctx_007584 ctx_007585 ctx_007586 ctx_007587 ctx_007588 ctx_007589 ctx_007590 ctx_007591 ctx_007592 ctx_007593 ctx_007594 ctx_007595 ctx_007596 ctx_007597 ctx_007598 ctx_007599 ctx_007600 ctx_007601 ctx_007602 ctx_007603 ctx_007604 ctx_007605 ctx_007606 ctx_007607 ctx_007608 ctx_007609 ctx_007610 ctx_007611 ctx_007612 ctx_007613 ctx_007614 ctx_007615 ctx_007616 ctx_007617 ctx_007618 ctx_007619 ctx_007620 ctx_007621 ctx_007622 ctx_007623 ctx_007624 ctx_007625 ctx_007626 ctx_007627 ctx_007628 ctx_007629 ctx_007630 ctx_007631 ctx_007632 ctx_007633 ctx_007634 ctx_007635 ctx_007636 ctx_007637 ctx_007638 ctx_007639 ctx_007640 ctx_007641 ctx_007642 ctx_007643 ctx_007644 ctx_007645 ctx_007646 ctx_007647 ctx_007648 ctx_007649 ctx_007650 ctx_007651 ctx_007652 ctx_007653 ctx_007654 ctx_007655 ctx_007656 ctx_007657 ctx_007658 ctx_007659 ctx_007660 ctx_007661 ctx_007662 ctx_007663 ctx_007664 ctx_007665 ctx_007666 ctx_007667 ctx_007668 ctx_007669 ctx_007670 ctx_007671 ctx_007672 ctx_007673 ctx_007674 ctx_007675 ctx_007676 ctx_007677 ctx_007678 ctx_007679 ctx_007680 ctx_007681 ctx_007682 ctx_007683 ctx_007684 ctx_007685 ctx_007686 ctx_007687 ctx_007688 ctx_007689 ctx_007690 ctx_007691 ctx_007692 ctx_007693 ctx_007694 ctx_007695 ctx_007696 ctx_007697 ctx_007698 ctx_007699 ctx_007700 ctx_007701 ctx_007702 ctx_007703 ctx_007704 ctx_007705 ctx_007706 ctx_007707 ctx_007708 ctx_007709 ctx_007710 ctx_007711 ctx_007712 ctx_007713 ctx_007714 ctx_007715 ctx_007716 ctx_007717 ctx_007718 ctx_007719 ctx_007720 ctx_007721 ctx_007722 ctx_007723 ctx_007724 ctx_007725 ctx_007726 ctx_007727 ctx_007728 ctx_007729 ctx_007730 ctx_007731 ctx_007732 ctx_007733 ctx_007734 ctx_007735 ctx_007736 ctx_007737 ctx_007738 ctx_007739 ctx_007740 ctx_007741 ctx_007742 ctx_007743 ctx_007744 ctx_007745 ctx_007746 ctx_007747 ctx_007748 ctx_007749 ctx_007750 ctx_007751 ctx_007752 ctx_007753 ctx_007754 ctx_007755 ctx_007756 ctx_007757 ctx_007758 ctx_007759 ctx_007760 ctx_007761 ctx_007762 ctx_007763 ctx_007764 ctx_007765 ctx_007766 ctx_007767 ctx_007768 ctx_007769 ctx_007770 ctx_007771 ctx_007772 ctx_007773 ctx_007774 ctx_007775 ctx_007776 ctx_007777 ctx_007778 ctx_007779 ctx_007780 ctx_007781 ctx_007782 ctx_007783 ctx_007784 ctx_007785 ctx_007786 ctx_007787 ctx_007788 ctx_007789 ctx_007790 ctx_007791 ctx_007792 ctx_007793 ctx_007794 ctx_007795 ctx_007796 ctx_007797 ctx_007798 ctx_007799 ctx_007800 ctx_007801 ctx_007802 ctx_007803 ctx_007804 ctx_007805 ctx_007806 ctx_007807 ctx_007808 ctx_007809 ctx_007810 ctx_007811 ctx_007812 ctx_007813 ctx_007814 ctx_007815 ctx_007816 ctx_007817 ctx_007818 ctx_007819 ctx_007820 ctx_007821 ctx_007822 ctx_007823 ctx_007824 ctx_007825 ctx_007826 ctx_007827 ctx_007828 ctx_007829 ctx_007830 ctx_007831 ctx_007832 ctx_007833 ctx_007834 ctx_007835 ctx_007836 ctx_007837 ctx_007838 ctx_007839 ctx_007840 ctx_007841 ctx_007842 ctx_007843 ctx_007844 ctx_007845 ctx_007846 ctx_007847 ctx_007848 ctx_007849 ctx_007850 ctx_007851 ctx_007852 ctx_007853 ctx_007854 ctx_007855 ctx_007856 ctx_007857 ctx_007858 ctx_007859 ctx_007860 ctx_007861 ctx_007862 ctx_007863 ctx_007864 ctx_007865 ctx_007866 ctx_007867 ctx_007868 ctx_007869 ctx_007870 ctx_007871 ctx_007872 ctx_007873 ctx_007874 ctx_007875 ctx_007876 ctx_007877 ctx_007878 ctx_007879 ctx_007880 ctx_007881 ctx_007882 ctx_007883 ctx_007884 ctx_007885 ctx_007886 ctx_007887 ctx_007888 ctx_007889 ctx_007890 ctx_007891 ctx_007892 ctx_007893 ctx_007894 ctx_007895 ctx_007896 ctx_007897 ctx_007898 ctx_007899 ctx_007900 ctx_007901 ctx_007902 ctx_007903 ctx_007904 ctx_007905 ctx_007906 ctx_007907 ctx_007908 ctx_007909 ctx_007910 ctx_007911 ctx_007912 ctx_007913 ctx_007914 ctx_007915 ctx_007916 ctx_007917 ctx_007918 ctx_007919 ctx_007920 ctx_007921 ctx_007922 ctx_007923 ctx_007924 ctx_007925 ctx_007926 ctx_007927 ctx_007928 ctx_007929 ctx_007930 ctx_007931 ctx_007932 ctx_007933 ctx_007934 ctx_007935 ctx_007936 ctx_007937 ctx_007938 ctx_007939 ctx_007940 ctx_007941 ctx_007942 ctx_007943 ctx_007944 ctx_007945 ctx_007946 ctx_007947 ctx_007948 ctx_007949 ctx_007950 ctx_007951 ctx_007952 ctx_007953 ctx_007954 ctx_007955 ctx_007956 ctx_007957 ctx_007958 ctx_007959 ctx_007960 ctx_007961 ctx_007962 ctx_007963 ctx_007964 ctx_007965 ctx_007966 ctx_007967 ctx_007968 ctx_007969 ctx_007970 ctx_007971 ctx_007972 ctx_007973 ctx_007974 ctx_007975 ctx_007976 ctx_007977 ctx_007978 ctx_007979 ctx_007980 ctx_007981 ctx_007982 ctx_007983 ctx_007984 ctx_007985 ctx_007986 ctx_007987 ctx_007988 ctx_007989 ctx_007990 ctx_007991 ctx_007992 ctx_007993 ctx_007994 ctx_007995 ctx_007996 ctx_007997 ctx_007998 ctx_007999 ctx_008000 ctx_008001 ctx_008002 ctx_008003 ctx_008004 ctx_008005 ctx_008006 ctx_008007 ctx_008008 ctx_008009 ctx_008010 ctx_008011 ctx_008012 ctx_008013 ctx_008014 ctx_008015 ctx_008016 ctx_008017 ctx_008018 ctx_008019 ctx_008020 ctx_008021 ctx_008022 ctx_008023 ctx_008024 ctx_008025 ctx_008026 ctx_008027 ctx_008028 ctx_008029 ctx_008030 ctx_008031 ctx_008032 ctx_008033 ctx_008034 ctx_008035 ctx_008036 ctx_008037 ctx_008038 ctx_008039 ctx_008040 ctx_008041 ctx_008042 ctx_008043 ctx_008044 ctx_008045 ctx_008046 ctx_008047 ctx_008048 ctx_008049 ctx_008050 ctx_008051 ctx_008052 ctx_008053 ctx_008054 ctx_008055 ctx_008056 ctx_008057 ctx_008058 ctx_008059 ctx_008060 ctx_008061 ctx_008062 ctx_008063 ctx_008064 ctx_008065 ctx_008066 ctx_008067 ctx_008068 ctx_008069 ctx_008070 ctx_008071 ctx_008072 ctx_008073 ctx_008074 ctx_008075 ctx_008076 ctx_008077 ctx_008078 ctx_008079 ctx_008080 ctx_008081 ctx_008082 ctx_008083 ctx_008084 ctx_008085 ctx_008086 ctx_008087 ctx_008088 ctx_008089 ctx_008090 ctx_008091 ctx_008092 ctx_008093 ctx_008094 ctx_008095 ctx_008096 ctx_008097 ctx_008098 ctx_008099 ctx_008100 ctx_008101 ctx_008102 ctx_008103 ctx_008104 ctx_008105 ctx_008106 ctx_008107 ctx_008108 ctx_008109 ctx_008110 ctx_008111 ctx_008112 ctx_008113 ctx_008114 ctx_008115 ctx_008116 ctx_008117 ctx_008118 ctx_008119 ctx_008120 ctx_008121 ctx_008122 ctx_008123 ctx_008124 ctx_008125 ctx_008126 ctx_008127 ctx_008128 ctx_008129 ctx_008130 ctx_008131 ctx_008132 ctx_008133 ctx_008134 ctx_008135 ctx_008136 ctx_008137 ctx_008138 ctx_008139 ctx_008140 ctx_008141 ctx_008142 ctx_008143 ctx_008144 ctx_008145 ctx_008146 ctx_008147 ctx_008148 ctx_008149 ctx_008150 ctx_008151 ctx_008152 ctx_008153 ctx_008154 ctx_008155 ctx_008156 ctx_008157 ctx_008158 ctx_008159 ctx_008160 ctx_008161 ctx_008162 ctx_008163 ctx_008164 ctx_008165 ctx_008166 ctx_008167 ctx_008168 ctx_008169 ctx_008170 ctx_008171 ctx_008172 ctx_008173 ctx_008174 ctx_008175 ctx_008176 ctx_008177 ctx_008178 ctx_008179 ctx_008180 ctx_008181 ctx_008182 ctx_008183 ctx_008184 ctx_008185 ctx_008186 ctx_008187 ctx_008188 ctx_008189 ctx_008190 ctx_008191\nQuestion: which early token is marked for recall? ctx_000005",
+        "expected": "ctx_000005",
+        "difficulty": "hard",
+        "token_count": 8192,
+        "metadata": {
+          "target_index": 5
+        }
+      },
+      "status": "ok",
+      "passed": true,
+      "score_mode": "context-gradient",
+      "score": {
+        "gradient": 0.007634970842764762,
+        "target_gradient": 0.05
+      },
+      "output": {
+        "route": "compress",
+        "signature": "46717617a14a2bd4",
+        "confidence": 0.8843025691483449,
+        "prompt_verifier": {
+          "passed": true,
+          "checker": "coherence",
+          "message": "coherence threshold passed",
+          "payload": {
+            "coherence": 0.999675446568903,
+            "threshold": 0.96
+          }
+        }
+      },
+      "adaptive": {
+        "steps_used": 40,
+        "max_budget": 180,
+        "mean_prediction_error": 0.01563992383079983,
+        "final_prediction_error": 0.015269342635068106,
+        "verifier_checks": 1,
+        "verifier_failures": 0,
+        "exhausted": false
+      },
+      "resonance": {
+        "step": 40,
+        "coherence": 0.999675446568903,
+        "gradient": 0.007634970842764762,
+        "energy": 0.0004751259498462444,
+        "coherence_delta": 1.1036375597850423e-06,
+        "resonant": true
+      },
+      "field_flops": 20971520,
+      "verifier_flops": 0,
+      "verifier_calls_counted": 0,
+      "flops": 20971520,
+      "estimated_flops": 20971520,
+      "flops_note": "Mesh total: deterministic field kernel counter plus verifier counter where verifier work is used.",
+      "measurement": {
+        "elapsed_s": 41.01539091701852,
+        "rss_start_bytes": 64110592,
+        "rss_end_bytes": 64552960,
+        "rss_peak_bytes": 64569344,
+        "max_rss_bytes": 64585728
+      }
+    }
+  ],
+  "query_log_path": "runs/frontier-honest/queries.jsonl",
+  "notes": [
+    "Mesh arithmetic rows are scored against decoded mesh output; prompt verifier results are logged as diagnostics/control signals.",
+    "Context rows measure phase-gradient retention for the mesh and expected-token text recall for HF baselines.",
+    "Mesh FLOPs include deterministic kernel-operation counters plus verifier counters where local verifier work is used.",
+    "HF FLOPs are parameter MAC counts from loaded weights when the baseline loads."
+  ],
+  "ratio_table": [
+    {
+      "metric": "Disk Size",
+      "baseline": "not_measured",
+      "phase_mesh": 65175,
+      "ratio": "not_measured",
+      "baseline_unit": "bytes",
+      "mesh_unit": "bytes"
+    },
+    {
+      "metric": "Peak RAM",
+      "baseline": "not_measured",
+      "phase_mesh": 64569344.0,
+      "ratio": "not_measured",
+      "baseline_unit": "bytes",
+      "mesh_unit": "bytes"
+    },
+    {
+      "metric": "Context Scaling",
+      "baseline": "not_requested",
+      "phase_mesh": "flat gradient 0.0075",
+      "ratio": "not_applicable"
+    },
+    {
+      "metric": "Median Latency",
+      "baseline": "not_measured",
+      "phase_mesh": 0.2001811250229366,
+      "ratio": "not_measured",
+      "baseline_unit": "seconds",
+      "mesh_unit": "seconds"
+    },
+    {
+      "metric": "Task Pass Rate",
+      "baseline": "not_measured",
+      "phase_mesh": 0.13043478260869565,
+      "ratio": "not_measured"
+    },
+    {
+      "metric": "FLOPs / Query",
+      "baseline": "not_measured",
+      "phase_mesh": 20972192.0,
+      "ratio": "not_measured"
+    }
+  ],
+  "output_path": "runs/frontier-honest/results.json",
+  "summary_path": "runs/frontier-honest/summary.md"
+}
