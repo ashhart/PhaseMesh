@@ -201,6 +201,8 @@ Current measured local artifact:
 | --- | ---: | ---: | ---: |
 | `runs/qwen3-4b-phase-chat-beast-plus` | 180 Qwen traces | ~2.18 ms | 65/65 on `qwen_coding_reasoning_eval_beast.jsonl` |
 
+Published artifact: [Vontra/PhaseMesh-Qwen3-4B](https://huggingface.co/Vontra/PhaseMesh-Qwen3-4B)
+
 The comparable live Qwen3-4B CUDA run on PGX took ~4,966 ms median per 96-token answer after model load. PhaseChat is a fast specialist over poured behavior, not a raw checkpoint clone.
 
 Train the experimental basin-to-token model layer:

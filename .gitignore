@@ -17,3 +17,4 @@ benchmark/frontier_comparison/*.pdf
 *.npz
 *.npy
 !artifacts/**/*.npz
+artifacts/hf-phasechat-qwen3-4b-beast-plus/
