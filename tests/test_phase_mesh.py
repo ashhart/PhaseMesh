@@ -1469,6 +1469,416 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(response.json()["status"], "saved")
 
 
+class RegistryDomainTests(unittest.TestCase):
+    def test_code_domain_extracts_python_facts(self) -> None:
+        from phase_mesh.domains import CodeDomain
+
+        result = CodeDomain().solve("def add(a, b):\n    return a + b")
+        self.assertEqual(result.status, "ok")
+        self.assertTrue(result.data["syntax_ok"])
+        self.assertEqual(result.data["functions"][0]["name"], "add")
+        self.assertIn("a", result.data["functions"][0]["args"])
+
+    def test_code_domain_factor_readout_round_trips(self) -> None:
+        from phase_mesh.domains import CodeDomain
+
+        with TemporaryDirectory() as tmp:
+            domain = CodeDomain()
+            fit = domain.fit(tmp)
+            loaded = CodeDomain.load(tmp)
+            probe = loaded.probe()
+            solved = loaded.solve("def add(x, y):\n    return x + y")
+
+        self.assertTrue(fit.metrics["passed_factor_gate"])
+        self.assertTrue(probe.passed)
+        self.assertIn("factor_readout", solved.data)
+        self.assertEqual(solved.data["factor_readout"]["kind"], "function")
+        self.assertEqual(solved.data["factor_readout"]["primary"], "add")
+
+    def test_json_domain_factor_readout_round_trips(self) -> None:
+        from phase_mesh.domains import JsonDomain
+
+        with TemporaryDirectory() as tmp:
+            domain = JsonDomain()
+            fit = domain.fit(tmp)
+            loaded = JsonDomain.load(tmp)
+            probe = loaded.probe()
+            solved = loaded.solve('{"ok": true}')
+
+        self.assertTrue(fit.metrics["passed_factor_gate"])
+        self.assertTrue(probe.passed)
+        self.assertEqual(solved.answer, "object")
+        self.assertIn("factor_readout", solved.data)
+        self.assertEqual(solved.data["factor_readout"]["root_type"], "object")
+        self.assertEqual(solved.data["factor_readout"]["key_signature"], "ok")
+
+    def test_tool_domain_routes_core_domains(self) -> None:
+        from phase_mesh.domains import ToolDomain
+
+        tool = ToolDomain()
+        self.assertEqual(tool.solve("8 plus 9").answer, "arithmetic")
+        self.assertEqual(tool.solve("remember project: PhaseMesh").answer, "memory")
+        self.assertEqual(tool.solve("def add(a, b):\n    return a + b").answer, "code")
+        self.assertEqual(tool.solve('{"ok": true}').answer, "json")
+
+    def test_memory_domain_persists_facts(self) -> None:
+        from phase_mesh.domains import MemoryDomain
+
+        with TemporaryDirectory() as tmp:
+            memory = MemoryDomain(artifact_dir=tmp)
+            remembered = memory.solve("remember project: PhaseMesh")
+            loaded = MemoryDomain.load(tmp)
+            recalled = loaded.solve("recall project")
+        self.assertEqual(remembered.status, "ok")
+        self.assertIn("PhaseMesh", recalled.answer)
+
+    def test_phase_mesh_registry_fit_probe_and_solve(self) -> None:
+        from phase_mesh.domains import ArithmeticDomain, CodeDomain, JsonDomain, MemoryDomain, ToolDomain
+        from phase_mesh.registry import PhaseMeshRegistry, render_domain_report
+
+        with TemporaryDirectory() as tmp:
+            registry = PhaseMeshRegistry(
+                domains={
+                    "arithmetic": ArithmeticDomain(
+                        max_value=3,
+                        grid_size=16,
+                        basin_dim=24,
+                        hidden=8,
+                        steps_per_chunk=1,
+                        backend="numpy",
+                    ),
+                    "code": CodeDomain(),
+                    "json": JsonDomain(),
+                    "memory": MemoryDomain(),
+                    "tool": ToolDomain(),
+                }
+            )
+            fit = registry.fit(tmp, domains=["arithmetic", "code", "json", "memory", "tool"])
+            loaded = PhaseMeshRegistry.load(tmp)
+            probe = loaded.probe(domains=["code", "json", "memory", "tool"])
+
+            report = render_domain_report(probe, artifact_dir=tmp)
+            solved = loaded.solve("2 times 3")
+            solved_json = loaded.solve('{"ok": true}')
+        self.assertEqual(fit["type"], "phase-mesh-domain-registry")
+        self.assertTrue(probe["passed"])
+        self.assertIn("| Domain | Gate | Key Metrics |", report)
+        self.assertIn("Status: **PASS**", report)
+        self.assertEqual(solved["domain"], "arithmetic")
+        self.assertEqual(solved["answer"], "6")
+        self.assertEqual(solved_json["domain"], "json")
+        self.assertEqual(solved_json["answer"], "object")
+
+    def test_lab_demo_html_renders_gates_and_limits(self) -> None:
+        from phase_mesh.lab_demo import render_lab_demo_html
+
+        html = render_lab_demo_html({
+            "status": "pass",
+            "elapsed_s": 1.2,
+            "artifact_sizes": {"registry_bytes": 2048},
+            "config": {"size": 16, "context_tokens": [16]},
+            "probe": {
+                "passed": True,
+                "domains": {
+                    "json": {
+                        "passed": True,
+                        "metrics": {
+                            "factor_mean_accuracy": 1.0,
+                            "exact_json_accuracy": 1.0,
+                        },
+                    }
+                },
+            },
+            "context_sweep": [
+                {
+                    "token_count": 16,
+                    "gradient": 0.01,
+                    "coherence": 0.99,
+                    "elapsed_s": 0.1,
+                    "passed": True,
+                }
+            ],
+            "controls": {
+                "context_pin_off": [
+                    {
+                        "token_count": 16,
+                        "gradient": 0.12,
+                        "passed": False,
+                    }
+                ],
+                "context_pin_on": [
+                    {
+                        "token_count": 16,
+                        "gradient": 0.01,
+                        "passed": True,
+                    }
+                ],
+                "gradient_reduction": 12.0,
+                "separation_passed": True,
+            },
+            "solves": [
+                {
+                    "label": "json",
+                    "prompt": "{\"ok\": true}",
+                    "result": {
+                        "answer": "object",
+                        "result": {"data": {"factor_readout": {"root_type": "object"}}},
+                    },
+                }
+            ],
+            "claims": ["This is not a general LLM claim."],
+        })
+
+        self.assertIn("PhaseMesh Lab Demo", html)
+        self.assertIn("Domain Gates", html)
+        self.assertIn("Pinning Ablation", html)
+        self.assertIn("12.0x", html)
+        self.assertIn("This is not a general LLM claim.", html)
+
+    def test_phase_accio_sketch_retrieves_bound_candidate(self) -> None:
+        from phase_mesh.phase_accio import PhaseAccioSketch
+
+        sketch = PhaseAccioSketch(grid_size=32, slots_per_symbol=10, pin_strength=0.25, filler_noise=0.0)
+        sketch.ingest("the audit memo linked k_abc123def0 beside marker v_0123456789abcdef after review")
+        ranked = sketch.rank("k_abc123def0", ["v_fedcba9876543210", "v_0123456789abcdef", "v_1111111111111111"])
+
+        self.assertEqual(ranked[0]["candidate"], "v_0123456789abcdef")
+        self.assertGreater(ranked[0]["score"], ranked[1]["score"])
+
+        pin_off = PhaseAccioSketch(grid_size=32, slots_per_symbol=10, pin_strength=0.0, filler_noise=0.0)
+        pin_off.ingest("the audit memo linked k_abc123def0 beside marker v_0123456789abcdef after review")
+        self.assertTrue(all(abs(item["score"]) < 1e-8 for item in pin_off.rank("k_abc123def0", ["v_fedcba9876543210", "v_0123456789abcdef"])))
+
+    def test_phase_accio_artifact_has_pin_ablation(self) -> None:
+        from phase_mesh.phase_accio import run_phase_accio
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_accio(
+                out_dir=tmp,
+                context_tokens=256,
+                needles=12,
+                candidates=6,
+                seeds=2,
+                grid_size=32,
+                slots_per_symbol=10,
+                pin_strength=0.25,
+                filler_noise=0.0,
+                context_style="natural",
+            )
+            out_path = Path(tmp)
+            self.assertTrue((out_path / "summary.json").exists())
+            self.assertTrue((out_path / "summary.md").exists())
+            self.assertTrue((out_path / "index.html").exists())
+            html = (out_path / "index.html").read_text(encoding="utf-8")
+
+        self.assertEqual(payload["status"], "pass")
+        self.assertGreaterEqual(payload["summary"]["pin_on"]["accuracy"], 0.9)
+        self.assertLessEqual(payload["summary"]["pin_off"]["accuracy"], 0.35)
+        self.assertLessEqual(payload["summary"]["scrambled"]["accuracy"], 0.5)
+        self.assertEqual(payload["summary"]["hash_map"]["accuracy"], 1.0)
+        self.assertIn("collapse_series", payload)
+        self.assertIn("PhaseAccio", html)
+
+    def test_phase_advantage_artifact_has_corruption_controls(self) -> None:
+        from phase_mesh.phase_advantage import run_phase_advantage
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_advantage(
+                out_dir=tmp,
+                seed=3,
+                items=80,
+                key_length=8,
+                vocab_size=400,
+                candidates=8,
+                trials=30,
+                memory_size=1024,
+                slots=3,
+            )
+            out_path = Path(tmp)
+            self.assertTrue((out_path / "summary.json").exists())
+            self.assertTrue((out_path / "summary.md").exists())
+            self.assertTrue((out_path / "index.html").exists())
+            html = (out_path / "index.html").read_text(encoding="utf-8")
+
+        self.assertEqual(payload["type"], "phase-mesh-advantage-probes")
+        self.assertIn("corruption_curve", payload)
+        self.assertIn("capacity_curve", payload)
+        self.assertIn("segmentation", payload)
+        self.assertEqual(payload["corruption_curve"]["by_rate"]["0.30"]["exact_hash"]["accuracy"], 0.0)
+        self.assertLessEqual(payload["corruption_curve"]["by_rate"]["0.30"]["whole_key_phase"]["accuracy"], 0.4)
+        self.assertGreaterEqual(payload["segmentation"]["coupled"]["pair_accuracy"], 0.8)
+        self.assertIn("Corrupted-Key Pattern Completion", html)
+
+    def test_phase_advantage_docs_writes_natural_dashboard(self) -> None:
+        from phase_mesh.phase_advantage_docs import run_phase_advantage_docs
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_advantage_docs(
+                out_dir=tmp,
+                context_tokens=4096,
+                records=48,
+                candidates=6,
+                trials=24,
+                corruption_rates=[0.0, 0.3],
+                phase_cells=1024,
+                slots=3,
+                seed=5,
+                skip_architecture=True,
+            )
+            out_path = Path(tmp)
+            self.assertTrue((out_path / "summary.json").exists())
+            self.assertTrue((out_path / "summary.md").exists())
+            self.assertTrue((out_path / "index.html").exists())
+            self.assertTrue((out_path / "context_sample.txt").exists())
+            html = (out_path / "index.html").read_text(encoding="utf-8")
+
+        self.assertEqual(payload["type"], "phase-mesh-natural-document-advantage")
+        self.assertEqual(payload["context"]["actual_tokens"], 4096)
+        self.assertIn("bm25", payload["baselines"])
+        self.assertIn("vector_faiss", payload["baselines"])
+        self.assertEqual(payload["corruption_curve"]["by_rate"]["0.30"]["exact_hash"]["accuracy"], 0.0)
+        self.assertIn("Control Collapse Live", html)
+
+    def test_phase_binding_hard_writes_role_binding_dashboard(self) -> None:
+        from phase_mesh.phase_binding_hard import run_phase_binding_hard
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_binding_hard(
+                out_dir=tmp,
+                records=48,
+                candidates=6,
+                trials=24,
+                corruption_rates=[0.0, 0.3],
+                phase_cells=1024,
+                slots=3,
+                context_tokens=4096,
+                seed=5,
+            )
+            out_path = Path(tmp)
+            self.assertTrue((out_path / "summary.json").exists())
+            self.assertTrue((out_path / "summary.md").exists())
+            self.assertTrue((out_path / "index.html").exists())
+            html = (out_path / "index.html").read_text(encoding="utf-8")
+
+        self.assertEqual(payload["type"], "phase-mesh-adversarial-role-binding")
+        self.assertEqual(payload["context"]["actual_tokens"], 4096)
+        self.assertIn("role_phase", payload["baselines"])
+        self.assertGreater(payload["curve"]["by_rate"]["0.30"]["role_phase"]["accuracy"], 0.5)
+        self.assertGreater(payload["curve"]["role_vs_bm25_at_30"], 1.0)
+        self.assertIn("Hard Role-Binding", html)
+
+    def test_phase_binding_recoverable_signature_hits_exact_ceiling(self) -> None:
+        from phase_mesh.phase_binding_hard import run_phase_binding_hard
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_binding_hard(
+                out_dir=tmp,
+                records=48,
+                candidates=6,
+                trials=24,
+                corruption_rates=[0.0, 0.3],
+                phase_cells=2048,
+                slots=4,
+                context_tokens=4096,
+                seed=5,
+                corruption_mode="recoverable-signature",
+                ecc_readout=True,
+            )
+
+        row = payload["curve"]["by_rate"]["0.30"]
+        self.assertEqual(payload["config"]["corruption_mode"], "recoverable-signature")
+        self.assertTrue(payload["config"]["ecc_readout"])
+        self.assertEqual(row["role_phase"]["accuracy"], 1.0)
+        self.assertEqual(row["exact_hash"]["accuracy"], 0.0)
+        self.assertEqual(row["exact_bloom"]["accuracy"], 0.0)
+
+    def test_phase_binding_ecc_signature_hits_forced_answer_ceiling(self) -> None:
+        from phase_mesh.phase_binding_hard import run_phase_binding_hard
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_binding_hard(
+                out_dir=tmp,
+                records=48,
+                candidates=6,
+                trials=24,
+                corruption_rates=[0.0, 0.3],
+                phase_cells=2048,
+                slots=4,
+                context_tokens=4096,
+                seed=17,
+                corruption_mode="ecc-signature",
+                ecc_readout=True,
+            )
+
+        row = payload["curve"]["by_rate"]["0.30"]
+        self.assertEqual(payload["status"], "pass")
+        self.assertEqual(payload["config"]["corruption_mode"], "ecc-signature")
+        self.assertTrue(payload["config"]["ecc_readout"])
+        self.assertFalse(payload["config"]["safe_abstain"])
+        self.assertEqual(row["role_phase"]["accuracy"], 1.0)
+        self.assertEqual(row["exact_hash"]["accuracy"], 0.0)
+        self.assertEqual(row["exact_bloom"]["accuracy"], 0.0)
+
+    def test_phase_binding_safe_abstain_reports_no_wrong_decisions(self) -> None:
+        from phase_mesh.phase_binding_hard import run_phase_binding_hard
+
+        with TemporaryDirectory() as tmp:
+            payload = run_phase_binding_hard(
+                out_dir=tmp,
+                records=48,
+                candidates=6,
+                trials=24,
+                corruption_rates=[0.0, 0.3],
+                phase_cells=2048,
+                slots=4,
+                context_tokens=4096,
+                seed=5,
+                corruption_mode="arbitrary",
+                ecc_readout=True,
+                safe_abstain=True,
+                abstain_margin=0.008,
+            )
+
+        safe = payload["curve"]["safe_decision_by_rate"]["0.30"]["role_phase"]
+        row = payload["curve"]["by_rate"]["0.30"]
+        self.assertTrue(payload["config"]["safe_abstain"])
+        self.assertEqual(safe["no_wrong_rate"], 1.0)
+        self.assertEqual(safe["wrong_answered"], 0)
+        self.assertGreaterEqual(safe["coverage"], 0.95)
+        self.assertEqual(row["exact_hash"]["accuracy"], 0.0)
+        self.assertEqual(row["exact_bloom"]["accuracy"], 0.0)
+
+    def test_learnable_core_probe_writes_gradient_artifact(self) -> None:
+        try:
+            import torch  # noqa: F401
+        except Exception:
+            self.skipTest("PyTorch is not installed")
+
+        from phase_mesh.learnable_core import run_learnable_core_probe
+
+        with TemporaryDirectory() as tmp:
+            payload = run_learnable_core_probe(
+                out_dir=tmp,
+                sequence_length=8,
+                train_size=64,
+                test_size=32,
+                epochs=1,
+                batch_size=16,
+                oscillators=8,
+                hidden=8,
+                seed=1,
+            )
+            out_path = Path(tmp)
+            self.assertTrue((out_path / "summary.json").exists())
+            self.assertTrue((out_path / "summary.md").exists())
+
+        gradients = payload["results"]["learned_phase"]["gradient_probe"]
+        self.assertGreater(gradients["token_phase"], 0.0)
+        self.assertGreater(gradients["omega"], 0.0)
+        self.assertGreater(gradients["coupling"], 0.0)
+        self.assertEqual(payload["type"], "phase-mesh-learnable-core-probe")
+
+
 class FrontierCompareTests(unittest.TestCase):
     def test_flop_counters(self) -> None:
         from bench.common import count_mesh_flops, count_verifier_flops

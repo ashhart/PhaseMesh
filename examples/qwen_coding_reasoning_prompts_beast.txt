@@ -1,0 +1,160 @@
+Write a Python function to add two numbers.
+Create a small Python helper that can add two numbers.
+Implement and briefly explain Python code to add two numbers.
+Write a Python function to subtract two numbers.
+Create a small Python helper that can subtract two numbers.
+Implement and briefly explain Python code to subtract two numbers.
+Write a Python function to multiply two numbers.
+Create a small Python helper that can multiply two numbers.
+Implement and briefly explain Python code to multiply two numbers.
+Write a Python function to divide two numbers safely and return None for division by zero.
+Create a small Python helper that can divide two numbers safely and return None for division by zero.
+Implement and briefly explain Python code to divide two numbers safely and return None for division by zero.
+Write a Python function to reverse a string.
+Create a small Python helper that can reverse a string.
+Implement and briefly explain Python code to reverse a string.
+Write a Python function to check whether a string is a palindrome.
+Create a small Python helper that can check whether a string is a palindrome.
+Implement and briefly explain Python code to check whether a string is a palindrome.
+Write a Python function to count words in a string.
+Create a small Python helper that can count words in a string.
+Implement and briefly explain Python code to count words in a string.
+Write a Python function to count vowels in a string.
+Create a small Python helper that can count vowels in a string.
+Implement and briefly explain Python code to count vowels in a string.
+Write a Python function to filter even numbers from a list.
+Create a small Python helper that can filter even numbers from a list.
+Implement and briefly explain Python code to filter even numbers from a list.
+Write a Python function to filter odd numbers from a list.
+Create a small Python helper that can filter odd numbers from a list.
+Implement and briefly explain Python code to filter odd numbers from a list.
+Write a Python function to return the maximum value in a list without using max().
+Create a small Python helper that can return the maximum value in a list without using max().
+Implement and briefly explain Python code to return the maximum value in a list without using max().
+Write a Python function to return the minimum value in a list without using min().
+Create a small Python helper that can return the minimum value in a list without using min().
+Implement and briefly explain Python code to return the minimum value in a list without using min().
+Write a Python function to remove duplicates from a list while preserving order.
+Create a small Python helper that can remove duplicates from a list while preserving order.
+Implement and briefly explain Python code to remove duplicates from a list while preserving order.
+Write a Python function to flatten a list of lists by one level.
+Create a small Python helper that can flatten a list of lists by one level.
+Implement and briefly explain Python code to flatten a list of lists by one level.
+Write a Python function to merge two dictionaries.
+Create a small Python helper that can merge two dictionaries.
+Implement and briefly explain Python code to merge two dictionaries.
+Write a Python function to sort a list of dictionaries by the name field.
+Create a small Python helper that can sort a list of dictionaries by the name field.
+Implement and briefly explain Python code to sort a list of dictionaries by the name field.
+Write a Python function to group records by a category key.
+Create a small Python helper that can group records by a category key.
+Implement and briefly explain Python code to group records by a category key.
+Write a Python function to parse JSON text safely and return None on invalid JSON.
+Create a small Python helper that can parse JSON text safely and return None on invalid JSON.
+Implement and briefly explain Python code to parse JSON text safely and return None on invalid JSON.
+Write a Python function to read all lines from a text file.
+Create a small Python helper that can read all lines from a text file.
+Implement and briefly explain Python code to read all lines from a text file.
+Write a Python function to write text to a file using a context manager.
+Create a small Python helper that can write text to a file using a context manager.
+Implement and briefly explain Python code to write text to a file using a context manager.
+Write a Python function to retry a flaky function three times before raising.
+Create a small Python helper that can retry a flaky function three times before raising.
+Implement and briefly explain Python code to retry a flaky function three times before raising.
+Write a Python function to chunk a list into batches of size n.
+Create a small Python helper that can chunk a list into batches of size n.
+Implement and briefly explain Python code to chunk a list into batches of size n.
+Write a Python function to compute factorial iteratively.
+Create a small Python helper that can compute factorial iteratively.
+Implement and briefly explain Python code to compute factorial iteratively.
+Write a Python function to compute fibonacci numbers iteratively.
+Create a small Python helper that can compute fibonacci numbers iteratively.
+Implement and briefly explain Python code to compute fibonacci numbers iteratively.
+Write a Python function to perform binary search on a sorted list.
+Create a small Python helper that can perform binary search on a sorted list.
+Implement and briefly explain Python code to perform binary search on a sorted list.
+Write a Python function to validate an email address with simple checks.
+Create a small Python helper that can validate an email address with simple checks.
+Implement and briefly explain Python code to validate an email address with simple checks.
+Write a Python function to turn a sentence into a URL slug.
+Create a small Python helper that can turn a sentence into a URL slug.
+Implement and briefly explain Python code to turn a sentence into a URL slug.
+Write a Python function to transpose a matrix represented as nested lists.
+Create a small Python helper that can transpose a matrix represented as nested lists.
+Implement and briefly explain Python code to transpose a matrix represented as nested lists.
+Write a Python function to calculate a moving average over a list of numbers.
+Create a small Python helper that can calculate a moving average over a list of numbers.
+Implement and briefly explain Python code to calculate a moving average over a list of numbers.
+Write a Python function to find the first duplicate item in a list.
+Create a small Python helper that can find the first duplicate item in a list.
+Implement and briefly explain Python code to find the first duplicate item in a list.
+Find the bug in this Python function: def add(a, b): return a - b
+Explain the bug and corrected code: Find the bug in this Python function: def add(a, b): return a - b
+Find the bug in this Python function: def is_even(n): return n % 2 == 1
+Explain the bug and corrected code: Find the bug in this Python function: def is_even(n): return n % 2 == 1
+Find the bug in this Python function: def first(items): return items[1]
+Explain the bug and corrected code: Find the bug in this Python function: def first(items): return items[1]
+Find the bug in this Python function: def append_item(x, items=[]): items.append(x); return items
+Explain the bug and corrected code: Find the bug in this Python function: def append_item(x, items=[]): items.append(x); return items
+Find the bug in this Python function: def percent(x): return x / 1000
+Explain the bug and corrected code: Find the bug in this Python function: def percent(x): return x / 1000
+Find the bug in this Python function: def area(width, height): return width + height
+Explain the bug and corrected code: Find the bug in this Python function: def area(width, height): return width + height
+Find the bug in this Python function: def last(items): return items[len(items)]
+Explain the bug and corrected code: Find the bug in this Python function: def last(items): return items[len(items)]
+Find the bug in this Python function: def average(nums): return sum(nums) / len(num)
+Explain the bug and corrected code: Find the bug in this Python function: def average(nums): return sum(nums) / len(num)
+Find the bug in this Python function: def greet(name): return 'Hello' + name when name is an int
+Explain the bug and corrected code: Find the bug in this Python function: def greet(name): return 'Hello' + name when name is an int
+Find the bug in this Python function: async def fetch(client): return client.get('/x')
+Explain the bug and corrected code: Find the bug in this Python function: async def fetch(client): return client.get('/x')
+Explain how to debug a Python TypeError.
+Answer like a coding assistant: Explain how to debug a Python TypeError.
+Explain how to debug a Python NameError.
+Write a concise answer for this task: Explain how to debug a Python NameError.
+Explain how to profile slow Python code.
+Answer like a coding assistant: Explain how to profile slow Python code.
+Explain how to use cProfile to find a bottleneck.
+Write a concise answer for this task: Explain how to use cProfile to find a bottleneck.
+Explain how to inspect a failing pytest test.
+Answer like a coding assistant: Explain how to inspect a failing pytest test.
+Explain how to reduce memory use in a Python script.
+Write a concise answer for this task: Explain how to reduce memory use in a Python script.
+Explain how to parse JSON safely in Python.
+Answer like a coding assistant: Explain how to parse JSON safely in Python.
+Explain when to use a dataclass in Python.
+Write a concise answer for this task: Explain when to use a dataclass in Python.
+Explain how a tokenizer turns text into model inputs.
+Answer like a coding assistant: Explain how a tokenizer turns text into model inputs.
+Explain what a model checkpoint contains.
+Write a concise answer for this task: Explain what a model checkpoint contains.
+Explain the difference between retrieval and generation.
+Answer like a coding assistant: Explain the difference between retrieval and generation.
+Explain what a vector database is useful for.
+Write a concise answer for this task: Explain what a vector database is useful for.
+Explain what a cache hit rate means.
+Answer like a coding assistant: Explain what a cache hit rate means.
+Explain how to read a Python stack trace.
+Write a concise answer for this task: Explain how to read a Python stack trace.
+Explain why a failing unit test is useful evidence.
+Answer like a coding assistant: Explain why a failing unit test is useful evidence.
+Solve step by step: If a server handles 12 requests per second for 5 minutes, how many requests is that?
+Compute carefully: If a server handles 12 requests per second for 5 minutes, how many requests is that?
+Solve step by step: A script processes 45 files per minute for 8 minutes. How many files is that?
+Compute carefully: A script processes 45 files per minute for 8 minutes. How many files is that?
+Solve step by step: If a cache hit rate is 80 percent on 250 requests, how many misses are there?
+Compute carefully: If a cache hit rate is 80 percent on 250 requests, how many misses are there?
+Solve step by step: A build takes 14 seconds and runs 30 times. How many seconds total?
+Compute carefully: A build takes 14 seconds and runs 30 times. How many seconds total?
+Solve step by step: A job uses 3 workers for 40 minutes each. How many worker-minutes is that?
+Compute carefully: A job uses 3 workers for 40 minutes each. How many worker-minutes is that?
+Solve step by step: A queue has 180 tasks and finishes 30 tasks per minute. How many minutes?
+Compute carefully: A queue has 180 tasks and finishes 30 tasks per minute. How many minutes?
+Solve step by step: A service has 2 percent errors over 500 requests. How many errors?
+Compute carefully: A service has 2 percent errors over 500 requests. How many errors?
+Solve step by step: A model emits 24 tokens per second for 15 seconds. How many tokens?
+Compute carefully: A model emits 24 tokens per second for 15 seconds. How many tokens?
+Solve step by step: If 7 tests fail out of 140, what percent failed?
+Compute carefully: If 7 tests fail out of 140, what percent failed?
+Solve step by step: If latency drops from 250 ms to 100 ms, what is the speedup ratio?
+Compute carefully: If latency drops from 250 ms to 100 ms, what is the speedup ratio?

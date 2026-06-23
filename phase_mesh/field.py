@@ -135,7 +135,7 @@ class PhaseFieldMesh:
         damping: float | None = None,
         external_force: np.ndarray | None = None,
     ) -> np.ndarray:
-        """Forecast the next phase with a learned residual world model.
+        """Forecast the next phase with a learned residual dynamics model.
 
         The predictor intentionally uses a smaller dynamics model than `step`:
         it sees the fixed natural landscape plus a learned residual trace, but

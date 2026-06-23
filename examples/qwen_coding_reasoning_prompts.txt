@@ -1,0 +1,10 @@
+Write a concise Python function that adds two numbers and explain it in one sentence.
+Find the bug in this Python function: def add(a, b): return a - b
+Solve step by step: If a server handles 12 requests per second for 5 minutes, how many requests is that?
+Explain how to parse a JSON object safely in Python.
+Write a small pytest test for a function named add_one.
+Given a list of numbers, describe the simplest algorithm to find the maximum.
+What should a local coding assistant do before editing a file?
+Explain why a failing unit test is useful evidence.
+Write a Python function that filters even numbers from a list.
+Summarize the difference between retrieval, reasoning, and generation.

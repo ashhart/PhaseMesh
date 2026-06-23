@@ -24,6 +24,12 @@ dependencies = [
 model = [
   "torch>=2.4",
 ]
+distill = [
+  "torch>=2.4",
+  "transformers>=4.45",
+  "huggingface_hub>=0.23",
+  "safetensors>=0.4",
+]
 bench = [
   "transformers>=4.45",
   "accelerate>=1.0",

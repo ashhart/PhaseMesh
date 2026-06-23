@@ -1,0 +1,65 @@
+{"category": "function", "must_contain_any": ["add", "sum", "return"], "must_not_contain_any": [], "prompt": "Can you write Python code to add two numbers?"}
+{"category": "function", "must_contain_any": ["subtract", "return"], "must_not_contain_any": [], "prompt": "Can you write Python code to subtract two numbers?"}
+{"category": "function", "must_contain_any": ["multiply", "return"], "must_not_contain_any": [], "prompt": "Can you write Python code to multiply two numbers?"}
+{"category": "function", "must_contain_any": ["divide", "zero", "none"], "must_not_contain_any": [], "prompt": "Can you write Python code to divide two numbers safely and return None for division by zero?"}
+{"category": "function", "must_contain_any": ["reverse", "string"], "must_not_contain_any": [], "prompt": "Can you write Python code to reverse a string?"}
+{"category": "function", "must_contain_any": ["palindrome", "reverse"], "must_not_contain_any": [], "prompt": "Can you write Python code to check whether a string is a palindrome?"}
+{"category": "function", "must_contain_any": ["count", "word"], "must_not_contain_any": [], "prompt": "Can you write Python code to count words in a string?"}
+{"category": "function", "must_contain_any": ["vowel", "count"], "must_not_contain_any": [], "prompt": "Can you write Python code to count vowels in a string?"}
+{"category": "function", "must_contain_any": ["even", "filter"], "must_not_contain_any": [], "prompt": "Can you write Python code to filter even numbers from a list?"}
+{"category": "function", "must_contain_any": ["odd", "filter"], "must_not_contain_any": [], "prompt": "Can you write Python code to filter odd numbers from a list?"}
+{"category": "function", "must_contain_any": ["maximum", "list"], "must_not_contain_any": [], "prompt": "Can you write Python code to return the maximum value in a list without using max()?"}
+{"category": "function", "must_contain_any": ["minimum", "list"], "must_not_contain_any": [], "prompt": "Can you write Python code to return the minimum value in a list without using min()?"}
+{"category": "function", "must_contain_any": ["duplicate", "order"], "must_not_contain_any": [], "prompt": "Can you write Python code to remove duplicates from a list while preserving order?"}
+{"category": "function", "must_contain_any": ["flatten", "list"], "must_not_contain_any": [], "prompt": "Can you write Python code to flatten a list of lists by one level?"}
+{"category": "function", "must_contain_any": ["dictionary", "merge"], "must_not_contain_any": [], "prompt": "Can you write Python code to merge two dictionaries?"}
+{"category": "function", "must_contain_any": ["sort", "dictionary"], "must_not_contain_any": [], "prompt": "Can you write Python code to sort a list of dictionaries by the name field?"}
+{"category": "function", "must_contain_any": ["group", "category"], "must_not_contain_any": [], "prompt": "Can you write Python code to group records by a category key?"}
+{"category": "function", "must_contain_any": ["json", "invalid", "none"], "must_not_contain_any": [], "prompt": "Can you write Python code to parse JSON text safely and return None on invalid JSON?"}
+{"category": "function", "must_contain_any": ["read", "line", "file"], "must_not_contain_any": [], "prompt": "Can you write Python code to read all lines from a text file?"}
+{"category": "function", "must_contain_any": ["write", "file", "context"], "must_not_contain_any": [], "prompt": "Can you write Python code to write text to a file using a context manager?"}
+{"category": "function", "must_contain_any": ["retry", "raise"], "must_not_contain_any": [], "prompt": "Can you write Python code to retry a flaky function three times before raising?"}
+{"category": "function", "must_contain_any": ["chunk", "batch"], "must_not_contain_any": [], "prompt": "Can you write Python code to chunk a list into batches of size n?"}
+{"category": "function", "must_contain_any": ["factorial", "iterative"], "must_not_contain_any": [], "prompt": "Can you write Python code to compute factorial iteratively?"}
+{"category": "function", "must_contain_any": ["fibonacci", "iterative"], "must_not_contain_any": [], "prompt": "Can you write Python code to compute fibonacci numbers iteratively?"}
+{"category": "function", "must_contain_any": ["binary", "search"], "must_not_contain_any": [], "prompt": "Can you write Python code to perform binary search on a sorted list?"}
+{"category": "function", "must_contain_any": ["email", "validate"], "must_not_contain_any": [], "prompt": "Can you write Python code to validate an email address with simple checks?"}
+{"category": "function", "must_contain_any": ["slug", "sentence"], "must_not_contain_any": [], "prompt": "Can you write Python code to turn a sentence into a URL slug?"}
+{"category": "function", "must_contain_any": ["transpose", "matrix"], "must_not_contain_any": [], "prompt": "Can you write Python code to transpose a matrix represented as nested lists?"}
+{"category": "function", "must_contain_any": ["moving", "average"], "must_not_contain_any": [], "prompt": "Can you write Python code to calculate a moving average over a list of numbers?"}
+{"category": "function", "must_contain_any": ["duplicate", "first"], "must_not_contain_any": [], "prompt": "Can you write Python code to find the first duplicate item in a list?"}
+{"category": "bug", "must_contain_any": ["return a + b"], "must_not_contain_any": ["return a - b"], "prompt": "Find the bug in this Python function: def add(a, b): return a - b"}
+{"category": "bug", "must_contain_any": ["== 0", "even"], "must_not_contain_any": ["== 1"], "prompt": "Find the bug in this Python function: def is_even(n): return n % 2 == 1"}
+{"category": "bug", "must_contain_any": ["items[0]", "first"], "must_not_contain_any": ["items[1]"], "prompt": "Find the bug in this Python function: def first(items): return items[1]"}
+{"category": "bug", "must_contain_any": ["none", "mutable"], "must_not_contain_any": ["items=[]"], "prompt": "Find the bug in this Python function: def append_item(x, items=[]): items.append(x); return items"}
+{"category": "bug", "must_contain_any": ["100", "percent"], "must_not_contain_any": ["1000"], "prompt": "Find the bug in this Python function: def percent(x): return x / 1000"}
+{"category": "bug", "must_contain_any": ["*", "multiply"], "must_not_contain_any": ["+ height"], "prompt": "Find the bug in this Python function: def area(width, height): return width + height"}
+{"category": "bug", "must_contain_any": ["len(items) - 1", "index"], "must_not_contain_any": ["items[len(items)]"], "prompt": "Find the bug in this Python function: def last(items): return items[len(items)]"}
+{"category": "bug", "must_contain_any": ["nums", "NameError"], "must_not_contain_any": ["len(num)"], "prompt": "Find the bug in this Python function: def average(nums): return sum(nums) / len(num)"}
+{"category": "bug", "must_contain_any": ["str", "TypeError"], "must_not_contain_any": [], "prompt": "Find the bug in this Python function: def greet(name): return 'Hello' + name when name is an int"}
+{"category": "bug", "must_contain_any": ["await", "async"], "must_not_contain_any": [], "prompt": "Find the bug in this Python function: async def fetch(client): return client.get('/x')"}
+{"category": "explain", "must_contain_any": ["typeerror", "type"], "must_not_contain_any": [], "prompt": "Briefly explain how to debug a Python TypeError."}
+{"category": "explain", "must_contain_any": ["nameerror", "defined"], "must_not_contain_any": [], "prompt": "Briefly explain how to debug a Python NameError."}
+{"category": "explain", "must_contain_any": ["profile", "cprofile"], "must_not_contain_any": [], "prompt": "Briefly explain how to profile slow Python code."}
+{"category": "explain", "must_contain_any": ["cprofile", "bottleneck"], "must_not_contain_any": [], "prompt": "Briefly explain how to use cProfile to find a bottleneck."}
+{"category": "explain", "must_contain_any": ["pytest", "failing"], "must_not_contain_any": [], "prompt": "Briefly explain how to inspect a failing pytest test."}
+{"category": "explain", "must_contain_any": ["memory", "profile"], "must_not_contain_any": [], "prompt": "Briefly explain how to reduce memory use in a Python script."}
+{"category": "explain", "must_contain_any": ["json", "exception"], "must_not_contain_any": [], "prompt": "Briefly explain how to parse JSON safely in Python."}
+{"category": "explain", "must_contain_any": ["dataclass", "class"], "must_not_contain_any": [], "prompt": "Briefly explain when to use a dataclass in Python."}
+{"category": "explain", "must_contain_any": ["tokenizer", "token"], "must_not_contain_any": [], "prompt": "Briefly explain how a tokenizer turns text into model inputs."}
+{"category": "explain", "must_contain_any": ["checkpoint", "weight"], "must_not_contain_any": [], "prompt": "Briefly explain what a model checkpoint contains."}
+{"category": "explain", "must_contain_any": ["retrieval", "generation"], "must_not_contain_any": [], "prompt": "Briefly explain the difference between retrieval and generation."}
+{"category": "explain", "must_contain_any": ["vector", "database"], "must_not_contain_any": [], "prompt": "Briefly explain what a vector database is useful for."}
+{"category": "explain", "must_contain_any": ["cache", "hit"], "must_not_contain_any": [], "prompt": "Briefly explain what a cache hit rate means."}
+{"category": "explain", "must_contain_any": ["stack", "trace"], "must_not_contain_any": [], "prompt": "Briefly explain how to read a Python stack trace."}
+{"category": "explain", "must_contain_any": ["test", "evidence"], "must_not_contain_any": [], "prompt": "Briefly explain why a failing unit test is useful evidence."}
+{"category": "reasoning", "must_contain_any": ["3600"], "must_not_contain_any": [], "prompt": "Solve step by step: If a server handles 12 requests per second for 5 minutes, how many requests is that?"}
+{"category": "reasoning", "must_contain_any": ["360"], "must_not_contain_any": [], "prompt": "Solve step by step: A script processes 45 files per minute for 8 minutes. How many files is that?"}
+{"category": "reasoning", "must_contain_any": ["50"], "must_not_contain_any": [], "prompt": "Solve step by step: If a cache hit rate is 80 percent on 250 requests, how many misses are there?"}
+{"category": "reasoning", "must_contain_any": ["420"], "must_not_contain_any": [], "prompt": "Solve step by step: A build takes 14 seconds and runs 30 times. How many seconds total?"}
+{"category": "reasoning", "must_contain_any": ["120"], "must_not_contain_any": [], "prompt": "Solve step by step: A job uses 3 workers for 40 minutes each. How many worker-minutes is that?"}
+{"category": "reasoning", "must_contain_any": ["6"], "must_not_contain_any": [], "prompt": "Solve step by step: A queue has 180 tasks and finishes 30 tasks per minute. How many minutes?"}
+{"category": "reasoning", "must_contain_any": ["10"], "must_not_contain_any": [], "prompt": "Solve step by step: A service has 2 percent errors over 500 requests. How many errors?"}
+{"category": "reasoning", "must_contain_any": ["360"], "must_not_contain_any": [], "prompt": "Solve step by step: A model emits 24 tokens per second for 15 seconds. How many tokens?"}
+{"category": "reasoning", "must_contain_any": ["5"], "must_not_contain_any": [], "prompt": "Solve step by step: If 7 tests fail out of 140, what percent failed?"}
+{"category": "reasoning", "must_contain_any": ["2.5"], "must_not_contain_any": [], "prompt": "Solve step by step: If latency drops from 250 ms to 100 ms, what is the speedup ratio?"}

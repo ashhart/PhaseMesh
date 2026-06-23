@@ -1,0 +1,30 @@
+Write a concise Python function that adds two numbers and explain it in one sentence.
+Write a Python function that filters even numbers from a list.
+Write a Python function that returns the maximum value in a list without using max().
+Write a Python function that counts words in a string.
+Write a Python function that reads JSON text safely and returns None on invalid JSON.
+Write a pytest test for a function named add_one.
+Write a pytest test for a function named filter_even_numbers.
+Find the bug in this Python function: def add(a, b): return a - b
+Find the bug in this Python function: def is_even(n): return n % 2 == 1
+Find the bug in this Python function: def first(items): return items[1]
+Explain why a failing unit test is useful evidence.
+Explain what a local coding assistant should do before editing a file.
+Explain the difference between retrieval, reasoning, and generation.
+Explain how to parse a JSON object safely in Python.
+Explain how to debug a Python NameError.
+Explain how to debug a Python TypeError.
+Solve step by step: If a server handles 12 requests per second for 5 minutes, how many requests is that?
+Solve step by step: A script processes 45 files per minute for 8 minutes. How many files is that?
+Solve step by step: If a cache hit rate is 80 percent on 250 requests, how many misses are there?
+Solve step by step: A build takes 14 seconds and runs 30 times. How many seconds total?
+Given a list of numbers, describe the simplest algorithm to find the maximum.
+Given a Python stack trace, what should you inspect first?
+Given a failing test, what is the smallest useful next debugging step?
+Summarize how a tokenizer turns text into model inputs.
+Summarize what a model checkpoint contains.
+Summarize what a vector database is useful for.
+Write a small function docstring for add(a, b).
+Write a small function docstring for parse_json(text).
+Write a simple CLI argument parser example in Python.
+Write a simple dataclass named User with id and name fields.
