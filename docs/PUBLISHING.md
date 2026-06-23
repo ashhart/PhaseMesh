@@ -7,6 +7,7 @@ Publish this as a clean open research harness, not as a model checkpoint.
 Include:
 
 - `phase_mesh/`: runtime, field, memory, verifier, service, CLI
+- `phase_mesh/model.py` and `phase_mesh/trainer.py`: experimental self-supervised model layer
 - `bench/`: benchmark harnesses and FLOP/RSS counters
 - `benchmark/`: report-generation scripts and small derived outputs
 - `tests/`: unit tests

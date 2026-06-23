@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -59,6 +59,30 @@ class ResonanceMetrics:
         }
 
 
+@dataclass(frozen=True)
+class BasinFeature:
+    """Stable attractor readout used by the experimental model layer."""
+
+    x: int
+    y: int
+    center: np.ndarray
+    dominant_phase: float
+    coherence: float
+    gradient: float
+    energy: float
+
+    def to_dict(self) -> dict[str, float | int | list[float]]:
+        return {
+            "x": self.x,
+            "y": self.y,
+            "center": [float(item) for item in self.center.tolist()],
+            "dominant_phase": self.dominant_phase,
+            "coherence": self.coherence,
+            "gradient": self.gradient,
+            "energy": self.energy,
+        }
+
+
 class PhaseFieldMesh:
     """Damped 2D phase field with a persistent potential landscape."""
 
@@ -79,6 +103,7 @@ class PhaseFieldMesh:
         self.pin_weights = np.zeros(self.config.shape, dtype=np.float64)
         self.step_index = 0
         self._last_coherence: float | None = None
+        self._residual_theta = self.theta.copy()
 
     def reset_field(self) -> None:
         self.theta.fill(0.0)
@@ -87,6 +112,7 @@ class PhaseFieldMesh:
         self.pin_weights.fill(0.0)
         self.step_index = 0
         self._last_coherence = None
+        self._residual_theta = self.theta.copy()
 
     def inject_text(self, text: str, encoder: TextPhaseEncoder | None = None) -> list[WavePacket]:
         encoder = encoder or TextPhaseEncoder(self.config.width, self.config.height)
@@ -278,6 +304,162 @@ class PhaseFieldMesh:
             self.landscape = np.clip(self.landscape, -4.0, 4.0)
         return history
 
+    def inject_residual(
+        self,
+        token: str | int,
+        *,
+        strength: float = 0.22,
+        encoder: TextPhaseEncoder | None = None,
+    ) -> None:
+        """Inject a generated token back into the field without a KV cache.
+
+        The previous phase state is blended into the current state, then a small
+        deterministic packet for the token is stamped into the center-biased
+        residual stream. This keeps generation state in phase space instead of
+        storing per-token vectors.
+        """
+
+        strength = float(np.clip(strength, 0.0, 1.0))
+        if strength <= 0.0:
+            return
+        if self._residual_theta.shape != self.theta.shape:
+            self._residual_theta = self.theta.copy()
+        self.theta = circular_blend(self.theta, self._residual_theta, self.config.phase_residual_carry)
+        encoder = encoder or TextPhaseEncoder(
+            self.config.width,
+            self.config.height,
+            max_packets=8,
+            base_amplitude=0.45,
+        )
+        for packet in encoder.encode(f"residual:{token}", max_packets=4):
+            scaled = replace(
+                packet,
+                amplitude=packet.amplitude * strength,
+                radius=max(2, min(packet.radius, max(2, min(self.config.width, self.config.height) // 16))),
+            )
+            self.inject_packet(scaled)
+        self.theta = wrap_phase(self.theta)
+        self._residual_theta = self.theta.copy()
+
+    def find_basin(self, *, feature_dim: int = 256, radius: int | None = None) -> BasinFeature:
+        """Return a compact feature vector for the current stable attractor."""
+
+        dx, dy = gradient_components(self.theta)
+        gradient_field = np.sqrt(dx * dx + dy * dy)
+        stability = np.exp(-gradient_field)
+        activation = stability * (0.5 + 0.5 * np.abs(np.cos(self.theta))) + 0.15 * np.abs(self.landscape)
+        y, x = np.unravel_index(int(np.argmax(activation)), activation.shape)
+        center = self.basin_feature_vector(x=int(x), y=int(y), feature_dim=feature_dim, radius=radius)
+        coherence = float(abs(np.mean(np.exp(1j * self.theta))))
+        gradient = float(np.mean(gradient_field))
+        energy = float(0.5 * (np.mean(self.velocity * self.velocity) + np.mean(dx * dx + dy * dy)))
+        return BasinFeature(
+            x=int(x),
+            y=int(y),
+            center=center,
+            dominant_phase=float(self.theta[y, x]),
+            coherence=coherence,
+            gradient=gradient,
+            energy=energy,
+        )
+
+    def basin_feature_vector(
+        self,
+        *,
+        x: int,
+        y: int,
+        feature_dim: int = 256,
+        radius: int | None = None,
+    ) -> np.ndarray:
+        """Pool local and global phase statistics into a fixed-size vector."""
+
+        feature_dim = max(8, int(feature_dim))
+        radius = max(2, int(radius or max(3, round(np.sqrt(feature_dim) / 3.0))))
+        offsets = np.arange(-radius, radius + 1)
+        yy = (int(y) + offsets) % self.config.height
+        xx = (int(x) + offsets) % self.config.width
+        region = np.ix_(yy, xx)
+        theta_patch = self.theta[region]
+        landscape_patch = self.landscape[region] / 4.0
+        predictor_patch = self.predictor_trace[region]
+        dx, dy = gradient_components(self.theta)
+        gradient = np.sqrt(dx * dx + dy * dy)
+        phase_hist, _ = np.histogram(
+            (self.theta + np.pi) % (2.0 * np.pi),
+            bins=16,
+            range=(0.0, 2.0 * np.pi),
+            density=False,
+        )
+        phase_hist = phase_hist.astype(np.float64) / max(1, self.theta.size)
+        stats = np.array(
+            [
+                x / max(1, self.config.width - 1),
+                y / max(1, self.config.height - 1),
+                float(abs(np.mean(np.exp(1j * self.theta)))),
+                float(np.mean(gradient)),
+                float(np.mean(self.velocity * self.velocity)),
+                float(np.mean(np.abs(self.landscape))),
+                float(self.step_index / max(1, self.config.max_steps)),
+                float(self.theta[int(y), int(x)] / np.pi),
+            ],
+            dtype=np.float64,
+        )
+        raw = np.concatenate(
+            [
+                np.sin(theta_patch).ravel(),
+                np.cos(theta_patch).ravel(),
+                landscape_patch.ravel(),
+                predictor_patch.ravel(),
+                phase_hist,
+                stats,
+            ]
+        )
+        if raw.size >= feature_dim:
+            indices = np.linspace(0, raw.size - 1, feature_dim).astype(np.int64)
+            vector = raw[indices]
+        else:
+            vector = np.zeros(feature_dim, dtype=np.float64)
+            vector[: raw.size] = raw
+        return np.asarray(vector, dtype=np.float32)
+
+    def reinforce_basin(
+        self,
+        basin: BasinFeature,
+        *,
+        gain: float = 0.035,
+        decay: float | None = None,
+        sigma: float = 3.0,
+    ) -> None:
+        """Gradient-free topology carving around a persistent basin."""
+
+        decay = self.config.memory_decay if decay is None else float(decay)
+        kernel = self.gaussian_kernel(x=basin.x, y=basin.y, sigma=sigma)
+        phase_alignment = np.cos(circular_delta(self.theta, basin.dominant_phase))
+        update = kernel * phase_alignment
+        self.landscape = (1.0 - decay) * self.landscape + gain * update
+        self.omega = (1.0 - decay) * self.omega + (gain * 0.18) * update
+        self.landscape = smooth(
+            self.landscape,
+            amount=0.08,
+            backend=self.config.laplacian_backend,
+        )
+        self.omega = smooth(
+            self.omega,
+            amount=0.04,
+            backend=self.config.laplacian_backend,
+        )
+        self.landscape = np.clip(self.landscape, -4.0, 4.0)
+        self.omega = np.clip(self.omega, -1.0, 1.0)
+
+    def gaussian_kernel(self, *, x: int, y: int, sigma: float = 3.0) -> np.ndarray:
+        sigma = max(float(sigma), 1e-6)
+        yy = np.arange(self.config.height)[:, None]
+        xx = np.arange(self.config.width)[None, :]
+        dx = np.minimum(np.abs(xx - int(x)), self.config.width - np.abs(xx - int(x)))
+        dy = np.minimum(np.abs(yy - int(y)), self.config.height - np.abs(yy - int(y)))
+        kernel = np.exp(-((dx * dx + dy * dy) / (2.0 * sigma * sigma)))
+        return kernel / max(float(np.max(kernel)), 1e-12)
+
     def save(self, path: str | Path) -> None:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -337,6 +519,7 @@ class PhaseFieldMesh:
             mesh.pin_weights = data["pin_weights"]
         mesh.step_index = int(data["step_index"][0])
         mesh._last_coherence = None
+        mesh._residual_theta = mesh.theta.copy()
         return mesh
 
     @classmethod
@@ -365,6 +548,7 @@ class PhaseFieldMesh:
         mesh.omega = data["omega_f16"].astype(np.float64)
         mesh.step_index = int(data["step_index"][0])
         mesh._last_coherence = None
+        mesh._residual_theta = mesh.theta.copy()
         return mesh
 
     def _stamp_packet(

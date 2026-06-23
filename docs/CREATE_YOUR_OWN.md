@@ -16,6 +16,7 @@ Optional extras:
 
 ```bash
 pip install -e '.[bench]'
+pip install -e '.[model]'
 ```
 
 ## 2. Run A First Mesh
@@ -77,7 +78,69 @@ curl -s "http://127.0.0.1:8765/think?text=check%2017%20*%2019%20=%20323&max_budg
 
 The service persists state by default under `runs/service-state/`.
 
-## 6. Benchmark Your Mesh
+## 6. Train The Experimental Model Layer
+
+`model-train` streams text into the field, updates the phase predictor, reinforces stable basins, and trains an optional basin-to-token decoder head. This is self-supervised scaffolding, not a pretrained fluent model.
+
+```bash
+python3 scripts/prepare_corpus.py path/to/data.jsonl \
+  --out runs/corpus.txt \
+  --max-lines 100000 \
+  --max-tokens 128
+
+phase-mesh model-train runs/corpus.txt \
+  --out runs/phase-model \
+  --max-steps 200000 \
+  --steps-per-chunk 30 \
+  --batch-size 32 \
+  --context-tokens 8 \
+  --windows-per-chunk 8 \
+  --window-stride 1 \
+  --lr 2e-4 \
+  --pin 0.25 \
+  --freeze-omega \
+  --consolidate-interval 5000
+```
+
+Evaluate a held-out file:
+
+```bash
+phase-mesh model-eval path/to/heldout.txt \
+  --model-dir runs/phase-model/final \
+  --chunks 1000 \
+  --context-tokens 8 \
+  --windows-per-chunk 8
+```
+
+Generate from the saved model directory:
+
+```bash
+phase-mesh generate "write a python function" \
+  --model-dir runs/phase-model/final \
+  --max-len 32 \
+  --steps-per-token 15 \
+  --temp 0.8 \
+  --top-k 50 \
+  --top-p 0.95
+```
+
+Saved files:
+
+- `topology.q8.npz`: quantized field/topology state
+- `vocab.json`: token map used by the decoder
+- `decoder.pt`: optional PyTorch decoder head
+- `model_config.json`: grid, basin, and decoder settings
+
+Use `--no-decoder` to carve topology without PyTorch or token generation.
+
+Useful honesty checks before claiming fluency:
+
+- `prediction_error_recent_window` lower than `prediction_error_first_window`
+- held-out `perplexity` trending down across checkpoints
+- repeated prompts produce stable basin centers
+- generated samples contain task-appropriate local structure, not just frequent tokens
+
+## 7. Benchmark Your Mesh
 
 ```bash
 phase-mesh bench --trials 50 --facts 10 --math-count 50 --pin 0.25 --out runs/bench-local
@@ -109,7 +172,7 @@ python3 -m bench.frontier_compare \
   --out runs/frontier-compare-qwen-local
 ```
 
-## 7. Share A Topology
+## 8. Share A Topology
 
 Share the compact `.q8.npz` file plus the JSON summary that produced it. Avoid publishing private prompts, API keys, or logs from personal notes.
 

@@ -46,6 +46,41 @@ Run predictive adaptive compute:
 python3 -m phase_mesh think "check 17 * 19 = 323" --max-budget 120 --temperature 0.2
 ```
 
+Train the experimental basin-to-token model layer:
+
+```bash
+pip install -e '.[model]'
+python3 scripts/prepare_corpus.py path/to/data.jsonl \
+  --out runs/corpus.txt \
+  --max-lines 100000 \
+  --max-tokens 128
+
+python3 -m phase_mesh model-train runs/corpus.txt \
+  --out runs/phase-model \
+  --max-steps 200000 \
+  --steps-per-chunk 30 \
+  --batch-size 32 \
+  --context-tokens 8 \
+  --windows-per-chunk 8 \
+  --window-stride 1 \
+  --lr 2e-4 \
+  --freeze-omega \
+  --consolidate-interval 5000
+
+python3 -m phase_mesh model-eval path/to/heldout.txt \
+  --model-dir runs/phase-model/final \
+  --chunks 1000 \
+  --context-tokens 8 \
+  --windows-per-chunk 8
+
+python3 -m phase_mesh generate "write a python function" \
+  --model-dir runs/phase-model/final \
+  --max-len 32 \
+  --temp 0.8 \
+  --top-k 50 \
+  --top-p 0.95
+```
+
 Run with salient-token phase pinning:
 
 ```bash
@@ -116,6 +151,19 @@ curl -s http://127.0.0.1:8765/jobs/resonate \
 `CognitiveMeshRuntime.think()` uses predictive coding for test-time compute scaling: the field forecasts its next phase, observes circular phase error after the real step, updates a residual predictor trace, adapts damping, and stops when both resonance and prediction error are low.
 
 Phase pinning is optional. `--pin 0.25` writes decaying phase anchors for salient packets and blends a small residual of the previous phase into each step. It preserves important wave structure without storing token vectors or a KV cache.
+
+## Experimental Model Layer
+
+`phase_mesh.model.PhaseModel` turns the substrate into a small self-supervised training loop:
+
+- stream text into the field as wave packets
+- predict the next phase and update the residual predictor from circular phase error
+- extract a stable basin feature vector from the settled field
+- reinforce the topology around that basin without answer labels
+- optionally train a tiny PyTorch decoder head from basin features to next-token logits
+- generate by repeatedly settling the field, sampling from the decoder head, and injecting the sampled token back as residual phase
+
+The field/topology update is gradient-free. The decoder head is a conventional optional PyTorch MLP, so generation quality depends on actual training data and should not be described as a pretrained language model.
 
 The default Laplacian backend is `auto`: SciPy convolution when available, NumPy `roll` otherwise. You can force either path:
 
