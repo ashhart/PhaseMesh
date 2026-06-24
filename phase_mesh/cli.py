@@ -62,6 +62,8 @@ def main(argv: list[str] | None = None) -> int:
         return domain_list(args)
     if args.command == "llm-shell":
         return llm_shell(args)
+    if args.command == "agent-loop":
+        return agent_loop(args)
     if args.command == "lab-demo":
         return lab_demo(args)
     if args.command == "phase-accio":
@@ -516,6 +518,21 @@ def build_parser() -> argparse.ArgumentParser:
     llm_shell_parser.add_argument("--weight-artifact-dir", type=Path, default=None, help="Optional PhaseMesh weight-pour artifact for generation.")
     llm_shell_parser.add_argument("--json", action="store_true", help="Print the full trace payload as JSON.")
     llm_shell_parser.add_argument("--out", type=Path, default=None, help="Optional JSON output path.")
+
+    agent_loop_parser = subparsers.add_parser(
+        "agent-loop",
+        help="Run the bounded PhaseMesh computer-world episode loop.",
+    )
+    agent_loop_parser.add_argument("text", nargs="+", help="Prompt text.")
+    agent_loop_parser.add_argument("--workspace", type=Path, default=Path.cwd(), help="Workspace to observe.")
+    agent_loop_parser.add_argument("--state-dir", type=Path, default=Path("runs/agent-loop"), help="Episode and shell state directory.")
+    agent_loop_parser.add_argument("--language-model-dir", type=Path, default=None, help="Optional PhaseLanguageModel directory for generation.")
+    agent_loop_parser.add_argument("--chat-model-dir", type=Path, default=None, help="Optional PhaseChatModel directory for generation.")
+    agent_loop_parser.add_argument("--weight-artifact-dir", type=Path, default=None, help="Optional PhaseMesh weight-pour artifact for generation.")
+    agent_loop_parser.add_argument("--execute-readonly", action="store_true", help="Execute critic-approved read-only/test commands.")
+    agent_loop_parser.add_argument("--command-timeout", type=float, default=10.0, help="Timeout for approved commands when execution is enabled.")
+    agent_loop_parser.add_argument("--json", action="store_true", help="Print the full episode payload as JSON.")
+    agent_loop_parser.add_argument("--out", type=Path, default=None, help="Optional JSON output path.")
 
     lab_demo_parser = subparsers.add_parser("lab-demo", help="Build a self-contained PhaseMesh lab demo artifact.")
     lab_demo_parser.add_argument("--out", type=Path, default=Path("runs/lab-demo"), help="Demo output directory.")
@@ -1530,6 +1547,29 @@ def llm_shell(args: argparse.Namespace) -> int:
     )
     payload = shell.run(" ".join(args.text))
     shell.save(args.state_dir)
+    if args.out is not None:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print(payload["answer"])
+    return 0 if payload.get("status") == "ok" else 2
+
+
+def agent_loop(args: argparse.Namespace) -> int:
+    from .agent_loop import PhaseMeshAgentLoop
+
+    loop = PhaseMeshAgentLoop(
+        workspace=args.workspace,
+        state_dir=args.state_dir,
+        language_model_dir=args.language_model_dir,
+        chat_model_dir=args.chat_model_dir,
+        weight_artifact_dir=args.weight_artifact_dir,
+        execute_readonly=args.execute_readonly,
+        command_timeout=args.command_timeout,
+    )
+    payload = loop.run(" ".join(args.text))
     if args.out is not None:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

@@ -324,6 +324,27 @@ python3 -m phase_mesh llm-shell "Write Python code for a function named add_one 
 
 `llm-shell` is the current integrated ladder rung. It wires memory/retrieval, role binding, narrow reasoning adapters, surface generation, learning, and control into one traced runtime. It is still an executive shell over verified PhaseMesh organs, not an open-ended general LLM.
 
+Run the bounded computer-world agent loop:
+
+```bash
+python3 -m phase_mesh agent-loop \
+  "Remember: PhaseMesh north star is computer-world learning." \
+  --workspace . \
+  --state-dir runs/agent-loop
+
+python3 -m phase_mesh agent-loop \
+  "Find the bug in this Python function: def add(a, b): return a - b" \
+  --workspace . \
+  --state-dir runs/agent-loop \
+  --json
+```
+
+`agent-loop` is the next rung above `llm-shell`. It observes a workspace, routes through the existing PhaseMesh organs, assigns explicit observer/memory/reasoner/planner/critic/recorder roles, predicts the next observation, and appends each state/action/outcome episode to `episodes.jsonl`. It is a safe-by-default episode recorder and control scaffold, not a general autonomous executor.
+
+The next accepted agent-loop capability is optional policy-gated read-only/test execution with prediction-vs-result scoring. When this mode is enabled, the loop may run only commands admitted by a fixed inspection/test policy, such as workspace status, diffs, file listing/search, or project tests. Before running anything, it must record the predicted command class, return-code class, file-change expectation, output or test-result shape, and risk. Afterward it records the actual return code, output summary, dirty-worktree check, policy decision, and score against the prediction. Blocked commands and failed predictions remain episode data for later training.
+
+This does not permit arbitrary shell execution, file edits, commits, pushes, network writes, browser/app actions, production changes, or other external side effects. Passing this rung means PhaseMesh can optionally ground plans in approved read-only/test results and score its predictions; it does not mean it can autonomously modify a repository.
+
 Build the reviewer-facing local demo artifact:
 
 ```bash

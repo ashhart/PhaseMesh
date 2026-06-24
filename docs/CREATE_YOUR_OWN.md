@@ -63,7 +63,34 @@ phase-mesh route "debug this python function: def add(a,b): return a+b"
 
 The route output is JSON with a route name, suggested tool, phase signature, confidence, resonance status, and verifier result.
 
-## 5. Run The Service
+## 5. Record Computer-World Episodes
+
+Use `agent-loop` when you want PhaseMesh to observe a workspace, route a prompt through its current organs, propose a safe next action, and record the episode for future world-model training.
+
+```bash
+phase-mesh agent-loop \
+  "Find the bug in this Python function: def add(a, b): return a - b" \
+  --workspace . \
+  --state-dir runs/agent-loop \
+  --json
+```
+
+This writes `runs/agent-loop/episodes.jsonl`. Each row contains the prompt, workspace observation, named agent-role outputs, shell trace, a bounded plan, and a predicted next observation. The scaffold is safe by default: it records and plans, but it does not execute arbitrary commands or edit files.
+
+To let it run approved inspection/test commands and score its prediction against the result, opt in explicitly:
+
+```bash
+phase-mesh agent-loop \
+  "Write Python code for a function named add_one that returns n + 1" \
+  --workspace . \
+  --state-dir runs/agent-loop \
+  --execute-readonly \
+  --json
+```
+
+Only commands admitted by the fixed policy can run. This rung records return code, output, dirty-worktree change, and prediction score; it still does not edit files, commit, push, or perform external side effects.
+
+## 6. Run The Service
 
 ```bash
 phase-mesh serve --host 127.0.0.1 --port 8765 --pin 0.25
@@ -78,7 +105,7 @@ curl -s "http://127.0.0.1:8765/think?text=check%2017%20*%2019%20=%20323&max_budg
 
 The service persists state by default under `runs/service-state/`.
 
-## 6. Train The Experimental Model Layer
+## 7. Train The Experimental Model Layer
 
 `model-train` streams text into the field, updates the phase predictor, reinforces stable basins, and trains an optional basin-to-token decoder head. This is self-supervised scaffolding, not a pretrained fluent model.
 

@@ -15,6 +15,7 @@ from .learnable_core import run_learnable_core_probe
 from .language_model import PhaseLanguageModel, PhaseLMConfig
 from .memory import MemoryEntry, RecallResult, TopologicalMemory
 from .model import PhaseModel, PhaseObservation, PhaseVocabulary
+from .agent_loop import PhaseMeshAgentLoop
 from .phase_accio import PhaseAccioSketch, run_phase_accio
 from .phase_advantage import DistributedPhaseAssociativeMemory, run_phase_advantage
 from .phase_advantage_docs import NaturalPhaseMemory, run_phase_advantage_docs
@@ -40,6 +41,7 @@ __all__ = [
     "PhaseVocabulary",
     "PhaseLanguageModel",
     "PhaseLMConfig",
+    "PhaseMeshAgentLoop",
     "PhaseChatConfig",
     "PhaseChatModel",
     "PhaseChatRecord",
