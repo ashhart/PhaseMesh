@@ -39,12 +39,57 @@ python -m phase_ssm.effbench \
 | 32,768 | 218k tok/s | 282k tok/s | 0.32 GB | 0.47 GB | 0.77x |
 | 65,536 | 217k tok/s | 155k tok/s | 0.58 GB | 0.87 GB | 1.40x |
 | 131,072 | 214k tok/s | 80k tok/s | 1.12 GB | 1.67 GB | 2.69x |
+| 262,144 | 216k tok/s | 40k tok/s | 2.19 GB | 3.28 GB | 5.44x |
 
 ## Read
 
 The PhaseSSM recurrent Triton backend stays roughly flat at `~214k-218k tok/s` from 32k to 131k. Flash attention falls from `744k tok/s` at 8k to `80k tok/s` at 131k. The crossover appears between 32k and 64k.
 
 Peak memory also favors PhaseSSM throughout this sweep, with the long-context gap widening at larger lengths.
+
+## 1M Extension Sweep
+
+After the first 131k run, the same recurrent Triton backend was swept to 1M context on PGX. This run measured the PhaseSSM side directly, then ran a bounded 256k side-by-side comparison against flash attention.
+
+Command for the SSM-only extension:
+
+```bash
+python - <<'PY'
+import torch
+from phase_ssm.effbench import SSMStack, measure
+
+d = 512
+layers = 8
+state = 64
+dev = "cuda"
+ssm = SSMStack(d, state, layers, backend="triton").to(dev)
+for L in [262144, 524288, 1048576]:
+    tok_s, mem = measure(ssm, L, dev, d, batch=1, reps=3, bf16=False)
+    print(L, tok_s, mem)
+PY
+```
+
+| Context | PhaseSSM Triton | SSM Mem |
+| ---: | ---: | ---: |
+| 262,144 | 216k tok/s | 2.15 GB |
+| 524,288 | 216k tok/s | 4.30 GB |
+| 1,048,576 | 216k tok/s | 8.59 GB |
+
+Command for the bounded 256k side-by-side row:
+
+```bash
+timeout 240 python -m phase_ssm.effbench \
+  --backend triton \
+  --lengths 262144
+```
+
+Result:
+
+| Context | PhaseSSM Triton | Flash Attention | SSM Mem | Attn Mem | Speed Ratio |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 262,144 | 216k tok/s | 40k tok/s | 2.19 GB | 3.28 GB | 5.44x |
+
+Read: PhaseSSM stays at `~216k tok/s` from 256k through 1M. The measured side-by-side gap is `5.44x` at 256k. Larger attention rows were not run because the 256k row already pushes the comparison into the steep part of the attention curve, while the SSM million-token extension completed directly.
 
 ## Backend Notes
 
@@ -63,4 +108,3 @@ The implemented `triton_chunked` backend is mathematically correct against the r
 | `triton_chunked` | 65,536 | 58k | 156k | 1.11 GB | 0.87 GB | 0.37x |
 
 The current production speed path is therefore `--backend triton`, not `--backend triton_chunked`.
-
