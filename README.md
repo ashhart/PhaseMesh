@@ -84,6 +84,22 @@ python3 -m phase_ssm.chat \
 
 PhaseSSM is the trainable damped-oscillator backbone. Its strongest current result is long-context efficiency: fixed-state decode and flat prefill throughput through 1M tokens. See `results/final_scorecard.md`, `results/effbench_long_ctx.md`, and `results/decode_mixed_bench.md`.
 
+Benchmark PhaseSSM training backends:
+
+```bash
+python3 -m phase_ssm.trainbench \
+  --ssm-backend fft \
+  --d-model 1088 \
+  --n-layers 12 \
+  --state-dim 64 \
+  --expand 1 \
+  --d-ff-mult 2 \
+  --seq 1024 \
+  --batch 64
+```
+
+Training backend notes: `fft` is the fully trainable path. `fixed_triton` uses the fast recurrent Triton forward with an exact input-gradient backward, but freezes the oscillator kernel. `real_chunked` is correct but too slow for training. See `results/training_backend_bench.md`.
+
 Pour a small transformer into PhaseMesh:
 
 ```bash

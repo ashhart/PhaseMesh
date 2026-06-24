@@ -13,7 +13,8 @@ Status date: 2026-06-24.
 | Mixed-length batches | `1.50x` effective throughput and `0.30 GB` vs `12.52 GB` on batch-32 uniform lengths | Green |
 | Trainable LM core | `phase_ssm.train` trains PhaseSSM and matched transformer checkpoints on identical byte data | Green |
 | Talkable checkpoint CLI | `python -m phase_ssm.chat --checkpoint runs/ssm/best.pt "prompt"` loads and samples a checkpoint | Green |
-| 131.7M quality run | Running on PGX with train-only throughput logging; timing probe shows `~14.3k tok/s` | In progress |
+| 131.7M quality run | Timing probe shows `~14.3k tok/s` on the fully trainable FFT backend | Measured |
+| Training backend probe | `fixed_triton` helps medium models but only reaches `14.8k tok/s` at 131.7M; skip ceiling is `21.2k tok/s` | Measured |
 
 ## What Is Not Claimed Yet
 
@@ -23,6 +24,7 @@ Status date: 2026-06-24.
 | 130M quality gap | Not run in this artifact | Text8/WikiText mix run with final bpc/perplexity table |
 | ChatGPT-style usefulness | Not proven | A trained checkpoint with qualitative and held-out task evals |
 | Fused RMSNorm/projection kernel | Not implemented | New row-blocked fused kernel shape; the current recurrent kernel is per channel |
+| 100x training speedup | Not available from the SSM scan alone | Needs full-block fusion, optimizer fusion, and/or multi-GPU |
 
 ## Current Efficiency Table
 

@@ -36,6 +36,65 @@ class PhaseSSMRealPairScanTests(unittest.TestCase):
 
         self.assertLess(rel, 1e-4)
 
+    def test_real_chunked_backend_matches_fft_backend(self) -> None:
+        from phase_ssm.model import OscillatorySSM
+
+        torch.manual_seed(13)
+        fft = OscillatorySSM(channels=6, state_dim=5, dt_min=1e-3, dt_max=1e-1, backend="fft")
+        real = OscillatorySSM(
+            channels=6,
+            state_dim=5,
+            dt_min=1e-3,
+            dt_max=1e-1,
+            backend="real_chunked",
+            chunk=8,
+        )
+        real.load_state_dict(fft.state_dict())
+        u = torch.randn(2, 31, 6)
+
+        fft_y = fft(u)
+        real_y = real(u)
+        scale = fft_y.abs().max().item() + 1e-9
+        rel = (fft_y - real_y).abs().max().item() / scale
+
+        self.assertLess(rel, 1e-4)
+
+    def test_fixed_kernel_backend_matches_fft_input_gradient(self) -> None:
+        from phase_ssm.model import OscillatorySSM
+
+        torch.manual_seed(19)
+        fft = OscillatorySSM(channels=5, state_dim=4, dt_min=1e-3, dt_max=1e-1, backend="fft")
+        fixed = OscillatorySSM(
+            channels=5,
+            state_dim=4,
+            dt_min=1e-3,
+            dt_max=1e-1,
+            backend="fixed_triton",
+            chunk=8,
+        )
+        fixed.load_state_dict(fft.state_dict())
+        for param in fft.parameters():
+            param.requires_grad_(False)
+        for param in fixed.parameters():
+            param.requires_grad_(False)
+
+        u_fft = torch.randn(2, 23, 5, requires_grad=True)
+        u_fixed = u_fft.detach().clone().requires_grad_(True)
+        target = torch.randn(2, 23, 5)
+
+        fft_loss = (fft(u_fft) * target).sum()
+        fixed_loss = (fixed(u_fixed) * target).sum()
+        fft_loss.backward()
+        fixed_loss.backward()
+
+        y_scale = abs(float(fft_loss.detach())) + 1e-9
+        y_rel = abs(float(fft_loss.detach() - fixed_loss.detach())) / y_scale
+        g_scale = u_fft.grad.abs().max().item() + 1e-9
+        g_rel = (u_fft.grad - u_fixed.grad).abs().max().item() / g_scale
+
+        self.assertLess(y_rel, 1e-4)
+        self.assertLess(g_rel, 1e-4)
+
     def test_triton_backend_fails_loudly_without_cuda_triton(self) -> None:
         from phase_ssm.model import OscillatorySSM
         from phase_ssm.triton_scan import (

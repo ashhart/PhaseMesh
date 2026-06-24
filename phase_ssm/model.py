@@ -35,6 +35,8 @@ class PhaseSSMConfig:
     expand: int = 2              # d_inner = expand * d_model
     d_ff_mult: int = 2           # FFN hidden = d_ff_mult * d_model
     short_conv: int = 4          # depthwise causal conv kernel before the SSM (0 = off)
+    ssm_backend: str = "fft"     # "fft", "real_chunked", "fixed_triton", or "skip"
+    ssm_chunk: int = 64          # chunk length for real-pair scan experiments
     dt_min: float = 1e-3
     dt_max: float = 1e-1
     dropout: float = 0.0
@@ -62,10 +64,21 @@ class OscillatorySSM(nn.Module):
     independent complex oscillators.
     """
 
-    def __init__(self, channels: int, state_dim: int, dt_min: float, dt_max: float):
+    def __init__(
+        self,
+        channels: int,
+        state_dim: int,
+        dt_min: float,
+        dt_max: float,
+        *,
+        backend: str = "fft",
+        chunk: int = 64,
+    ):
         super().__init__()
         self.H = channels
         self.N = state_dim
+        self.backend = backend
+        self.chunk = chunk
 
         # Timestep Δ per channel (log-uniform in [dt_min, dt_max]).
         log_dt = torch.rand(channels) * (math.log(dt_max) - math.log(dt_min)) + math.log(dt_min)
@@ -101,6 +114,17 @@ class OscillatorySSM(nn.Module):
         return kc
 
     def forward(self, u: torch.Tensor) -> torch.Tensor:
+        if self.backend == "skip":
+            return u * self.D[None, None, :]
+        if self.backend == "fixed_triton":
+            return _FixedKernelSSM.apply(u, self)
+        if self.backend == "real_chunked":
+            from .recurrent import ssm_chunked_real
+
+            return ssm_chunked_real(self, u, chunk=self.chunk)
+        if self.backend != "fft":
+            raise ValueError(f"unsupported SSM backend: {self.backend!r}")
+
         # u: (B, L, H) -> (B, H, L)
         B, L, H = u.shape
         x = u.transpose(1, 2)                                      # (B, H, L)
@@ -112,6 +136,53 @@ class OscillatorySSM(nn.Module):
         y = torch.fft.irfft(Uf * Kf[None], n=n, dim=-1)[..., :L]   # (B, H, L) causal conv
         y = y + x * self.D[None, :, None]
         return y.transpose(1, 2).to(u.dtype)                      # (B, L, H)
+
+
+class _FixedKernelSSM(torch.autograd.Function):
+    """Fast/frozen SSM kernel.
+
+    Forward uses the recurrent Triton inference kernel when available. Backward
+    returns an exact gradient for the input ``u`` with the current SSM kernel,
+    but intentionally returns no gradients for SSM parameters. This is a speed
+    rung: train projections/gates/FFN around a fixed oscillator bank while the
+    full trainable scan backward is built.
+    """
+
+    @staticmethod
+    def forward(ctx, u: torch.Tensor, ssm: OscillatorySSM) -> torch.Tensor:  # type: ignore[override]
+        with torch.no_grad():
+            kernel = ssm.kernel(u.shape[1], u.device, torch.float32).detach()
+            d = ssm.D.detach().to(torch.float32)
+            try:
+                if u.is_cuda:
+                    from .triton_scan import ssm_recurrent_triton, triton_available
+
+                    if triton_available():
+                        y = ssm_recurrent_triton(ssm, u)
+                    else:
+                        raise RuntimeError("Triton unavailable")
+                else:
+                    raise RuntimeError("CPU fallback")
+            except RuntimeError:
+                from .recurrent import ssm_chunked_real
+
+                y = ssm_chunked_real(ssm, u, chunk=ssm.chunk)
+        ctx.save_for_backward(kernel, d)
+        return y
+
+    @staticmethod
+    def backward(ctx, grad_y: torch.Tensor) -> tuple[torch.Tensor, None]:  # type: ignore[override]
+        kernel, d = ctx.saved_tensors
+        B, L, H = grad_y.shape
+        gy = grad_y.to(torch.float32).transpose(1, 2)                    # (B,H,L)
+        rev = torch.flip(gy, dims=[-1])
+        n = 2 * L
+        yf = torch.fft.rfft(rev, n=n, dim=-1)
+        kf = torch.fft.rfft(kernel, n=n, dim=-1)
+        conv = torch.fft.irfft(yf * kf[None], n=n, dim=-1)[..., :L]
+        grad_u = torch.flip(conv, dims=[-1]).transpose(1, 2)
+        grad_u = grad_u + grad_y.to(torch.float32) * d[None, None, :]
+        return grad_u.to(grad_y.dtype), None
 
 
 class PhaseTimeMixer(nn.Module):
@@ -126,7 +197,14 @@ class PhaseTimeMixer(nn.Module):
             nn.Conv1d(d_inner, d_inner, cfg.short_conv, groups=d_inner, padding=cfg.short_conv - 1)
             if cfg.short_conv > 0 else None
         )
-        self.ssm = OscillatorySSM(d_inner, cfg.state_dim, cfg.dt_min, cfg.dt_max)
+        self.ssm = OscillatorySSM(
+            d_inner,
+            cfg.state_dim,
+            cfg.dt_min,
+            cfg.dt_max,
+            backend=cfg.ssm_backend,
+            chunk=cfg.ssm_chunk,
+        )
         self.out_proj = nn.Linear(d_inner, cfg.d_model)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
