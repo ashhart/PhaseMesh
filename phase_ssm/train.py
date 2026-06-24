@@ -60,6 +60,8 @@ def main():
                    help="Training backend for PhaseSSM temporal mixer.")
     p.add_argument("--ssm-chunk", type=int, default=64,
                    help="Chunk length for --ssm-backend real_chunked.")
+    p.add_argument("--allow-diagnostic-backend", action="store_true",
+                   help="Allow quality-degrading diagnostic backends such as fixed_triton or skip.")
     p.add_argument("--dropout", type=float, default=0.0)
     p.add_argument("--seq", type=int, default=512)
     p.add_argument("--batch", type=int, default=32)
@@ -81,6 +83,13 @@ def main():
     p.add_argument("--compile", action="store_true")
     p.add_argument("--seed", type=int, default=1)
     args = p.parse_args()
+    diagnostic_backends = {"fixed_triton", "skip"}
+    if args.model == "phasessm" and args.ssm_backend in diagnostic_backends and not args.allow_diagnostic_backend:
+        raise SystemExit(
+            f"--ssm-backend {args.ssm_backend!r} is diagnostic and can degrade training quality. "
+            "Use --allow-diagnostic-backend only for timing/probing runs. "
+            "Use --ssm-backend fft for quality training."
+        )
 
     torch.manual_seed(args.seed)
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)

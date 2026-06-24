@@ -28,6 +28,9 @@ def build_model(args: argparse.Namespace) -> PhaseSSMLM:
         short_conv=args.short_conv,
         ssm_backend=args.ssm_backend,
         ssm_chunk=args.ssm_chunk,
+        use_mixer=not args.no_mixer,
+        use_ffn=not args.no_ffn,
+        use_gate=not args.no_gate,
     )
     return PhaseSSMLM(cfg)
 
@@ -107,6 +110,9 @@ def main() -> int:
     parser.add_argument("--expand", type=int, default=2)
     parser.add_argument("--d-ff-mult", type=int, default=3)
     parser.add_argument("--short-conv", type=int, default=4)
+    parser.add_argument("--no-mixer", action="store_true", help="Ablation: remove the temporal mixer block.")
+    parser.add_argument("--no-ffn", action="store_true", help="Ablation: remove the feed-forward block.")
+    parser.add_argument("--no-gate", action="store_true", help="Ablation: remove the mixer gate projection.")
     parser.add_argument("--seq", type=int, default=512)
     parser.add_argument("--batch", type=int, default=32)
     parser.add_argument("--steps", type=int, default=10)

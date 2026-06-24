@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import subprocess
+import sys
 import unittest
 
 import torch
@@ -94,6 +96,43 @@ class PhaseSSMRealPairScanTests(unittest.TestCase):
 
         self.assertLess(y_rel, 1e-4)
         self.assertLess(g_rel, 1e-4)
+
+    def test_phase_ssm_block_ablation_configs_train(self) -> None:
+        from phase_ssm.model import PhaseSSMConfig, PhaseSSMLM
+
+        for cfg in [
+            PhaseSSMConfig(vocab_size=32, d_model=16, n_layers=1, state_dim=4, use_mixer=False),
+            PhaseSSMConfig(vocab_size=32, d_model=16, n_layers=1, state_dim=4, use_ffn=False),
+            PhaseSSMConfig(vocab_size=32, d_model=16, n_layers=1, state_dim=4, use_gate=False),
+        ]:
+            model = PhaseSSMLM(cfg)
+            ids = torch.randint(0, 32, (2, 12))
+            logits, loss = model(ids, ids)
+            self.assertEqual(logits.shape, (2, 12, 32))
+            self.assertIsNotNone(loss)
+            loss.backward()
+
+    def test_train_rejects_diagnostic_backend_without_explicit_override(self) -> None:
+        run = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "phase_ssm.train",
+                "--model",
+                "phasessm",
+                "--ssm-backend",
+                "skip",
+                "--out",
+                "/tmp/phase-ssm-should-not-run",
+                "--steps",
+                "0",
+            ],
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("diagnostic", run.stderr + run.stdout)
 
     def test_triton_backend_fails_loudly_without_cuda_triton(self) -> None:
         from phase_ssm.model import OscillatorySSM

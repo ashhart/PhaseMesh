@@ -44,6 +44,9 @@ class PhaseSSMConfig:
     use_phase_memory: bool = False  # add the phase-binding associative-memory branch
     mem_heads: int = 4
     mem_head_dim: int = 32
+    use_mixer: bool = True
+    use_ffn: bool = True
+    use_gate: bool = True
 
 
 class RMSNorm(nn.Module):
@@ -191,8 +194,9 @@ class PhaseTimeMixer(nn.Module):
     def __init__(self, cfg: PhaseSSMConfig):
         super().__init__()
         d_inner = cfg.expand * cfg.d_model
+        self.use_gate = cfg.use_gate
         self.in_proj = nn.Linear(cfg.d_model, d_inner)
-        self.gate_proj = nn.Linear(cfg.d_model, d_inner)
+        self.gate_proj = nn.Linear(cfg.d_model, d_inner) if cfg.use_gate else None
         self.short_conv = (
             nn.Conv1d(d_inner, d_inner, cfg.short_conv, groups=d_inner, padding=cfg.short_conv - 1)
             if cfg.short_conv > 0 else None
@@ -215,7 +219,8 @@ class PhaseTimeMixer(nn.Module):
             u = c.transpose(1, 2)
         u = F.silu(u)
         y = self.ssm(u)
-        y = y * F.silu(self.gate_proj(x))                        # input-dependent gate
+        if self.gate_proj is not None:
+            y = y * F.silu(self.gate_proj(x))                    # input-dependent gate
         return self.out_proj(y)
 
 
@@ -233,22 +238,24 @@ class SwiGLU(nn.Module):
 class PhaseBlock(nn.Module):
     def __init__(self, cfg: PhaseSSMConfig):
         super().__init__()
-        self.norm1 = RMSNorm(cfg.d_model)
-        self.mixer = PhaseTimeMixer(cfg)
+        self.norm1 = RMSNorm(cfg.d_model) if cfg.use_mixer else None
+        self.mixer = PhaseTimeMixer(cfg) if cfg.use_mixer else None
         self.memory = None
-        if cfg.use_phase_memory:
+        if cfg.use_phase_memory and cfg.use_mixer:
             from .memory import PhaseBindingMemory
             self.norm_m = RMSNorm(cfg.d_model)
             self.memory = PhaseBindingMemory(cfg.d_model, cfg.mem_heads, cfg.mem_head_dim)
-        self.norm2 = RMSNorm(cfg.d_model)
-        self.ffn = SwiGLU(cfg.d_model, cfg.d_ff_mult * cfg.d_model)
+        self.norm2 = RMSNorm(cfg.d_model) if cfg.use_ffn else None
+        self.ffn = SwiGLU(cfg.d_model, cfg.d_ff_mult * cfg.d_model) if cfg.use_ffn else None
         self.drop = nn.Dropout(cfg.dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x + self.drop(self.mixer(self.norm1(x)))          # oscillatory SSM (temporal)
+        if self.mixer is not None and self.norm1 is not None:
+            x = x + self.drop(self.mixer(self.norm1(x)))      # oscillatory SSM (temporal)
         if self.memory is not None:
             x = x + self.drop(self.memory(self.norm_m(x)))    # phase-binding recall (associative)
-        x = x + self.drop(self.ffn(self.norm2(x)))            # channel mixing
+        if self.ffn is not None and self.norm2 is not None:
+            x = x + self.drop(self.ffn(self.norm2(x)))        # channel mixing
         return x
 
 

@@ -71,6 +71,8 @@ The near-term safe speed path is:
 3. Do not use `real_chunked` for training.
 4. For large quality runs, either accept the `fft` training speed or change the architecture/training system.
 
+Quality guardrail: `phase_ssm.train` now refuses `fixed_triton` and `skip` unless `--allow-diagnostic-backend` is passed explicitly. The default quality-training backend remains `fft`. `phase_ssm.trainbench` is the place to use diagnostic ablations because it runs random byte batches and does not touch the corpus.
+
 The real 100x path is larger than one kernel:
 
 - fused trainable SSM forward/backward
