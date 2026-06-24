@@ -100,6 +100,50 @@ if triton is not None:  # pragma: no cover - CUDA-only JIT body.
         tl.store(state_r_ptr + state_base, hr, mask=nmask)
         tl.store(state_i_ptr + state_base, hi, mask=nmask)
 
+    @triton.jit
+    def _ssm_real_step_kernel(
+        u_ptr,
+        ar_ptr,
+        ai_ptr,
+        wr_ptr,
+        wi_ptr,
+        d_ptr,
+        state_r_ptr,
+        state_i_ptr,
+        y_ptr,
+        B: tl.constexpr,
+        H: tl.constexpr,
+        N: tl.constexpr,
+        BLOCK_N: tl.constexpr,
+    ):
+        pid_b = tl.program_id(0)
+        pid_h = tl.program_id(1)
+        offs_n = tl.arange(0, BLOCK_N)
+        nmask = offs_n < N
+
+        hn = pid_h * N + offs_n
+        ar = tl.load(ar_ptr + hn, mask=nmask, other=0.0)
+        ai = tl.load(ai_ptr + hn, mask=nmask, other=0.0)
+        wr = tl.load(wr_ptr + hn, mask=nmask, other=0.0)
+        wi = tl.load(wi_ptr + hn, mask=nmask, other=0.0)
+        d = tl.load(d_ptr + pid_h)
+
+        state_base = (pid_b * H + pid_h) * N + offs_n
+        hr = tl.load(state_r_ptr + state_base, mask=nmask, other=0.0)
+        hi = tl.load(state_i_ptr + state_base, mask=nmask, other=0.0)
+        u_val = tl.load(u_ptr + pid_b * H + pid_h).to(tl.float32)
+
+        next_r = ar * hr - ai * hi + u_val
+        next_i = ai * hr + ar * hi
+        next_r = tl.where(nmask, next_r, 0.0)
+        next_i = tl.where(nmask, next_i, 0.0)
+
+        prod = tl.where(nmask, wr * next_r - wi * next_i, 0.0)
+        y_val = 2.0 * tl.sum(prod, axis=0) + d * u_val
+        tl.store(y_ptr + pid_b * H + pid_h, y_val)
+        tl.store(state_r_ptr + state_base, next_r, mask=nmask)
+        tl.store(state_i_ptr + state_base, next_i, mask=nmask)
+
 
     @triton.jit
     def _ssm_chunk_reduce_kernel(
@@ -291,7 +335,12 @@ if triton is not None:  # pragma: no cover - CUDA-only JIT body.
         )
 
 
-def ssm_recurrent_triton(ssm: OscillatorySSM, u: torch.Tensor, block_n: int | None = None) -> torch.Tensor:
+def ssm_recurrent_triton(
+    ssm: OscillatorySSM,
+    u: torch.Tensor,
+    block_n: int | None = None,
+    return_state: bool = False,
+) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Fused CUDA recurrent scan.
 
     Raises:
@@ -326,6 +375,55 @@ def ssm_recurrent_triton(ssm: OscillatorySSM, u: torch.Tensor, block_n: int | No
     _ssm_real_recurrent_kernel[(B, H)](
         uf, ar, ai, wr, wi, d, y, state_r, state_i,
         B, L, H, ssm.N, block_n,
+        num_warps=4,
+    )
+    y = y.to(u.dtype)
+    if return_state:
+        return y, state_r, state_i
+    return y
+
+
+def ssm_step_triton(
+    ssm: OscillatorySSM,
+    u: torch.Tensor,
+    state_r: torch.Tensor,
+    state_i: torch.Tensor,
+    block_n: int | None = None,
+) -> torch.Tensor:
+    """One-token recurrent step with in-place state update.
+
+    Args:
+        u: ``(B,H)`` real input for a single step.
+        state_r/state_i: ``(B,H,N)`` real-pair recurrent state, updated in place.
+    """
+    ok, reason = triton_status()
+    if not ok:
+        raise RuntimeError(f"Triton PhaseSSM step is unavailable: {reason}.")
+    if u.ndim != 2:
+        raise ValueError(f"expected u as (B,H), got shape {tuple(u.shape)}")
+    B, H = u.shape
+    if H != ssm.H:
+        raise ValueError(f"input has H={H}, but SSM has H={ssm.H}")
+    if state_r.shape != (B, H, ssm.N) or state_i.shape != (B, H, ssm.N):
+        raise ValueError("state tensors must have shape (B,H,N)")
+
+    ar, ai, wr, wi, _, _ = ssm_pole_real_pairs(ssm, torch.float32)
+    ar = ar.contiguous()
+    ai = ai.contiguous()
+    wr = wr.contiguous()
+    wi = wi.contiguous()
+    d = ssm.D.to(torch.float32).contiguous()
+    uf = u.to(torch.float32).contiguous()
+    y = torch.empty_like(uf)
+
+    if block_n is None:
+        block_n = triton.next_power_of_2(ssm.N)
+    if block_n < ssm.N:
+        raise ValueError(f"block_n={block_n} must be >= state_dim={ssm.N}")
+
+    _ssm_real_step_kernel[(B, H)](
+        uf, ar, ai, wr, wi, d, state_r, state_i, y,
+        B, H, ssm.N, block_n,
         num_warps=4,
     )
     return y.to(u.dtype)

@@ -78,6 +78,50 @@ def measure(model, L, dev, d, batch=1, reps=3, bf16=False):
     return batch * L / dt, torch.cuda.max_memory_allocated() / 1e9
 
 
+@torch.no_grad()
+def measure_mixed(ssm, attn, lengths, dev, d, reps=3):
+    """Measure effective throughput for exact-length SSM vs padded attention.
+
+    Attention gets a padded batch at max length. PhaseSSM processes each sequence
+    at its actual length. Throughput is effective real tokens per second.
+    """
+    total_tokens = int(sum(lengths))
+    max_len = int(max(lengths))
+    torch.cuda.reset_peak_memory_stats(); torch.cuda.synchronize()
+    for L in lengths:
+        ssm(torch.randn(1, int(L), d, device=dev))
+    torch.cuda.synchronize()
+    t0 = time.time()
+    for _ in range(reps):
+        for L in lengths:
+            ssm(torch.randn(1, int(L), d, device=dev))
+    torch.cuda.synchronize()
+    ssm_dt = (time.time() - t0) / reps
+    ssm_mem = torch.cuda.max_memory_allocated() / 1e9
+
+    torch.cuda.reset_peak_memory_stats(); torch.cuda.synchronize()
+    with torch.autocast("cuda", dtype=torch.bfloat16):
+        attn(torch.randn(len(lengths), max_len, d, device=dev))
+    torch.cuda.synchronize()
+    t0 = time.time()
+    with torch.autocast("cuda", dtype=torch.bfloat16):
+        for _ in range(reps):
+            attn(torch.randn(len(lengths), max_len, d, device=dev))
+    torch.cuda.synchronize()
+    attn_dt = (time.time() - t0) / reps
+    attn_mem = torch.cuda.max_memory_allocated() / 1e9
+
+    return {
+        "ssm_tok_s": total_tokens / ssm_dt,
+        "attn_tok_s": total_tokens / attn_dt,
+        "ssm_mem_gb": ssm_mem,
+        "attn_mem_gb": attn_mem,
+        "total_tokens": total_tokens,
+        "max_len": max_len,
+        "mean_len": total_tokens / len(lengths),
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--d-model", type=int, default=512)
@@ -89,6 +133,11 @@ def main():
     ap.add_argument("--state-block", type=int, default=16)
     ap.add_argument("--lengths", type=int, nargs="+", default=[1024, 2048, 4096, 8192, 16384, 32768, 65536])
     ap.add_argument("--seq", type=int, default=None, help="Alias for --lengths SEQ when running a single length")
+    ap.add_argument("--batch", type=int, default=1)
+    ap.add_argument("--seq-dist", choices=["fixed", "uniform"], default="fixed")
+    ap.add_argument("--min-seq", type=int, default=512)
+    ap.add_argument("--max-seq", type=int, default=32768)
+    ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
     if args.seq is not None:
         args.lengths = [args.seq]
@@ -112,14 +161,29 @@ def main():
         flush=True,
     )
     print("%8s %11s %11s %9s %9s %8s" % ("L", "ssm_tok/s", "attn_tok/s", "ssm_GB", "attn_GB", "ssm/attn"), flush=True)
+    if args.seq_dist == "uniform":
+        g = torch.Generator().manual_seed(args.seed)
+        lengths = torch.randint(args.min_seq, args.max_seq + 1, (args.batch,), generator=g).tolist()
+        r = measure_mixed(ssm, attn, lengths, dev, args.d_model)
+        spd = r["ssm_tok_s"] / r["attn_tok_s"]
+        label = f"mix[{int(r['mean_len'])}/{r['max_len']}]"
+        print("%8s %11s %11s %9s %9s %8s" % (
+            label,
+            f"{r['ssm_tok_s']/1e3:.0f}k",
+            f"{r['attn_tok_s']/1e3:.0f}k",
+            f"{r['ssm_mem_gb']:.2f}",
+            f"{r['attn_mem_gb']:.2f}",
+            f"{spd:.2f}x"), flush=True)
+        print("DONE", flush=True)
+        return
     for L in args.lengths:
         try:
-            st, sm = measure(ssm, L, dev, args.d_model, bf16=False)
+            st, sm = measure(ssm, L, dev, args.d_model, batch=args.batch, bf16=False)
         except RuntimeError:
             st = sm = None
             torch.cuda.empty_cache()
         try:
-            at, am = measure(attn, L, dev, args.d_model, bf16=True)
+            at, am = measure(attn, L, dev, args.d_model, batch=args.batch, bf16=True)
         except RuntimeError:
             at = am = None
             torch.cuda.empty_cache()
