@@ -65,6 +65,25 @@ python3 -m phase_mesh lm-eval runs/heldout.txt --model-dir runs/phase-lm
 
 This is the first actual trainable language-model core in the repo: it learns next-token continuations from a corpus, stores ordered context/next-token bindings in a complex phase memory, saves/loads the model, and generates token streams. It is small and early, but it is no longer just routing or a shell.
 
+Train and talk to the PhaseSSM engine:
+
+```bash
+python3 -m phase_ssm.train \
+  --model phasessm \
+  --out runs/ssm-small \
+  --steps 10000 \
+  --seq 512 \
+  --batch 32
+
+python3 -m phase_ssm.chat \
+  --checkpoint runs/ssm-small \
+  --max-tokens 120 \
+  --temperature 0.8 \
+  "PhaseMesh is"
+```
+
+PhaseSSM is the trainable damped-oscillator backbone. Its strongest current result is long-context efficiency: fixed-state decode and flat prefill throughput through 1M tokens. See `results/final_scorecard.md`, `results/effbench_long_ctx.md`, and `results/decode_mixed_bench.md`.
+
 Pour a small transformer into PhaseMesh:
 
 ```bash
