@@ -13,6 +13,7 @@ Status date: 2026-06-24.
 | Mixed-length batches | `1.50x` effective throughput and `0.30 GB` vs `12.52 GB` on batch-32 uniform lengths | Green |
 | Trainable LM core | `phase_ssm.train` trains PhaseSSM and matched transformer checkpoints on identical byte data | Green |
 | Talkable checkpoint CLI | `python -m phase_ssm.chat --checkpoint runs/ssm/best.pt "prompt"` loads and samples a checkpoint | Green |
+| 131.7M quality run | Running on PGX with train-only throughput logging; timing probe shows `~14.3k tok/s` | In progress |
 
 ## What Is Not Claimed Yet
 

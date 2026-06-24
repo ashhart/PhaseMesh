@@ -67,6 +67,10 @@ def main():
     p.add_argument("--grad-clip", dest="grad_clip", type=float, default=1.0)
     p.add_argument("--eval-interval", dest="eval_interval", type=int, default=500)
     p.add_argument("--eval-iters", dest="eval_iters", type=int, default=50)
+    p.add_argument("--train-log-interval", dest="train_log_interval", type=int, default=0,
+                   help="Print train-only throughput every N optimization steps. 0 disables.")
+    p.add_argument("--skip-initial-eval", action="store_true",
+                   help="Do not run the expensive step-0 eval/checkpoint pass.")
     p.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     p.add_argument("--dtype", type=str, default="bfloat16", choices=["bfloat16", "float32"])
     p.add_argument("--compile", action="store_true")
@@ -97,20 +101,33 @@ def main():
 
     log = {"model": args.model, "params": n_params, "cfg": model_cfg, "args": vars(args), "history": []}
     best_val = float("inf")
-    t0 = time.time(); tok_seen = 0; run_t = time.time()
+    t0 = time.time()
+    tok_seen = 0
+    run_t = time.time()
+    train_log_tokens = 0
+    train_log_t = time.time()
 
     for step in range(args.steps + 1):
         for g in opt.param_groups:
             g["lr"] = lr_at(step, args)
 
-        if step % args.eval_interval == 0:
+        should_eval = (
+            args.eval_interval > 0
+            and step % args.eval_interval == 0
+            and not (step == 0 and args.skip_initial_eval)
+        )
+        if should_eval:
+            eval_t0 = time.time()
             val_bpc = data.eval_bpc(model, "val", args.batch, args.seq, dev, args.eval_iters)
             train_bpc = data.eval_bpc(model, "train", args.batch, args.seq, dev, max(10, args.eval_iters // 5))
+            eval_s = time.time() - eval_t0
             dt = time.time() - run_t; tps = tok_seen / dt if dt > 0 else 0
             print(f"[{args.model}] step {step:6d}  train_bpc {train_bpc:.4f}  val_bpc {val_bpc:.4f}  "
-                  f"lr {opt.param_groups[0]['lr']:.2e}  {tps/1e3:.0f}k tok/s  {time.time()-t0:.0f}s")
+                  f"lr {opt.param_groups[0]['lr']:.2e}  interval_tok/s {tps/1e3:.0f}k  "
+                  f"eval_s {eval_s:.1f}  elapsed_s {time.time()-t0:.0f}")
             log["history"].append({"step": step, "train_bpc": train_bpc, "val_bpc": val_bpc,
-                                   "lr": opt.param_groups[0]["lr"], "tok_per_s": tps, "elapsed_s": time.time() - t0})
+                                   "lr": opt.param_groups[0]["lr"], "tok_per_s": tps,
+                                   "eval_s": eval_s, "elapsed_s": time.time() - t0})
             (out / "log.json").write_text(json.dumps(log, indent=2))
             if val_bpc < best_val:
                 best_val = val_bpc
@@ -124,6 +141,7 @@ def main():
 
         model.train()
         opt.zero_grad(set_to_none=True)
+        train_step_t0 = time.time()
         for _ in range(args.grad_accum):
             x, y = data.get_batch("train", args.batch, args.seq, dev)
             with torch.autocast(device_type=dev.split(":")[0], dtype=amp_dtype, enabled=(amp_dtype == torch.bfloat16)):
@@ -131,9 +149,29 @@ def main():
                 loss = loss / args.grad_accum
             loss.backward()
             tok_seen += x.numel()
+            train_log_tokens += x.numel()
         if args.grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         opt.step()
+        train_step_s = time.time() - train_step_t0
+
+        if args.train_log_interval > 0 and (step + 1) % args.train_log_interval == 0:
+            train_log_dt = time.time() - train_log_t
+            train_tps = train_log_tokens / train_log_dt if train_log_dt > 0 else 0
+            print(f"[{args.model}] train_step {step + 1:6d}  loss {loss.item() * args.grad_accum:.4f}  "
+                  f"train_tok/s {train_tps/1e3:.1f}k  step_s {train_step_s:.2f}  "
+                  f"lr {opt.param_groups[0]['lr']:.2e}  elapsed_s {time.time()-t0:.0f}")
+            log.setdefault("train_history", []).append({
+                "step": step + 1,
+                "loss": loss.item() * args.grad_accum,
+                "train_tok_per_s": train_tps,
+                "step_s": train_step_s,
+                "lr": opt.param_groups[0]["lr"],
+                "elapsed_s": time.time() - t0,
+            })
+            (out / "log.json").write_text(json.dumps(log, indent=2))
+            train_log_tokens = 0
+            train_log_t = time.time()
 
     log["best_val_bpc"] = best_val
     (out / "log.json").write_text(json.dumps(log, indent=2))
