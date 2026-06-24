@@ -23,6 +23,7 @@ dependencies = [
 [project.optional-dependencies]
 model = [
   "torch>=2.4",
+  "triton>=3.3; platform_system == 'Linux'",
 ]
 distill = [
   "torch>=2.4",
@@ -52,7 +53,7 @@ phase-mesh = "phase_mesh.cli:main"
 phase_mesh = "phase_mesh.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["phase_mesh*", "bench*", "benchmark*"]
+include = ["phase_mesh*", "phase_ssm*", "bench*", "benchmark*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
