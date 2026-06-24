@@ -35,8 +35,9 @@ class PhaseSSMConfig:
     expand: int = 2              # d_inner = expand * d_model
     d_ff_mult: int = 2           # FFN hidden = d_ff_mult * d_model
     short_conv: int = 4          # depthwise causal conv kernel before the SSM (0 = off)
-    ssm_backend: str = "fft"     # "fft", "real_chunked", "fixed_triton", or "skip"
+    ssm_backend: str = "fft"     # "fft", "auto", "real_chunked", "fixed_triton", or "skip"
     ssm_chunk: int = 64          # chunk length for real-pair scan experiments
+    ssm_auto_threshold: int = 32768  # "auto": FFT at/below threshold, recurrent above
     dt_min: float = 1e-3
     dt_max: float = 1e-1
     dropout: float = 0.0
@@ -76,12 +77,14 @@ class OscillatorySSM(nn.Module):
         *,
         backend: str = "fft",
         chunk: int = 64,
+        auto_threshold: int = 32768,
     ):
         super().__init__()
         self.H = channels
         self.N = state_dim
         self.backend = backend
         self.chunk = chunk
+        self.auto_threshold = int(auto_threshold)
 
         # Timestep Δ per channel (log-uniform in [dt_min, dt_max]).
         log_dt = torch.rand(channels) * (math.log(dt_max) - math.log(dt_min)) + math.log(dt_min)
@@ -117,15 +120,16 @@ class OscillatorySSM(nn.Module):
         return kc
 
     def forward(self, u: torch.Tensor) -> torch.Tensor:
-        if self.backend == "skip":
+        backend = self.backend_for_length(u.shape[1])
+        if backend == "skip":
             return u * self.D[None, None, :]
-        if self.backend == "fixed_triton":
+        if backend == "fixed_triton":
             return _FixedKernelSSM.apply(u, self)
-        if self.backend == "real_chunked":
+        if backend == "real_chunked":
             from .recurrent import ssm_chunked_real
 
             return ssm_chunked_real(self, u, chunk=self.chunk)
-        if self.backend != "fft":
+        if backend != "fft":
             raise ValueError(f"unsupported SSM backend: {self.backend!r}")
 
         # u: (B, L, H) -> (B, H, L)
@@ -139,6 +143,11 @@ class OscillatorySSM(nn.Module):
         y = torch.fft.irfft(Uf * Kf[None], n=n, dim=-1)[..., :L]   # (B, H, L) causal conv
         y = y + x * self.D[None, :, None]
         return y.transpose(1, 2).to(u.dtype)                      # (B, L, H)
+
+    def backend_for_length(self, length: int) -> str:
+        if self.backend != "auto":
+            return self.backend
+        return "fft" if int(length) <= self.auto_threshold else "fixed_triton"
 
 
 class _FixedKernelSSM(torch.autograd.Function):
@@ -208,6 +217,7 @@ class PhaseTimeMixer(nn.Module):
             cfg.dt_max,
             backend=cfg.ssm_backend,
             chunk=cfg.ssm_chunk,
+            auto_threshold=cfg.ssm_auto_threshold,
         )
         self.out_proj = nn.Linear(d_inner, cfg.d_model)
 

@@ -28,6 +28,7 @@ def build_model(args: argparse.Namespace) -> PhaseSSMLM:
         short_conv=args.short_conv,
         ssm_backend=args.ssm_backend,
         ssm_chunk=args.ssm_chunk,
+        ssm_auto_threshold=args.ssm_auto_threshold,
         use_mixer=not args.no_mixer,
         use_ffn=not args.no_ffn,
         use_gate=not args.no_gate,
@@ -102,8 +103,9 @@ def measure(args: argparse.Namespace) -> dict[str, object]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Benchmark PhaseSSM training-step throughput.")
-    parser.add_argument("--ssm-backend", choices=["fft", "real_chunked", "fixed_triton", "skip"], default="fft")
+    parser.add_argument("--ssm-backend", choices=["fft", "auto", "real_chunked", "fixed_triton", "skip"], default="fft")
     parser.add_argument("--ssm-chunk", type=int, default=64)
+    parser.add_argument("--ssm-auto-threshold", type=int, default=32768)
     parser.add_argument("--d-model", type=int, default=384)
     parser.add_argument("--n-layers", type=int, default=6)
     parser.add_argument("--state-dim", type=int, default=64)

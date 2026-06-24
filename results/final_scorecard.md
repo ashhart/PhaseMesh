@@ -25,6 +25,7 @@ Status date: 2026-06-24.
 | ChatGPT-style usefulness | Not proven | A trained checkpoint with qualitative and held-out task evals |
 | Fused RMSNorm/projection kernel | Not implemented | New row-blocked fused kernel shape; the current recurrent kernel is per channel |
 | 100x training speedup | Not available from the SSM scan alone | Needs full-block fusion, optimizer fusion, and/or multi-GPU |
+| Short-context prefill win | In progress | `effbench --backend auto` now routes short prefill to FFT and long prefill to Triton; PGX measurement pending after the 131M scout |
 
 ## Current Efficiency Table
 
@@ -56,6 +57,28 @@ python -m phase_ssm.effbench \
   --min-seq 512 \
   --max-seq 32768
 ```
+
+For short-context prefill, also test the parallel FFT backend:
+
+```bash
+python -m phase_ssm.effbench \
+  --backend fft \
+  --lengths 1024 2048 4096 8192 16384 32768
+```
+
+Hybrid prefill route:
+
+```bash
+python -m phase_ssm.effbench \
+  --backend auto \
+  --auto-threshold 32768 \
+  --ssm-dtype bfloat16 \
+  --lengths 1024 2048 4096 8192 16384 32768 65536 131072
+```
+
+Read: `auto` uses the parallel FFT path at or below `--auto-threshold` and the recurrent Triton path above it. This is the first fix for the below-64k gap. The remaining constant-factor work is a fused block kernel and a row-blocked parallel scan; those need CUDA kernels, not another Python routing tweak.
+
+Precision note: `--ssm-dtype bfloat16` measures bf16 input/output/autocast behavior where supported. The current recurrent Triton state math remains fp32 for stability. A true bf16/real-pair recurrent kernel is a separate CUDA task.
 
 ## How To Talk To A Trained PhaseSSM Checkpoint
 

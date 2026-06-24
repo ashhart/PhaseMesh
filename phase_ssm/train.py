@@ -27,7 +27,8 @@ def build_model(args, vocab_size: int):
         cfg = PhaseSSMConfig(vocab_size=vocab_size, d_model=args.d_model, n_layers=args.n_layers,
                              state_dim=args.state_dim, expand=args.expand, d_ff_mult=args.d_ff_mult,
                              short_conv=args.short_conv, ssm_backend=args.ssm_backend,
-                             ssm_chunk=args.ssm_chunk, dropout=args.dropout)
+                             ssm_chunk=args.ssm_chunk, ssm_auto_threshold=args.ssm_auto_threshold,
+                             dropout=args.dropout)
         return PhaseSSMLM(cfg), cfg.__dict__
     cfg = TransformerConfig(vocab_size=vocab_size, d_model=args.d_model, n_layers=args.n_layers,
                             n_heads=args.n_heads, d_ff_mult=args.d_ff_mult, block_size=args.seq,
@@ -56,10 +57,12 @@ def main():
     p.add_argument("--n-heads", dest="n_heads", type=int, default=6)
     p.add_argument("--d-ff-mult", dest="d_ff_mult", type=int, default=3)
     p.add_argument("--short-conv", dest="short_conv", type=int, default=4)
-    p.add_argument("--ssm-backend", choices=["fft", "real_chunked", "fixed_triton", "skip"], default="fft",
+    p.add_argument("--ssm-backend", choices=["fft", "auto", "real_chunked", "fixed_triton", "skip"], default="fft",
                    help="Training backend for PhaseSSM temporal mixer.")
     p.add_argument("--ssm-chunk", type=int, default=64,
                    help="Chunk length for --ssm-backend real_chunked.")
+    p.add_argument("--ssm-auto-threshold", type=int, default=32768,
+                   help="For --ssm-backend auto, use FFT at or below this sequence length.")
     p.add_argument("--allow-diagnostic-backend", action="store_true",
                    help="Allow quality-degrading diagnostic backends such as fixed_triton or skip.")
     p.add_argument("--dropout", type=float, default=0.0)
@@ -89,6 +92,17 @@ def main():
             f"--ssm-backend {args.ssm_backend!r} is diagnostic and can degrade training quality. "
             "Use --allow-diagnostic-backend only for timing/probing runs. "
             "Use --ssm-backend fft for quality training."
+        )
+    if (
+        args.model == "phasessm"
+        and args.ssm_backend == "auto"
+        and args.seq > args.ssm_auto_threshold
+        and not args.allow_diagnostic_backend
+    ):
+        raise SystemExit(
+            "--ssm-backend 'auto' would route this sequence length through the frozen recurrent path. "
+            "Use --ssm-backend fft for quality training, lower --seq, raise --ssm-auto-threshold, "
+            "or pass --allow-diagnostic-backend for timing/probing only."
         )
 
     torch.manual_seed(args.seed)

@@ -98,7 +98,7 @@ python3 -m phase_ssm.trainbench \
   --batch 64
 ```
 
-Training backend notes: `fft` is the quality-training path. `fixed_triton` uses the fast recurrent Triton forward with an exact input-gradient backward, but freezes the oscillator kernel. `skip` removes SSM mixing entirely. `phase_ssm.train` refuses those diagnostic backends unless `--allow-diagnostic-backend` is passed explicitly. `phase_ssm.trainbench` is the safe place to use ablations because it runs random byte batches and does not touch the corpus. See `results/training_backend_bench.md`.
+Training backend notes: `fft` is the quality-training path. `auto` uses FFT at or below `--ssm-auto-threshold` and the fast recurrent path above it, so `phase_ssm.train` refuses `auto` when the requested sequence length would cross into the frozen recurrent branch unless `--allow-diagnostic-backend` is explicit. `fixed_triton` uses the fast recurrent Triton forward with an exact input-gradient backward, but freezes the oscillator kernel. `skip` removes SSM mixing entirely. `phase_ssm.train` refuses those diagnostic backends unless `--allow-diagnostic-backend` is passed explicitly. `phase_ssm.trainbench` is the safe place to use ablations because it runs random byte batches and does not touch the corpus. See `results/training_backend_bench.md`.
 
 Pour a small transformer into PhaseMesh:
 

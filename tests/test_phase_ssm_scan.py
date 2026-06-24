@@ -61,6 +61,21 @@ class PhaseSSMRealPairScanTests(unittest.TestCase):
 
         self.assertLess(rel, 1e-4)
 
+    def test_oscillatory_ssm_auto_backend_routes_by_length(self) -> None:
+        from phase_ssm.model import OscillatorySSM
+
+        ssm = OscillatorySSM(
+            channels=4,
+            state_dim=3,
+            dt_min=1e-3,
+            dt_max=1e-1,
+            backend="auto",
+            auto_threshold=16,
+        )
+
+        self.assertEqual(ssm.backend_for_length(16), "fft")
+        self.assertEqual(ssm.backend_for_length(17), "fixed_triton")
+
     def test_fixed_kernel_backend_matches_fft_input_gradient(self) -> None:
         from phase_ssm.model import OscillatorySSM
 
@@ -112,6 +127,15 @@ class PhaseSSMRealPairScanTests(unittest.TestCase):
             self.assertIsNotNone(loss)
             loss.backward()
 
+    def test_effbench_auto_backend_routes_short_to_fft_and_long_to_triton(self) -> None:
+        from phase_ssm.effbench import SSMStack
+
+        stack = SSMStack(8, 4, 1, backend="auto", auto_threshold=128)
+
+        self.assertEqual(stack.backend_for_length(64), "fft")
+        self.assertEqual(stack.backend_for_length(128), "fft")
+        self.assertEqual(stack.backend_for_length(129), "triton")
+
     def test_train_rejects_diagnostic_backend_without_explicit_override(self) -> None:
         run = subprocess.run(
             [
@@ -133,6 +157,32 @@ class PhaseSSMRealPairScanTests(unittest.TestCase):
 
         self.assertNotEqual(run.returncode, 0)
         self.assertIn("diagnostic", run.stderr + run.stdout)
+
+    def test_train_rejects_auto_backend_when_sequence_crosses_threshold(self) -> None:
+        run = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "phase_ssm.train",
+                "--model",
+                "phasessm",
+                "--ssm-backend",
+                "auto",
+                "--ssm-auto-threshold",
+                "16",
+                "--seq",
+                "17",
+                "--out",
+                "/tmp/phase-ssm-auto-should-not-run",
+                "--steps",
+                "0",
+            ],
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("frozen recurrent path", run.stderr + run.stdout)
 
     def test_triton_backend_fails_loudly_without_cuda_triton(self) -> None:
         from phase_ssm.model import OscillatorySSM
