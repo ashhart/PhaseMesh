@@ -1,3 +1,5 @@
+![PhaseMesh banner with luminous oscillating wavefronts](assets/phasemesh-banner.png)
+
 # PhaseMesh
 
 PhaseMesh is an experimental codebase for phase-based sequence processing and memory. Its trainable language-model component, **PhaseSSM**, uses damped complex oscillators to carry information through a recurrent state. An optional phase-binding memory adds content-based retrieval.
