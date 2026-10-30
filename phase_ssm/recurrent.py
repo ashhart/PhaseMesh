@@ -177,6 +177,45 @@ def ssm_recurrent_real(ssm: OscillatorySSM, u: torch.Tensor) -> torch.Tensor:
     return out
 
 
+@torch.no_grad()
+def ssm_step_real(ssm: OscillatorySSM, u: torch.Tensor, state_r: torch.Tensor,
+                  state_i: torch.Tensor) -> torch.Tensor:
+    """One-token real-pair step, PyTorch on any device; same contract as ``ssm_step_triton``.
+
+    u: ``(B,H)``; state_r/state_i: ``(B,H,N)`` fp32, updated in place. Returns y ``(B,H)``.
+    """
+    ar, ai, wr, wi, _, _ = ssm_pole_real_pairs(ssm, torch.float32)
+    uf = u.float()
+    next_r = ar[None] * state_r - ai[None] * state_i + uf[..., None]
+    next_i = ai[None] * state_r + ar[None] * state_i
+    state_r.copy_(next_r)
+    state_i.copy_(next_i)
+    return 2.0 * (wr[None] * state_r - wi[None] * state_i).sum(-1) + ssm.D.float()[None] * uf
+
+
+@torch.no_grad()
+def ssm_final_state_real(ssm: OscillatorySSM, u: torch.Tensor, chunk: int = 256):
+    """Recurrent state after reading all of u ``(B,L,H)``, as real pairs ``(B,H,N)``.
+
+    Chunked so it never materialises an (L,H,N) tensor: per chunk, h = a^C h + sum_j a^(C-1-j) u_j.
+    """
+    _, _, _, _, log_r, angle = ssm_pole_real_pairs(ssm, torch.float32)
+    B, L, H = u.shape
+    h_r = torch.zeros(B, H, ssm.N, dtype=torch.float32, device=u.device)
+    h_i = torch.zeros_like(h_r)
+    for start in range(0, L, chunk):
+        uc = u[:, start:start + chunk].float()                              # (B,C,H)
+        C = uc.shape[1]
+        steps = torch.arange(C - 1, -1, -1, device=u.device, dtype=torch.float32)
+        pow_r, pow_i = _polar_power(log_r, angle, steps)                    # a^(C-1-j)  (C,H,N)
+        carry_r, carry_i = _polar_power(log_r, angle, torch.tensor([float(C)], device=u.device))
+        carry_r, carry_i = carry_r[0], carry_i[0]                           # a^C  (H,N)
+        new_r = carry_r * h_r - carry_i * h_i + torch.einsum("bch,chn->bhn", uc, pow_r)
+        new_i = carry_i * h_r + carry_r * h_i + torch.einsum("bch,chn->bhn", uc, pow_i)
+        h_r, h_i = new_r, new_i
+    return h_r, h_i
+
+
 def _test():
     torch.manual_seed(0)
     H, N, L, B = 32, 16, 200, 2          # L not a multiple of chunk (tests padding)
