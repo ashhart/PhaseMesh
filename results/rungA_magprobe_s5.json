@@ -1,0 +1,199 @@
+{
+  "device": "mps",
+  "train_L": 32,
+  "steps": 6000,
+  "seeds": 3,
+  "d": 128,
+  "heads": 8,
+  "d_h": 16,
+  "n_h": 4,
+  "layers": 2,
+  "transition": "householder",
+  "ND": 30,
+  "beta_init": "identity",
+  "parity_ablation": false,
+  "mag_probe": [
+    {
+      "arm": "init=identity",
+      "seed": 0,
+      "acc_maxL": 0.1220703125,
+      "diag": [
+        {
+          "layer": 0,
+          "carrier_head": 2,
+          "sign_best": 1.0,
+          "gen_absdet": 0.14067967236042023,
+          "dist_absdet": 0.4766490161418915
+        },
+        {
+          "layer": 1,
+          "carrier_head": 3,
+          "sign_best": 0.901659369468689,
+          "gen_absdet": 0.4616682529449463,
+          "dist_absdet": 0.9305466413497925
+        }
+      ]
+    },
+    {
+      "arm": "init=reflect",
+      "seed": 0,
+      "acc_maxL": 0.443359375,
+      "diag": [
+        {
+          "layer": 0,
+          "carrier_head": 2,
+          "sign_best": 0.8689135909080505,
+          "gen_absdet": 0.004216475877910852,
+          "dist_absdet": 0.4824115037918091
+        },
+        {
+          "layer": 1,
+          "carrier_head": 7,
+          "sign_best": 0.9416112303733826,
+          "gen_absdet": 0.7921216487884521,
+          "dist_absdet": 0.9899466633796692
+        }
+      ]
+    },
+    {
+      "arm": "init=identity",
+      "seed": 1,
+      "acc_maxL": 0.2392578125,
+      "diag": [
+        {
+          "layer": 0,
+          "carrier_head": 3,
+          "sign_best": 1.0,
+          "gen_absdet": 0.1416919082403183,
+          "dist_absdet": 0.5116757154464722
+        },
+        {
+          "layer": 1,
+          "carrier_head": 3,
+          "sign_best": 0.9395026564598083,
+          "gen_absdet": 0.7716977596282959,
+          "dist_absdet": 0.9989920258522034
+        }
+      ]
+    },
+    {
+      "arm": "init=reflect",
+      "seed": 1,
+      "acc_maxL": 0.1884765625,
+      "diag": [
+        {
+          "layer": 0,
+          "carrier_head": 4,
+          "sign_best": 0.9023426175117493,
+          "gen_absdet": 0.1321776956319809,
+          "dist_absdet": 0.21421827375888824
+        },
+        {
+          "layer": 1,
+          "carrier_head": 2,
+          "sign_best": 0.9265785217285156,
+          "gen_absdet": 0.6798139810562134,
+          "dist_absdet": 0.9046652317047119
+        }
+      ]
+    },
+    {
+      "arm": "init=identity",
+      "seed": 2,
+      "acc_maxL": 0.5537109375,
+      "diag": [
+        {
+          "layer": 0,
+          "carrier_head": 4,
+          "sign_best": 1.0,
+          "gen_absdet": 0.2232315093278885,
+          "dist_absdet": 0.5208930969238281
+        },
+        {
+          "layer": 1,
+          "carrier_head": 5,
+          "sign_best": 0.8426899909973145,
+          "gen_absdet": 0.6145521998405457,
+          "dist_absdet": 0.9962688684463501
+        }
+      ]
+    },
+    {
+      "arm": "init=reflect",
+      "seed": 2,
+      "acc_maxL": 0.099609375,
+      "diag": [
+        {
+          "layer": 0,
+          "carrier_head": 1,
+          "sign_best": 0.8814680576324463,
+          "gen_absdet": 0.3614257872104645,
+          "dist_absdet": 0.16491994261741638
+        },
+        {
+          "layer": 1,
+          "carrier_head": 4,
+          "sign_best": 0.9645862579345703,
+          "gen_absdet": 0.5833336710929871,
+          "dist_absdet": 0.6930316090583801
+        }
+      ]
+    }
+  ],
+  "results": {
+    "init=identity": {
+      "32": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "48": [
+        0.9892578125,
+        1.0,
+        0.9990234375
+      ],
+      "64": [
+        0.9052734375,
+        0.982421875,
+        0.994140625
+      ],
+      "96": [
+        0.4501953125,
+        0.6796875,
+        0.8662109375
+      ],
+      "128": [
+        0.1220703125,
+        0.2392578125,
+        0.5537109375
+      ]
+    },
+    "init=reflect": {
+      "32": [
+        0.9990234375,
+        1.0,
+        0.9970703125
+      ],
+      "48": [
+        0.9951171875,
+        0.9814453125,
+        0.9482421875
+      ],
+      "64": [
+        0.9560546875,
+        0.896484375,
+        0.796875
+      ],
+      "96": [
+        0.69921875,
+        0.4453125,
+        0.3310546875
+      ],
+      "128": [
+        0.443359375,
+        0.1884765625,
+        0.099609375
+      ]
+    }
+  }
+}

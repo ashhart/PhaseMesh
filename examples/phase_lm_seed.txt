@@ -1,0 +1,15 @@
+PhaseMesh learns compact language patterns.
+PhaseMesh learns memory from local text.
+PhaseMesh routes prompts through verified organs.
+PhaseMesh writes traced answers.
+PhaseMesh generates small continuations from a phase memory.
+Phase mesh learns compact language patterns.
+Phase mesh learns memory from local text.
+Phase mesh routes prompts through verified organs.
+Phase mesh writes traced answers.
+Phase mesh generates small continuations from a phase memory.
+The phase language model binds ordered context to the next token.
+The phase language model stores next token signals in complex phase memory.
+The shell remembers facts, binds roles, reasons through adapters, and answers.
+Train PhaseMesh on a larger corpus to improve fluency.
+Train PhaseMesh on notes, code, and examples to specialize the local model.

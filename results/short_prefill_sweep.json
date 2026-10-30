@@ -1,0 +1,315 @@
+{
+  "status": "ok",
+  "config": {
+    "d_model": 512,
+    "layers": 8,
+    "state_dim": 64,
+    "heads": 8,
+    "batch": 1,
+    "reps": 3,
+    "ssm_dtype": "bfloat16",
+    "auto_threshold": 32768,
+    "backends": [
+      "fft",
+      "triton",
+      "auto"
+    ],
+    "lengths": [
+      1024,
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536
+    ]
+  },
+  "rows": [
+    {
+      "length": 1024,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 17259.14619552478,
+      "attn_tok_s": 1121011.126500783,
+      "ssm_mem_gb": 0.561289216,
+      "attn_mem_gb": 0.072482816,
+      "ratio": 0.015396052534642459,
+      "error": ""
+    },
+    {
+      "length": 1024,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 214594.57202338325,
+      "attn_tok_s": 1121011.126500783,
+      "ssm_mem_gb": 0.02179072,
+      "attn_mem_gb": 0.072482816,
+      "ratio": 0.19142947554252787,
+      "error": ""
+    },
+    {
+      "length": 1024,
+      "backend": "auto",
+      "used_backend": "fft",
+      "ssm_tok_s": 17262.49901260701,
+      "attn_tok_s": 1121011.126500783,
+      "ssm_mem_gb": 0.561289216,
+      "attn_mem_gb": 0.072482816,
+      "ratio": 0.01539904342117603,
+      "error": ""
+    },
+    {
+      "length": 2048,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 17577.9391950102,
+      "attn_tok_s": 1104483.2751585806,
+      "ssm_mem_gb": 1.108129792,
+      "attn_mem_gb": 0.086114304,
+      "ratio": 0.015915079558344942,
+      "error": ""
+    },
+    {
+      "length": 2048,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 215158.95981498028,
+      "attn_tok_s": 1104483.2751585806,
+      "ssm_mem_gb": 0.030179328,
+      "attn_mem_gb": 0.086114304,
+      "ratio": 0.1948050863731621,
+      "error": ""
+    },
+    {
+      "length": 2048,
+      "backend": "auto",
+      "used_backend": "fft",
+      "ssm_tok_s": 17443.41594098029,
+      "attn_tok_s": 1104483.2751585806,
+      "ssm_mem_gb": 1.108129792,
+      "attn_mem_gb": 0.086114304,
+      "ratio": 0.015793282101511024,
+      "error": ""
+    },
+    {
+      "length": 4096,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 17528.266858841962,
+      "attn_tok_s": 1013282.6272412707,
+      "ssm_mem_gb": 2.202847232,
+      "attn_mem_gb": 0.111804416,
+      "ratio": 0.017298497366488787,
+      "error": ""
+    },
+    {
+      "length": 4096,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 219683.93043715472,
+      "attn_tok_s": 1013282.6272412707,
+      "ssm_mem_gb": 0.046956544,
+      "attn_mem_gb": 0.111804416,
+      "ratio": 0.21680420105026257,
+      "error": ""
+    },
+    {
+      "length": 4096,
+      "backend": "auto",
+      "used_backend": "fft",
+      "ssm_tok_s": 17632.74870165326,
+      "attn_tok_s": 1013282.6272412707,
+      "ssm_mem_gb": 2.202847232,
+      "attn_mem_gb": 0.111804416,
+      "ratio": 0.017401609607834285,
+      "error": ""
+    },
+    {
+      "length": 8192,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 17191.41608513718,
+      "attn_tok_s": 745891.4520246605,
+      "ssm_mem_gb": 4.392290304,
+      "attn_mem_gb": 0.161087488,
+      "ratio": 0.02304814733896267,
+      "error": ""
+    },
+    {
+      "length": 8192,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 212748.08953320136,
+      "attn_tok_s": 745891.4520246605,
+      "ssm_mem_gb": 0.080510976,
+      "attn_mem_gb": 0.161087488,
+      "ratio": 0.2852266089867558,
+      "error": ""
+    },
+    {
+      "length": 8192,
+      "backend": "auto",
+      "used_backend": "fft",
+      "ssm_tok_s": 17097.731681004454,
+      "attn_tok_s": 745891.4520246605,
+      "ssm_mem_gb": 4.392290304,
+      "attn_mem_gb": 0.161087488,
+      "ratio": 0.022922546752069724,
+      "error": ""
+    },
+    {
+      "length": 16384,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 16971.33531558766,
+      "attn_tok_s": 472280.4156722419,
+      "ssm_mem_gb": 8.771176448,
+      "attn_mem_gb": 0.260702208,
+      "ratio": 0.03593486994676825,
+      "error": ""
+    },
+    {
+      "length": 16384,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 217645.54439565848,
+      "attn_tok_s": 472280.4156722419,
+      "ssm_mem_gb": 0.14761984,
+      "attn_mem_gb": 0.260702208,
+      "ratio": 0.4608396562153922,
+      "error": ""
+    },
+    {
+      "length": 16384,
+      "backend": "auto",
+      "used_backend": "fft",
+      "ssm_tok_s": 17011.61158669886,
+      "attn_tok_s": 472280.4156722419,
+      "ssm_mem_gb": 8.771176448,
+      "attn_mem_gb": 0.260702208,
+      "ratio": 0.036020150364449485,
+      "error": ""
+    },
+    {
+      "length": 32768,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 16010.770090277556,
+      "attn_tok_s": 282128.22618601227,
+      "ssm_mem_gb": 17.528948736,
+      "attn_mem_gb": 0.4620288,
+      "ratio": 0.05674997608967124,
+      "error": ""
+    },
+    {
+      "length": 32768,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 216764.15857676463,
+      "attn_tok_s": 282128.22618601227,
+      "ssm_mem_gb": 0.281837568,
+      "attn_mem_gb": 0.4620288,
+      "ratio": 0.7683178727173795,
+      "error": ""
+    },
+    {
+      "length": 32768,
+      "backend": "auto",
+      "used_backend": "fft",
+      "ssm_tok_s": 15810.086576757745,
+      "attn_tok_s": 282128.22618601227,
+      "ssm_mem_gb": 17.528948736,
+      "attn_mem_gb": 0.4620288,
+      "ratio": 0.05603865586399664,
+      "error": ""
+    },
+    {
+      "length": 65536,
+      "backend": "fft",
+      "used_backend": "fft",
+      "ssm_tok_s": 15665.082767884522,
+      "attn_tok_s": 154547.63415201873,
+      "ssm_mem_gb": 35.044493312,
+      "attn_mem_gb": 0.864681984,
+      "ratio": 0.10136087073630497,
+      "error": ""
+    },
+    {
+      "length": 65536,
+      "backend": "triton",
+      "used_backend": "triton",
+      "ssm_tok_s": 215092.56892396815,
+      "attn_tok_s": 154547.63415201873,
+      "ssm_mem_gb": 0.550273024,
+      "attn_mem_gb": 0.864681984,
+      "ratio": 1.3917558175778686,
+      "error": ""
+    },
+    {
+      "length": 65536,
+      "backend": "auto",
+      "used_backend": "triton",
+      "ssm_tok_s": 215341.73221368567,
+      "attn_tok_s": 154547.63415201873,
+      "ssm_mem_gb": 0.550273024,
+      "attn_mem_gb": 0.864681984,
+      "ratio": 1.3933680278914373,
+      "error": ""
+    }
+  ],
+  "recommendation": {
+    "recommended_auto_threshold": null,
+    "first_best_ssm_win_vs_attention": 65536,
+    "best_by_length": [
+      {
+        "length": 1024,
+        "best_backend": "triton",
+        "best_ssm_tok_s": 214594.57202338325,
+        "attn_tok_s": 1121011.126500783,
+        "best_ratio": 0.19142947554252787
+      },
+      {
+        "length": 2048,
+        "best_backend": "triton",
+        "best_ssm_tok_s": 215158.95981498028,
+        "attn_tok_s": 1104483.2751585806,
+        "best_ratio": 0.1948050863731621
+      },
+      {
+        "length": 4096,
+        "best_backend": "triton",
+        "best_ssm_tok_s": 219683.93043715472,
+        "attn_tok_s": 1013282.6272412707,
+        "best_ratio": 0.21680420105026257
+      },
+      {
+        "length": 8192,
+        "best_backend": "triton",
+        "best_ssm_tok_s": 212748.08953320136,
+        "attn_tok_s": 745891.4520246605,
+        "best_ratio": 0.2852266089867558
+      },
+      {
+        "length": 16384,
+        "best_backend": "triton",
+        "best_ssm_tok_s": 217645.54439565848,
+        "attn_tok_s": 472280.4156722419,
+        "best_ratio": 0.4608396562153922
+      },
+      {
+        "length": 32768,
+        "best_backend": "triton",
+        "best_ssm_tok_s": 216764.15857676463,
+        "attn_tok_s": 282128.22618601227,
+        "best_ratio": 0.7683178727173795
+      },
+      {
+        "length": 65536,
+        "best_backend": "auto",
+        "best_ssm_tok_s": 215341.73221368567,
+        "attn_tok_s": 154547.63415201873,
+        "best_ratio": 1.3933680278914373
+      }
+    ]
+  }
+}

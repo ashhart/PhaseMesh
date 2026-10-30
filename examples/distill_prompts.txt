@@ -1,0 +1,8 @@
+Write three concise sentences explaining PhaseMesh as a local phase-memory language model.
+Explain how a shell can combine memory, binding, reasoning, generation, learning, and control.
+Write a short technical note about distilling a small transformer into a phase memory language model.
+Give a compact example of using PhaseMesh to remember a fact and answer a question.
+Explain why evaluating a new language model requires honest benchmarks, controls, and ablations.
+Write a short developer note about improving generation quality without pretending the model is solved.
+Describe how a compact local model can learn from notes, code, and workflow traces.
+Write a concise README paragraph for a trainable PhaseMesh language model.
