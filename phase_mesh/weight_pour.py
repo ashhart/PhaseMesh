@@ -303,7 +303,7 @@ def _iter_checkpoint_tensors(model_path: Path) -> Iterable[tuple[str, np.ndarray
     except Exception as exc:  # pragma: no cover - optional dependency path
         raise RuntimeError(WEIGHT_POUR_IMPORT_ERROR) from exc
     for shard in bins:
-        state = torch.load(shard, map_location="cpu")
+        state = torch.load(shard, map_location="cpu", weights_only=True)
         if isinstance(state, dict) and "state_dict" in state:
             state = state["state_dict"]
         for name, tensor in state.items():

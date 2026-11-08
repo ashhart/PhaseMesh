@@ -32,7 +32,7 @@ def load_checkpoint(path: str | Path, device: str) -> tuple[torch.nn.Module, dic
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"checkpoint not found: {checkpoint_path}")
 
-    payload = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    payload = torch.load(checkpoint_path, map_location=device, weights_only=True)
     model_type = payload.get("model_type", "phasessm")
     cfg_data = dict(payload["cfg"])
 

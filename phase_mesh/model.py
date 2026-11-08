@@ -3303,21 +3303,21 @@ class PhaseModel:
                 )
             elif model.decoder is None:
                 model._init_decoder()
-            model.decoder.load_state_dict(torch.load(decoder_path, map_location="cpu"))
+            model.decoder.load_state_dict(torch.load(decoder_path, map_location="cpu", weights_only=True))
             model.decoder.eval()
         reranker_path = path / "reranker.pt"
         if load_decoder and reranker_path.exists():
             torch, _nn, _functional = _torch_modules()
             if model.reranker is None:
                 model._init_reranker()
-            model.reranker.load_state_dict(torch.load(reranker_path, map_location="cpu"))
+            model.reranker.load_state_dict(torch.load(reranker_path, map_location="cpu", weights_only=True))
             model.reranker.eval()
         gate_path = path / "gate.pt"
         if load_decoder and gate_path.exists() and model.num_slots > 0:
             torch, _nn, _functional = _torch_modules()
             if model.gate_net is None:
                 model._init_gate()
-            model.gate_net.load_state_dict(torch.load(gate_path, map_location="cpu"))
+            model.gate_net.load_state_dict(torch.load(gate_path, map_location="cpu", weights_only=True))
             model.gate_net.eval()
         delta_path = path / "delta_scorer.pt"
         if load_decoder and delta_path.exists():
@@ -3325,7 +3325,7 @@ class PhaseModel:
             if model.delta_scorer is None:
                 model._init_delta_scorer()
             try:
-                model.delta_scorer.load_state_dict(torch.load(delta_path, map_location="cpu"))
+                model.delta_scorer.load_state_dict(torch.load(delta_path, map_location="cpu", weights_only=True))
                 model.delta_scorer.eval()
             except RuntimeError:
                 model.delta_trained_steps = 0
