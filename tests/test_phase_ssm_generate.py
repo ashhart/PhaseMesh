@@ -55,6 +55,26 @@ class PhaseSSMGenerateTests(unittest.TestCase):
         self.assertIn('"tokens_per_s"', run.stdout)
         self.assertIn('"limits"', run.stdout)
 
+    def test_load_checkpoint_refuses_pickled_code(self) -> None:
+        import pickle
+
+        from phase_ssm.generate import load_checkpoint
+
+        class _OpensMarkerWhenUnpickled:
+            def __init__(self, marker: Path) -> None:
+                self.marker = marker
+
+            def __reduce__(self):
+                return (open, (str(self.marker), "w"))
+
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            marker = root / "unpickled-code-ran"
+            torch.save(_OpensMarkerWhenUnpickled(marker), root / "best.pt")
+            with self.assertRaises(pickle.UnpicklingError):
+                load_checkpoint(root, "cpu")
+            self.assertFalse(marker.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

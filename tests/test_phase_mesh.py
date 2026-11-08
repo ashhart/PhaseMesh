@@ -433,6 +433,39 @@ class PhaseModelTests(unittest.TestCase):
             model.structural_prototypes[key],
         )
 
+    def test_load_refuses_pickled_code_in_decoder_file(self) -> None:
+        try:
+            import torch
+        except Exception:
+            self.skipTest("PyTorch is not installed")
+
+        import pickle
+
+        from phase_mesh.model import PhaseModel
+
+        class _OpensMarkerWhenUnpickled:
+            def __init__(self, marker: Path) -> None:
+                self.marker = marker
+
+            def __reduce__(self):
+                return (open, (str(self.marker), "w"))
+
+        model = PhaseModel(
+            grid_size=16,
+            vocab_capacity=64,
+            basin_dim=8,
+            hidden=8,
+            backend="numpy",
+            create_decoder=True,
+        )
+        with TemporaryDirectory() as tmp:
+            model.save(tmp)
+            marker = Path(tmp) / "unpickled-code-ran"
+            torch.save(_OpensMarkerWhenUnpickled(marker), Path(tmp) / "decoder.pt")
+            with self.assertRaises(pickle.UnpicklingError):
+                PhaseModel.load(tmp)
+            self.assertFalse(marker.exists())
+
     def test_annealed_generate_smoke(self) -> None:
         try:
             import torch  # noqa: F401
